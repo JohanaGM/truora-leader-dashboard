@@ -1,0 +1,131 @@
+<div class="tip-generator">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">💡 Generador de Tips</h1>
+      <p class="page-subtitle">Crea tips inspiradores para tu equipo</p>
+    </div>
+  </div>
+
+  <div class="generator-container">
+    <!-- Input Section -->
+    <div class="input-section card">
+      <h3 class="section-title">Crea tu tip personalizado</h3>
+      
+      <div class="form-group">
+        <label class="form-label">Título del Tip *</label>
+        <input 
+          type="text"
+          [value]="title()"
+          (input)="title.set($any($event.target).value)"
+          placeholder="Ejemplo: TIP MANUAL, TIP DEL DÍA, CONSEJO..."
+          class="title-input"
+          [disabled]="isGenerating() || isSending()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Contenido del Tip *</label>
+        <textarea 
+          [value]="topic()"
+          (input)="topic.set($any($event.target).value)"
+          placeholder="Ejemplo: La importancia de la comunicación efectiva en equipos remotos..."
+          class="topic-input"
+          rows="4"
+          [disabled]="isGenerating() || isSending()"
+        ></textarea>
+      </div>
+
+      <div class="action-buttons">
+        <button 
+          class="btn-generate"
+          (click)="generateTip()"
+          [disabled]="!canGenerate"
+        >
+          @if (isGenerating()) {
+            <span class="spinner"></span>
+            <span>Generando...</span>
+          } @else {
+            <span>✨ Generar Tip</span>
+          }
+        </button>
+
+        @if (generatedImage()) {
+          <button 
+            class="btn-reset"
+            (click)="reset()"
+            [disabled]="isSending()"
+          >
+            🔄 Nuevo Tip
+          </button>
+        }
+      </div>
+
+      @if (errorMessage()) {
+        <div class="alert alert-error">
+          ❌ {{ errorMessage() }}
+        </div>
+      }
+
+      @if (showSuccess()) {
+        <div class="alert alert-success">
+          ✅ ¡Tip enviado exitosamente a Telegram!
+        </div>
+      }
+    </div>
+
+    <!-- Preview Section -->
+    @if (generatedImage() || isGenerating()) {
+      <div class="preview-section card">
+        <h3 class="section-title">Vista Previa</h3>
+        
+        @if (isGenerating()) {
+          <div class="loading-preview">
+            <div class="loading-spinner"></div>
+            <p>Generando tu tip...</p>
+          </div>
+        } @else {
+          <div class="image-preview">
+            <img [src]="generatedImage()" alt="Tip generado" />
+          </div>
+
+          <button 
+            class="btn-send"
+            (click)="sendToTelegram()"
+            [disabled]="!canSend"
+          >
+            @if (isSending()) {
+              <span class="spinner"></span>
+              <span>Enviando...</span>
+            } @else {
+              <span>📤 Enviar a Telegram</span>
+            }
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Tips History -->
+  <div class="tips-history card">
+    <h3 class="section-title">💡 Consejos para crear tips efectivos</h3>
+    
+    <div class="tips-list">
+      <div class="tip-item">
+        <span class="tip-icon">✓</span>
+        <p>Sé claro y conciso en tu mensaje</p>
+      </div>
+      <div class="tip-item">
+        <span class="tip-icon">✓</span>
+        <p>Usa un lenguaje positivo y motivador</p>
+      </div>
+      <div class="tip-item">
+        <span class="tip-icon">✓</span>
+        <p>Relaciona el tip con situaciones cotidianas</p>
+      </div>
+      <div class="tip-item">
+        <span class="tip-icon">✓</span>
+        <p>Agrega valor práctico al contenido</p>
+      </div>
+    </div>
+  </div>
+</div>

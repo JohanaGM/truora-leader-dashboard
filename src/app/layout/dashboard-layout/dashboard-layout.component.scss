@@ -1,0 +1,30 @@
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f7fafc;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 280px;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease;
+}
+
+.content-area {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 70px;
+  }
+
+  .content-area {
+    padding: 1rem;
+  }
+}

@@ -1,0 +1,19 @@
+<header class="header">
+  <div class="header-content">
+    <div class="header-left">
+      <h2 class="greeting">{{ greeting }}, {{ currentUser()?.name || 'Usuario' }}! 👋</h2>
+      <p class="date">{{ currentDate | date:'EEEE, d MMMM yyyy':'':'es-ES' }}</p>
+    </div>
+    
+    <div class="header-right">
+      <button class="icon-button notification-button">
+        <span class="icon">🔔</span>
+        <span class="badge">3</span>
+      </button>
+      
+      <button class="icon-button settings-button">
+        <span class="icon">⚙️</span>
+      </button>
+    </div>
+  </div>
+</header>

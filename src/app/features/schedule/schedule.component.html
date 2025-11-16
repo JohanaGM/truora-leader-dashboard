@@ -1,0 +1,201 @@
+<div class="schedule">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">📅 Cronograma de Actividades</h1>
+      <p class="page-subtitle">Gestiona tus eventos y reuniones</p>
+    </div>
+    <button class="btn-primary" (click)="openModal()">
+      ➕ Nueva Actividad
+    </button>
+  </div>
+
+  <!-- Today's Activities -->
+  <div class="section">
+    <h2 class="section-title">Actividades de Hoy</h2>
+    
+    @if (todayActivities.length === 0) {
+      <div class="empty-state">
+        <span class="empty-icon">📭</span>
+        <p>No tienes actividades programadas para hoy</p>
+      </div>
+    } @else {
+      <div class="activities-grid">
+        @for (activity of todayActivities; track activity.id) {
+          <div class="activity-card" [style.border-left-color]="activity.color">
+            <div class="activity-header">
+              <div class="activity-time">
+                <span class="time">{{ activity.startTime }} - {{ activity.endTime }}</span>
+              </div>
+              <div class="activity-actions">
+                <button class="btn-icon" (click)="openModal(activity)">✏️</button>
+                <button class="btn-icon" (click)="deleteActivity(activity.id)">🗑️</button>
+              </div>
+            </div>
+            
+            <h3 class="activity-title">{{ activity.title }}</h3>
+            
+            @if (activity.description) {
+              <p class="activity-description">{{ activity.description }}</p>
+            }
+            
+            <div class="activity-footer">
+              <select 
+                [value]="activity.status" 
+                (change)="updateStatus(activity.id, $any($event.target).value)"
+                class="status-select"
+                [class]="activity.status"
+              >
+                <option value="pending">Pendiente</option>
+                <option value="in-progress">En Progreso</option>
+                <option value="completed">Completada</option>
+                <option value="cancelled">Cancelada</option>
+              </select>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Upcoming Activities -->
+  <div class="section">
+    <h2 class="section-title">Próximas Actividades</h2>
+    
+    @if (upcomingActivities.length === 0) {
+      <div class="empty-state">
+        <span class="empty-icon">📅</span>
+        <p>No tienes actividades próximas programadas</p>
+      </div>
+    } @else {
+      <div class="activities-list">
+        @for (activity of upcomingActivities; track activity.id) {
+          <div class="activity-item">
+            <div class="activity-indicator" [style.background-color]="activity.color"></div>
+            <div class="activity-info">
+              <h4 class="item-title">{{ activity.title }}</h4>
+              <div class="item-meta">
+                <span class="item-date">{{ activity.date | date:'dd/MM/yyyy' }}</span>
+                <span class="item-time">{{ activity.startTime }} - {{ activity.endTime }}</span>
+                <span class="item-status" [class]="activity.status">
+                  {{ getStatusLabel(activity.status) }}
+                </span>
+              </div>
+            </div>
+            <div class="activity-actions">
+              <button class="btn-icon" (click)="openModal(activity)">✏️</button>
+              <button class="btn-icon" (click)="deleteActivity(activity.id)">🗑️</button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Modal -->
+@if (showModal()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ editingActivity() ? 'Editar Actividad' : 'Nueva Actividad' }}</h3>
+        <button class="btn-close" (click)="closeModal()">✕</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Título *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="formData().title"
+            (ngModelChange)="updateFormTitle($event)"
+            placeholder="Nombre de la actividad"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha *</label>
+            <input 
+              type="date" 
+              [(ngModel)]="formData().date"
+              (ngModelChange)="updateFormDate($event)"
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Hora Inicio *</label>
+            <input 
+              type="time" 
+              [(ngModel)]="formData().startTime"
+              (ngModelChange)="updateFormStartTime($event)"
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Hora Fin *</label>
+            <input 
+              type="time" 
+              [(ngModel)]="formData().endTime"
+              (ngModelChange)="updateFormEndTime($event)"
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea 
+            [(ngModel)]="formData().description"
+            (ngModelChange)="updateFormDescription($event)"
+            placeholder="Detalles de la actividad"
+            class="form-textarea"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Color</label>
+          <div class="color-picker">
+            @for (color of colors; track color) {
+              <button 
+                type="button"
+                class="color-option"
+                [class.active]="formData().color === color"
+                [style.background-color]="color"
+                (click)="updateFormColor(color)"
+              ></button>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Estado</label>
+          <select 
+            [(ngModel)]="formData().status"
+            (ngModelChange)="updateFormActivityStatus($event)"
+            class="form-select"
+          >
+            <option value="pending">Pendiente</option>
+            <option value="in-progress">En Progreso</option>
+            <option value="completed">Completada</option>
+            <option value="cancelled">Cancelada</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button 
+          class="btn-primary" 
+          (click)="saveActivity()"
+          [disabled]="!formData().title"
+        >
+          {{ editingActivity() ? 'Guardar Cambios' : 'Crear Actividad' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

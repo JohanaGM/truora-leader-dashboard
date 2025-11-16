@@ -1,0 +1,202 @@
+<div class="tasks">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">✅ Tareas de la Semana</h1>
+      <p class="page-subtitle">Organiza y da seguimiento a tus tareas</p>
+    </div>
+    <button class="btn-primary" (click)="openSidePanel()">
+      ➕ Nueva Tarea
+    </button>
+  </div>
+
+  <!-- Stats Summary -->
+  <div class="stats-summary">
+    <div class="stat-item pending">
+      <span class="stat-number">{{ pendingTasks() }}</span>
+      <span class="stat-label">Pendientes</span>
+    </div>
+    <div class="stat-item in-progress">
+      <span class="stat-number">{{ inProgressTasks() }}</span>
+      <span class="stat-label">En Progreso</span>
+    </div>
+    <div class="stat-item completed">
+      <span class="stat-number">{{ completedTasks() }}</span>
+      <span class="stat-label">Completadas</span>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <div class="filter-group">
+      <label>Estado:</label>
+      <select 
+        [value]="filterStatus()" 
+        (change)="filterStatus.set($any($event.target).value)"
+        class="filter-select"
+      >
+        <option value="all">Todos</option>
+        <option value="pending">Pendientes</option>
+        <option value="in-progress">En Progreso</option>
+        <option value="completed">Completadas</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Prioridad:</label>
+      <select 
+        [value]="filterPriority()" 
+        (change)="filterPriority.set($any($event.target).value)"
+        class="filter-select"
+      >
+        <option value="all">Todas</option>
+        <option value="high">Alta</option>
+        <option value="medium">Media</option>
+        <option value="low">Baja</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Tasks List -->
+  @if (filteredTasks().length === 0) {
+    <div class="empty-state">
+      <span class="empty-icon">📝</span>
+      <p>No hay tareas que coincidan con los filtros</p>
+    </div>
+  } @else {
+    <div class="tasks-grid">
+      @for (task of filteredTasks(); track task.id) {
+        <div class="task-card" [class]="task.status">
+          <div class="task-header">
+            <div class="task-priority" [class]="getPriorityClass(task.priority)">
+              {{ getPriorityLabel(task.priority) }}
+            </div>
+            <div class="task-actions">
+              <button class="btn-icon" (click)="openSidePanel(task)">✏️</button>
+              <button class="btn-icon" (click)="deleteTask(task.id)">🗑️</button>
+            </div>
+          </div>
+
+          <h3 class="task-title">{{ task.title }}</h3>
+          <p class="task-description">{{ task.description }}</p>
+
+          <div class="task-footer">
+            <div class="task-meta">
+              <span class="task-date">📅 {{ task.dueDate | date:'dd/MM/yyyy' }}</span>
+            </div>
+            
+            <select 
+              [value]="task.status" 
+              (change)="updateStatus(task.id, $any($event.target).value)"
+              class="status-badge"
+              [class]="task.status"
+            >
+              <option value="pending">Pendiente</option>
+              <option value="in-progress">En Progreso</option>
+              <option value="completed">Completada</option>
+            </select>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Side Panel -->
+@if (showSidePanel()) {
+  <div class="side-panel-overlay" (click)="closeSidePanel()">
+    <div class="side-panel" (click)="$event.stopPropagation()">
+      <div class="panel-header">
+        <h3>{{ editingTask() ? 'Editar Tarea' : 'Nueva Tarea' }}</h3>
+        <button class="btn-close" (click)="closeSidePanel()">✕</button>
+      </div>
+
+      <div class="panel-body">
+        <div class="form-group">
+          <label>Título *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="formData().title"
+            (ngModelChange)="updateTitle($event)"
+            placeholder="Nombre de la tarea"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Descripción *</label>
+          <textarea 
+            [(ngModel)]="formData().description"
+            (ngModelChange)="updateDescription($event)"
+            placeholder="Detalles de la tarea"
+            class="form-textarea"
+            rows="4"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Prioridad *</label>
+          <div class="priority-buttons">
+            <button 
+              type="button"
+              class="priority-btn low"
+              [class.active]="formData().priority === 'low'"
+              (click)="updatePriority('low')"
+            >
+              Baja
+            </button>
+            <button 
+              type="button"
+              class="priority-btn medium"
+              [class.active]="formData().priority === 'medium'"
+              (click)="updatePriority('medium')"
+            >
+              Media
+            </button>
+            <button 
+              type="button"
+              class="priority-btn high"
+              [class.active]="formData().priority === 'high'"
+              (click)="updatePriority('high')"
+            >
+              Alta
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Fecha de vencimiento *</label>
+          <input 
+            type="date" 
+            [(ngModel)]="formData().dueDate"
+            (ngModelChange)="updateDueDate($event)"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Estado *</label>
+          <select 
+            [(ngModel)]="formData().status"
+            (ngModelChange)="updateFormStatus($event)"
+            class="form-select"
+          >
+            <option value="pending">Pendiente</option>
+            <option value="in-progress">En Progreso</option>
+            <option value="completed">Completada</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        <button class="btn-secondary" (click)="closeSidePanel()">Cancelar</button>
+        <button 
+          class="btn-primary" 
+          (click)="saveTask()"
+          [disabled]="!formData().title || !formData().description"
+        >
+          {{ editingTask() ? 'Guardar Cambios' : 'Crear Tarea' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

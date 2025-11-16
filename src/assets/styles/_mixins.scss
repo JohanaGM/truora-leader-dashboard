@@ -1,0 +1,126 @@
+// Mixins útiles para el proyecto
+
+// Flexbox center
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Flex between
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// Transición suave
+@mixin smooth-transition($property: all, $duration: 0.2s) {
+  transition: $property $duration ease;
+}
+
+// Hover elevado
+@mixin hover-elevate($translateY: -4px, $shadow: 0 8px 24px rgba(0, 0, 0, 0.12)) {
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateY($translateY);
+    box-shadow: $shadow;
+  }
+}
+
+// Card base
+@mixin card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+}
+
+// Botón base
+@mixin button-base {
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0.875rem 1.5rem;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Gradiente primario
+@mixin gradient-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+// Truncate text
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Line clamp
+@mixin line-clamp($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// Scrollbar personalizado
+@mixin custom-scrollbar($width: 8px, $track-bg: #f7fafc, $thumb-bg: #cbd5e0) {
+  &::-webkit-scrollbar {
+    width: $width;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $track-bg;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $thumb-bg;
+    border-radius: $width / 2;
+
+    &:hover {
+      background: darken($thumb-bg, 10%);
+    }
+  }
+}
+
+// Media queries
+@mixin mobile {
+  @media (max-width: 768px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: 769px) and (max-width: 1024px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: 1025px) {
+    @content;
+  }
+}
+
+// Focus visible
+@mixin focus-visible {
+  &:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+  }
+}

@@ -1,0 +1,12 @@
+<div class="image-text-wrapper" [style.width]="width" [style.height]="height">
+  <img 
+    [src]="src" 
+    [alt]="alt"
+    class="wrapper-image"
+  />
+  @if (text) {
+    <div class="text-overlay" [style.font-size]="textSize">
+      {{ text }}
+    </div>
+  }
+</div>

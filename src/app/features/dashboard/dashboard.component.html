@@ -1,0 +1,83 @@
+<div class="dashboard">
+  <div class="welcome-section">
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Resumen de tus actividades y tareas</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    @for (stat of stats; track stat.label) {
+      <div class="stat-card" [style.border-left-color]="stat.color">
+        <div class="stat-icon">{{ stat.icon }}</div>
+        <div class="stat-content">
+          <p class="stat-label">{{ stat.label }}</p>
+          <div class="stat-value-row">
+            <h3 class="stat-value">{{ stat.value }}</h3>
+            <span class="stat-trend" [class.positive]="stat.trend.includes('+')">
+              {{ stat.trend }}
+            </span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="content-grid">
+    <!-- Recent Activities -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Actividades de Hoy</h3>
+        <button class="btn-link">Ver todas →</button>
+      </div>
+      <div class="card-body">
+        <div class="activities-list">
+          @for (activity of recentActivities; track activity.title) {
+            <div class="activity-item">
+              <div class="activity-indicator" [style.background-color]="activity.color"></div>
+              <div class="activity-content">
+                <p class="activity-title">{{ activity.title }}</p>
+                <span class="activity-time">{{ activity.time }}</span>
+              </div>
+              <span class="activity-status" [class]="activity.status">
+                {{ activity.status === 'completed' ? '✓' : '○' }}
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Acciones Rápidas</h3>
+      </div>
+      <div class="card-body">
+        <div class="quick-actions">
+          @for (action of quickActions; track action.label) {
+            <button class="action-button" [style.background]="action.color">
+              <span class="action-icon">{{ action.icon }}</span>
+              <span class="action-label">{{ action.label }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tips Section -->
+  <div class="card tips-card">
+    <div class="card-header">
+      <h3 class="card-title">💡 Tip del Día</h3>
+    </div>
+    <div class="card-body">
+      <div class="tip-content">
+        <p class="tip-text">
+          "Recuerda celebrar los pequeños logros de tu equipo. El reconocimiento oportuno 
+          motiva y fortalece la cultura de excelencia."
+        </p>
+        <button class="btn-primary">Generar Nuevo Tip</button>
+      </div>
+    </div>
+  </div>
+</div>

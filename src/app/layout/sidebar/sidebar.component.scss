@@ -1,0 +1,240 @@
+.sidebar {
+  width: 280px;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+  }
+}
+
+.sidebar-header {
+  padding: 2rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+
+    .logo-icon {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: 2px;
+    }
+  }
+
+  .logo-subtitle {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    padding-left: 3rem;
+  }
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1.5rem 0;
+
+  .nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .nav-item {
+    margin-bottom: 0.5rem;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: #FFD93D;
+      transform: scaleY(0);
+      transition: transform 0.2s ease;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      transform: translateX(5px);
+
+      .nav-icon {
+        transform: scale(1.2);
+      }
+    }
+
+    &.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      font-weight: 600;
+
+      &::before {
+        transform: scaleY(1);
+      }
+
+      .nav-icon {
+        filter: drop-shadow(0 0 8px rgba(255, 217, 61, 0.8));
+      }
+    }
+
+    .nav-icon {
+      font-size: 1.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .nav-label {
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+    }
+  }
+}
+
+.sidebar-footer {
+  padding: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FFD93D 0%, #FF6B9D 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .user-info {
+      flex: 1;
+
+      .user-name {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #ffffff;
+      }
+
+      .user-role {
+        margin: 0;
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.7);
+        text-transform: capitalize;
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .sidebar {
+    width: 70px;
+
+    .sidebar-header {
+      .logo {
+        justify-content: center;
+        
+        .logo-text {
+          display: none;
+        }
+      }
+
+      .logo-subtitle {
+        display: none;
+      }
+    }
+
+    .nav-link {
+      justify-content: center;
+      padding: 1rem;
+
+      .nav-label {
+        display: none;
+      }
+    }
+
+    .sidebar-footer {
+      .user-profile {
+        flex-direction: column;
+        padding: 0.75rem;
+
+        .user-info {
+          display: none;
+        }
+      }
+    }
+  }
+}
