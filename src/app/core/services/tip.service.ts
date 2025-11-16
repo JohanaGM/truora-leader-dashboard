@@ -150,19 +150,43 @@ export class TipService {
   }
 
   sendToTelegram(tip: Tip): Observable<any> {
-    const payload: TipTelegramPayload = {
-      image: tip.imageData,
+    if (!environment.n8nWebhookUrl) {
+      // Simular envío exitoso en desarrollo
+      return of({ success: true, message: 'Tip enviado a Telegram (modo demo)' }).pipe(delay(1000));
+    }
+
+    // Quitar el prefijo 'data:image/png;base64,' del base64
+    const base64Data = tip.imageData.split(',')[1] || tip.imageData;
+
+    // Enviar datos como JSON con imagen en base64 limpio
+    const payload = {
+      image: base64Data,
+      title: tip.title,
       topic: tip.topic,
       leaderName: tip.leaderName,
       timestamp: tip.createdAt.toISOString()
     };
 
-    if (environment.n8nWebhookUrl) {
-      return this.http.post(environment.n8nWebhookUrl, payload);
-    } else {
-      // Simular envío exitoso en desarrollo
-      return of({ success: true, message: 'Tip enviado a Telegram (modo demo)' }).pipe(delay(1000));
+    return this.http.post(environment.n8nWebhookUrl, payload);
+  }
+
+  private base64ToBlob(base64: string, contentType: string = ''): Blob {
+    const byteCharacters = atob(base64);
+    const byteArrays = [];
+
+    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+      const slice = byteCharacters.slice(offset, offset + 512);
+      const byteNumbers = new Array(slice.length);
+      
+      for (let i = 0; i < slice.length; i++) {
+        byteNumbers[i] = slice.charCodeAt(i);
+      }
+      
+      const byteArray = new Uint8Array(byteNumbers);
+      byteArrays.push(byteArray);
     }
+
+    return new Blob(byteArrays, { type: contentType });
   }
 
   saveTip(tip: Tip): void {
