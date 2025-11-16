@@ -1,19 +1,23 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TipService } from '../../core/services/tip.service';
 import { AuthService } from '../../core/services/auth.service';
+import { ImageTextWrapperComponent } from '../../shared/components';
+import html2canvas from 'html2canvas';
 
 @Component({
   selector: 'app-tip-generator',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImageTextWrapperComponent],
   templateUrl: './tip-generator.component.html',
   styleUrl: './tip-generator.component.scss'
 })
 export class TipGeneratorComponent {
   private tipService = inject(TipService);
-  private authService = inject(AuthService);
+  authService = inject(AuthService);
+  
+  @ViewChild('tipCanvas', { static: false }) tipCanvas!: ElementRef<HTMLDivElement>;
   
   title = signal('');
   topic = signal('');
@@ -31,30 +35,41 @@ export class TipGeneratorComponent {
     return this.generatedImage() !== null && !this.isSending();
   }
 
-  generateTip() {
+  get currentDate(): string {
+    return new Date().toLocaleDateString('es-ES');
+  }
+
+  get leaderName(): string {
+    return this.authService.currentUser()?.name || 'Líder de Identidad';
+  }
+
+  async generateTip() {
     if (!this.canGenerate) return;
 
     this.isGenerating.set(true);
     this.errorMessage.set(null);
     this.generatedImage.set(null);
 
-    const currentUser = this.authService.currentUser();
-    const leaderName = currentUser?.name || 'Líder de Identidad';
+    try {
+      // Esperar un ciclo de renderizado para que Angular actualice el DOM
+      await new Promise(resolve => setTimeout(resolve, 100));
 
-    this.tipService.generateTipImage({
-      title: this.title(),
-      topic: this.topic(),
-      leaderName: leaderName
-    }).subscribe({
-      next: (imageData) => {
-        this.generatedImage.set(imageData);
-        this.isGenerating.set(false);
-      },
-      error: (error) => {
-        this.errorMessage.set('Error al generar el tip. Intenta nuevamente.');
-        this.isGenerating.set(false);
-      }
-    });
+      const canvas = await html2canvas(this.tipCanvas.nativeElement, {
+        backgroundColor: '#6B46C1',
+        scale: 2,
+        logging: false,
+        useCORS: true,
+        allowTaint: true
+      });
+
+      const imageData = canvas.toDataURL('image/png');
+      this.generatedImage.set(imageData);
+      this.isGenerating.set(false);
+    } catch (error) {
+      console.error('Error generating tip:', error);
+      this.errorMessage.set('Error al generar el tip. Intenta nuevamente.');
+      this.isGenerating.set(false);
+    }
   }
 
   sendToTelegram() {

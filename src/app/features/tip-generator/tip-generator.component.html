@@ -103,6 +103,33 @@
         }
       </div>
     }
+
+    <!-- Hidden Canvas Template -->
+    <div #tipCanvas class="tip-canvas-template" [class.visible]="isGenerating()">
+      <div class="tip-canvas-content">
+        <!-- Bombillo en la esquina superior izquierda -->
+        <img src="assets/images/bombilloTip.png" alt="Bombillo" class="bombillo-icon" />
+        
+        <!-- Imagen del óvalo con TIP fijo -->
+        <div class="title-wrapper">
+          <img src="assets/images/tipTitle.png" alt="Title Background" class="title-bg" />
+        </div>
+
+        <!-- Subtítulo dinámico del usuario -->
+        <div class="subtitle-text">{{ title().toUpperCase() }}</div>
+
+        <!-- Contenido del tip -->
+        <div class="tip-content">
+          <p class="tip-text">{{ topic() }}</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-section">
+          <img src="assets/images/footer.png" alt="Footer" class="footer-img" />
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <!-- Tips History -->
