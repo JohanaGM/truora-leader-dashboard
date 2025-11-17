@@ -331,24 +331,24 @@
 
     .bombillo-icon {
       position: absolute;
-      top: 20px;
-      left: 30px;
-      width: 190px;
+      top: 0px;
+      left: 5px;
+      width: 200px;
       height: 200px;
     }
 
     .title-wrapper {
       position: absolute;
-      top: 30px;
+      top: 0px;
       right: 60px;
       width: 480px;
       height: 150px;
       overflow: hidden;
 
       .title-bg {
+        top: 0px;
         width: 85%;
         height: 100%;
-        display: block;
         object-fit: cover;
       }
 
@@ -368,7 +368,7 @@
 
     .subtitle-text {
       position: absolute;
-      top: 205px;
+      top: 150px;
       left: 50%;
       transform: translateX(-50%);
       color: #FFFFFF;
@@ -376,8 +376,8 @@
       font-size: 24px;
       font-weight: 700;
       text-align: center;
-      width: 80%;
-      white-space: nowrap;
+      width: 60%;
+      word-wrap: break-word;
       overflow: hidden;
       text-overflow: ellipsis;
       text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
@@ -385,17 +385,20 @@
 
     .tip-content {
       position: absolute;
-      top: 280px;
-      left: 50px;
-      right: 50px;
-      max-width: 700px;
+      top: 220px;
+      left: 25px;
+      height: 315px;
+      overflow: auto;
+      right: 25px;
+      max-width: 1500px;
+      white-space: normal;
 
       .tip-text {
         color: #FFFFFF;
         font-family: 'Montserrat', sans-serif;
         font-size: 26px;
         font-weight: 700;
-        line-height: 1.6;
+        line-height: 1.5;
         margin: 0;
         word-wrap: break-word;
       }
