@@ -68,15 +68,47 @@
   <!-- Tips Section -->
   <div class="card tips-card">
     <div class="card-header">
-      <h3 class="card-title">💡 Tip del Día</h3>
+      <h3 class="card-title">💡 Recordatorios</h3>
     </div>
     <div class="card-body">
       <div class="tip-content">
-        <p class="tip-text">
-          "Recuerda celebrar los pequeños logros de tu equipo. El reconocimiento oportuno 
-          motiva y fortalece la cultura de excelencia."
-        </p>
-        <button class="btn-primary">Generar Nuevo Tip</button>
+        <div class="reminder-form">
+          <div class="form-group">
+            <textarea 
+              [value]="reminder()"
+              (input)="reminder.set($any($event.target).value)"
+              placeholder="Agrega una frase inspiradora o un recordatorio importante…"
+              class="reminder-input"
+              rows="3"
+              [disabled]="isSending()"
+            ></textarea>
+          </div>
+
+          @if (showSuccess()) {
+            <div class="alert alert-success">
+              ✓ Recordatorio enviado exitosamente a Telegram
+            </div>
+          }
+
+          @if (errorMessage()) {
+            <div class="alert alert-error">
+              {{ errorMessage() }}
+            </div>
+          }
+
+          <button 
+            class="btn-primary btn-send-reminder"
+            (click)="sendReminder()"
+            [disabled]="!canSend"
+          >
+            @if (isSending()) {
+              <span class="spinner"></span>
+              <span>Enviando...</span>
+            } @else {
+              <span>📤 Enviar a Telegram</span>
+            }
+          </button>
+        </div>
       </div>
     </div>
   </div>

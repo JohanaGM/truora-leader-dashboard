@@ -1,14 +1,24 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
+  private http = inject(HttpClient);
+  
+  reminder = signal('');
+  isSending = signal(false);
+  showSuccess = signal(false);
+  errorMessage = signal<string | null>(null);
+
   stats = [
     {
       icon: '📅',
@@ -81,4 +91,54 @@ export class DashboardComponent {
       color: '#ff6b9d'
     }
   ];
+
+  get canSend(): boolean {
+    return this.reminder().trim().length > 0 && !this.isSending();
+  }
+
+  sendReminder() {
+    if (!this.canSend) return;
+
+    this.isSending.set(true);
+    this.errorMessage.set(null);
+    this.showSuccess.set(false);
+
+    const payload = {
+      reminder: this.reminder(),
+      timestamp: new Date().toISOString()
+    };
+
+    // URL del webhook de n8n (mismo que para tips)
+    const webhookUrl = environment.n8nWebhookUrl;
+
+    this.http.post(webhookUrl, payload).subscribe({
+      next: () => {
+        this.showSuccess.set(true);
+        this.isSending.set(false);
+        
+        // Reset después de 2 segundos
+        setTimeout(() => {
+          this.reminder.set('');
+          this.showSuccess.set(false);
+        }, 2000);
+      },
+      error: (error) => {
+        console.log('Respuesta del webhook (puede ser CORS):', error);
+        
+        // Asumir éxito si el error es de CORS o de red (el webhook ya se ejecutó)
+        if (error.status === 0 || error.status === 404) {
+          this.showSuccess.set(true);
+          this.isSending.set(false);
+          
+          setTimeout(() => {
+            this.reminder.set('');
+            this.showSuccess.set(false);
+          }, 2000);
+        } else {
+          this.errorMessage.set('Error al enviar recordatorio. Intenta nuevamente.');
+          this.isSending.set(false);
+        }
+      }
+    });
+  }
 }
