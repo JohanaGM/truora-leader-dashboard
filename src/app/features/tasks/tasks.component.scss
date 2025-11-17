@@ -28,18 +28,25 @@
   .btn-primary {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: #ffffff;
-    border: none;
+    border: 4px solid transparent;
+    background-image: 
+      linear-gradient(135deg, #667eea 0%, #764ba2 100%),
+      linear-gradient(90deg, #667eea, #764ba2, #ff6b9d, #667eea);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    background-size: 100%, 400% 100%;
     padding: 0.875rem 1.5rem;
     border-radius: 12px;
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     white-space: nowrap;
+    animation: borderShift 4s linear infinite;
 
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
     }
   }
 }
@@ -501,5 +508,14 @@
     .panel-body {
       padding: 1.5rem;
     }
+  }
+}
+
+@keyframes borderShift {
+  0% {
+    background-position: 0% 0%, 0% 0%;
+  }
+  100% {
+    background-position: 0% 0%, 400% 0%;
   }
 }

@@ -41,18 +41,15 @@
     margin-bottom: 0.5rem;
 
     .logo-icon {
-      width: 60px;
-      height: 60px;
+      display: block;
+      margin: 0 auto;
+      width: 100px;
+      height: 100px;
       object-fit: contain;
-      animation: pulse 2s ease-in-out infinite;
+      animation: pulse 1s ease-in-out infinite;
     }
 
-    .logo-text {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin: 0;
-      letter-spacing: 2px;
-    }
+    
   }
 
   .logo-subtitle {
@@ -207,9 +204,7 @@
       .logo {
         justify-content: center;
         
-        .logo-text {
-          display: none;
-        }
+        
       }
 
       .logo-subtitle {
