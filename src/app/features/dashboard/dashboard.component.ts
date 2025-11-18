@@ -25,14 +25,14 @@ export class DashboardComponent {
       label: 'Actividades Hoy',
       value: '5',
       trend: '+2',
-      color: '#FF6B9D'
+      color: '#e689a8ff'
     },
     {
       icon: '✅',
       label: 'Tareas Completadas',
       value: '12',
       trend: '+4',
-      color: '#4ECDC4'
+      color: '#37d0ebff'
     },
     {
       icon: '⏰',
@@ -46,7 +46,7 @@ export class DashboardComponent {
       label: 'Tips Generados',
       value: '23',
       trend: '+3',
-      color: '#95E1D3'
+      color: '#db6df7ff'
     }
   ];
 
@@ -76,19 +76,19 @@ export class DashboardComponent {
       icon: '➕',
       label: 'Nueva Actividad',
       route: '/schedule',
-      color: '#667eea'
+      color: '#6373a7ff'
     },
     {
       icon: '✏️',
       label: 'Crear Tarea',
       route: '/tasks',
-      color: '#764ba2'
+      color: '#9471b9ff'
     },
     {
       icon: '💡',
       label: 'Generar Tip',
       route: '/tip-generator',
-      color: '#ff6b9d'
+      color: '#6eaad3ff'
     }
   ];
 

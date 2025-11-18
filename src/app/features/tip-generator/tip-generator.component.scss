@@ -114,10 +114,11 @@
     display: flex;
     gap: 1rem;
     margin-bottom: 1rem;
+    justify-content: center;
   }
 
   .btn-generate {
-    flex: 1;
+    
     background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%);
     color: #2d3748;
     border: 4px solid transparent;
@@ -127,7 +128,7 @@
     background-origin: border-box;
     background-clip: padding-box, border-box;
     background-size: 100%, 400% 100%;
-    padding: 1rem 2rem;
+    padding: 0.6rem 1.2rem;
     border-radius: 16px;
     font-weight: 600;
     font-size: 1rem;
@@ -152,11 +153,61 @@
     }
 
     &:hover:not(:disabled) {
+      all: unset;
+      width: auto;
+      font-size: 18px;
+      padding: 0.6rem 1.2rem;
+      background: hsl(0, 0%, 0%);
+      color: white;
+      text-transform: uppercase;
+      position: relative;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
       transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
-      background-image: 
-        linear-gradient(135deg, #ffffff 0%, #f5f7ff 100%),
-        linear-gradient(90deg, #667eea, #764ba2, #ff6b9d, #667eea);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+
+      > span,
+      .btn-text {
+        font-family: "Roboto", system-ui;
+        letter-spacing: 1px;
+        z-index: 10;
+        transition: 0.25s ease;
+        position: relative;
+        color: hsl(250, 66%, 61%);
+        background: none;
+        -webkit-text-fill-color: hsl(250, 66%, 61%);
+      }
+
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        inset: -2px;
+        background-color: inherit;
+        border-radius: inherit;
+        background-image: conic-gradient(
+          from var(--angle) at 50% 50%,
+          transparent 0%,
+          transparent 33%,
+          hsl(250, 66%, 61%) 50%,
+          transparent 66%
+        );
+        animation: rotate 4s linear infinite;
+      }
+
+      &::before {
+        filter: blur(15px);
+      }
+
+      &::after {
+        filter: blur(5px);
+      }
     }
 
     &:disabled {
@@ -255,7 +306,7 @@
   }
 
   .btn-send {
-    width: 100%;
+    width: auto;
     background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
     color: #ffffff;
     border: 4px solid transparent;
@@ -265,7 +316,7 @@
     background-origin: border-box;
     background-clip: padding-box, border-box;
     background-size: 100%, 400% 100%;
-    padding: 1rem 2rem;
+    padding: 0.3rem 0.6rem;
     border-radius: 12px;
     font-weight: 600;
     font-size: 1rem;
@@ -278,8 +329,58 @@
     animation: borderShift 4s linear infinite;
 
     &:hover:not(:disabled) {
+      all: unset;
+      width: auto;
+      font-size: 18px;
+      padding: 0.6rem 1.2rem;
+      background: hsl(0, 0%, 0%);
+      color: white;
+      text-transform: uppercase;
+      position: relative;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
       transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 8px 25px rgba(78, 205, 196, 0.6);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+
+      > span {
+        font-family: "Roboto", system-ui;
+        letter-spacing: 1px;
+        z-index: 10;
+        transition: 0.25s ease;
+        position: relative;
+        color: hsl(250, 66%, 61%);
+      }
+
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        inset: -2px;
+        background-color: inherit;
+        border-radius: inherit;
+        background-image: conic-gradient(
+          from var(--angle) at 50% 50%,
+          transparent 0%,
+          transparent 33%,
+          hsl(250, 66%, 61%) 50%,
+          transparent 66%
+        );
+        animation: rotate 4s linear infinite;
+      }
+
+      &::before {
+        filter: blur(15px);
+      }
+
+      &::after {
+        filter: blur(5px);
+      }
     }
 
     &:disabled {
@@ -529,6 +630,21 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes rotate {
+  0% {
+    --angle: 0deg;
+  }
+  100% {
+    --angle: 360deg;
+  }
+}
+
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
 }
 
 // Responsive

@@ -213,8 +213,6 @@
     position: relative;
     overflow: hidden;
 
-    // El background viene del [style.background] en el HTML
-    // Creamos el efecto de borde animado con ::before
     &::before {
       content: '';
       position: absolute;
@@ -327,7 +325,89 @@
       }
 
       .btn-send-reminder {
-        width: 100%;
+        width: auto;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #ffffff;
+        border: 4px solid transparent;
+        background-image: 
+          linear-gradient(135deg, #667eea 0%, #764ba2 100%),
+          linear-gradient(90deg, #667eea, #764ba2, #ff6b9d, #667eea);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+        background-size: 100%, 400% 100%;
+        padding: 0.35rem 0.75rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        animation: borderShift 4s linear infinite;
+        display: block;
+        text-align: center;
+
+        &:hover:not(:disabled) {
+          all: unset;
+          width: auto;
+          font-size: 18px;
+          padding: 0.6rem 1.2rem;
+          background: hsl(0, 0%, 0%);
+          color: white;
+          text-transform: uppercase;
+          position: relative;
+          border-radius: 100px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+          display: block;
+          text-align: center;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+
+          > span {
+            font-family: "Roboto", system-ui;
+            letter-spacing: 1px;
+            z-index: 10;
+            transition: 0.25s ease;
+            position: relative;
+            color: hsl(250, 66%, 61%);
+          }
+
+          &::before,
+          &::after {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            background-color: inherit;
+            border-radius: inherit;
+            background-image: conic-gradient(
+              from var(--angle) at 50% 50%,
+              transparent 0%,
+              transparent 33%,
+              hsl(250, 66%, 61%) 50%,
+              transparent 66%
+            );
+            animation: rotate 4s linear infinite;
+          }
+
+          &::before {
+            filter: blur(15px);
+          }
+
+          &::after {
+            filter: blur(5px);
+          }
+        }
+
+        &:active:not(:disabled) {
+          transform: translateY(0);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none;
+        }
       }
     }
 
@@ -353,7 +433,8 @@
       background-origin: border-box;
       background-clip: padding-box, border-box;
       background-size: 100%, 400% 100%;
-      padding: 0.875rem 2rem;
+      margin-left: 0;
+      padding: 0.35rem 0.75rem;
       border-radius: 12px;
       font-weight: 600;
       font-size: 1rem;
@@ -422,6 +503,21 @@
   100% {
     background-position: 0% 0%, 400% 0%;
   }
+}
+
+@keyframes rotate {
+  0% {
+    --angle: 0deg;
+  }
+  100% {
+    --angle: 360deg;
+  }
+}
+
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
 }
 
 // Responsive
