@@ -1,0 +1,149 @@
+<div class="login-container">
+  <!-- Fondo animado galaxia -->
+  <div class="animated-background"></div>
+
+  <!-- Card de login -->
+  <div class="login-card">
+    <!-- Logo con animación pulse -->
+    <div class="login-header">
+      <div class="logo-wrapper">
+        <img 
+          src="assets/images/logoTruora.png" 
+          alt="Truora Logo" 
+          class="logo-animated"
+          width="120"
+          height="120"
+        >
+      </div>
+      <h1 class="app-title">Leader Dashboard</h1>
+      <p class="app-subtitle">Inicia sesión para continuar</p>
+    </div>
+
+    <!-- Formulario -->
+    <form class="login-form" (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <!-- Email Input -->
+      <div class="form-group">
+        <label for="email" class="form-label">
+          <span class="label-icon">✉️</span>
+          Correo Electrónico
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          class="form-input"
+          [(ngModel)]="email"
+          placeholder="tu.email@truora.com"
+          required
+          email
+          #emailInput="ngModel"
+          [class.input-error]="emailInput.invalid && emailInput.touched"
+        >
+        @if (emailInput.invalid && emailInput.touched) {
+          <span class="error-message">
+            @if (emailInput.errors?.['required']) {
+              El correo es requerido
+            }
+            @if (emailInput.errors?.['email']) {
+              Ingresa un correo válido
+            }
+          </span>
+        }
+      </div>
+
+      <!-- Password Input -->
+      <div class="form-group">
+        <label for="password" class="form-label">
+          <span class="label-icon">🔒</span>
+          Contraseña
+        </label>
+        <div class="password-wrapper">
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            id="password"
+            name="password"
+            class="form-input"
+            [(ngModel)]="password"
+            placeholder="••••••••"
+            required
+            minlength="6"
+            #passwordInput="ngModel"
+            [class.input-error]="passwordInput.invalid && passwordInput.touched"
+          >
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+          >
+            {{ showPassword() ? '👁️' : '👁️‍🗨️' }}
+          </button>
+        </div>
+        @if (passwordInput.invalid && passwordInput.touched) {
+          <span class="error-message">
+            @if (passwordInput.errors?.['required']) {
+              La contraseña es requerida
+            }
+            @if (passwordInput.errors?.['minlength']) {
+              Mínimo 6 caracteres
+            }
+          </span>
+        }
+      </div>
+
+      <!-- Remember me & Forgot password -->
+      <div class="form-options">
+        <label class="checkbox-wrapper">
+          <input
+            type="checkbox"
+            name="rememberMe"
+            [(ngModel)]="rememberMe"
+          >
+          <span class="checkbox-label">Recordarme</span>
+        </label>
+        <a href="#" class="forgot-password" (click)="onForgotPassword($event)">
+          ¿Olvidaste tu contraseña?
+        </a>
+      </div>
+
+      <!-- Error message -->
+      @if (errorMessage()) {
+        <div class="alert alert-error">
+          <span class="alert-icon">⚠️</span>
+          <span class="alert-text">{{ errorMessage() }}</span>
+        </div>
+      }
+
+      <!-- Submit button -->
+      <button
+        type="submit"
+        class="btn-login"
+        [disabled]="loginForm.invalid || isLoading()"
+      >
+        @if (isLoading()) {
+          <span class="spinner"></span>
+          <span>Iniciando sesión...</span>
+        } @else {
+          <span class="btn-icon">🚀</span>
+          <span>Iniciar Sesión</span>
+        }
+      </button>
+    </form>
+
+    <!-- Footer -->
+    <div class="login-footer">
+      <p class="footer-text">
+        <span class="footer-icon">🔒</span>
+        Conexión segura y encriptada
+      </p>
+      <p class="footer-copyright">
+        © 2025 Truora. Todos los derechos reservados.
+      </p>
+    </div>
+  </div>
+
+  <!-- Decorative elements -->
+  <div class="decorative-circle circle-1"></div>
+  <div class="decorative-circle circle-2"></div>
+  <div class="decorative-circle circle-3"></div>
+</div>
