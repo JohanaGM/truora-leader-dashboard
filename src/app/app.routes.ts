@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { DashboardLayoutComponent } from './layout/dashboard-layout/dashboard-layout.component';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -9,6 +10,7 @@ export const routes: Routes = [
   {
     path: '',
     component: DashboardLayoutComponent,
+    canActivate: [authGuard], // 🔒 Proteger todas las rutas del dashboard
     children: [
       {
         path: '',
@@ -35,6 +37,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'dashboard'
+    redirectTo: 'login' // Redirigir a login por defecto
   }
 ];

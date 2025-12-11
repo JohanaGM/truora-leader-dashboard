@@ -467,6 +467,19 @@
       height: 200px;
     }
 
+    .leader-name {
+      position: absolute;
+      bottom: 15px;
+      right: 20px;
+      color: #edf205;
+      font-size: 18px;
+      font-weight: 700;
+      opacity: 0.9;
+      text-align: right;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+      z-index: 10;
+    }
+
     .title-wrapper {
       position: absolute;
       top: 0px;

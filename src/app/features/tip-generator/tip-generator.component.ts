@@ -40,7 +40,7 @@ export class TipGeneratorComponent {
   }
 
   get leaderName(): string {
-    return this.authService.currentUser()?.name || 'Líder de Identidad';
+    return this.authService.getCurrentLeader()?.full_name || 'Líder de Identidad';
   }
 
   async generateTip() {
@@ -79,7 +79,7 @@ export class TipGeneratorComponent {
     this.errorMessage.set(null);
     this.showSuccess.set(false);
 
-    const currentUser = this.authService.currentUser();
+    const currentLeader = this.authService.getCurrentLeader();
     const tip = {
       id: `tip_${Date.now()}`,
       title: this.title(),
@@ -87,7 +87,7 @@ export class TipGeneratorComponent {
       imageData: this.generatedImage()!,
       createdAt: new Date(),
       sentToTelegram: true,
-      leaderName: currentUser?.name || 'Líder de Identidad'
+      leaderName: currentLeader?.full_name || 'Líder de Identidad'
     };
 
     this.tipService.sendToTelegram(tip).subscribe({

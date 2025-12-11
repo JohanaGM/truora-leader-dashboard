@@ -11,9 +11,9 @@ import { AuthService } from '../../core/services';
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
-  private authService = inject(AuthService);
+  authService = inject(AuthService);
   
-  currentUser = this.authService.currentUser;
+  currentLeader$ = this.authService.currentLeader$;
 
   menuItems = [
     {

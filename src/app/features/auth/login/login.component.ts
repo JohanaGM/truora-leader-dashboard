@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -11,17 +12,18 @@ import { Router } from '@angular/router';
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   // Form fields
   email = '';
   password = '';
   rememberMe = false;
 
-  // UI states (usando signals como en tu proyecto)
+  // UI states
   showPassword = signal(false);
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
-
-  constructor(private router: Router) {}
 
   /**
    * Toggle password visibility
@@ -33,36 +35,25 @@ export class LoginComponent {
   /**
    * Handle form submission
    */
-  onSubmit(): void {
-    // Reset error message
+  async onSubmit(): Promise<void> {
     this.errorMessage.set(null);
 
-    // Validate form
     if (!this.email || !this.password) {
       this.errorMessage.set('Por favor completa todos los campos');
       return;
     }
 
-    // Set loading state
     this.isLoading.set(true);
 
-    // TODO: Implementar lógica de autenticación con Supabase
-    // Por ahora, simulamos un login exitoso después de 1.5 segundos
-    setTimeout(() => {
-      // Simular autenticación exitosa
-      console.log('Login attempt:', {
-        email: this.email,
-        rememberMe: this.rememberMe
-      });
+    const result = await this.authService.login(this.email, this.password);
 
-      this.isLoading.set(false);
-      
-      // TODO: Aquí irá la lógica real con AuthService
-      // this.authService.login(this.email, this.password)
-      
-      // Redirigir al dashboard (temporalmente)
+    this.isLoading.set(false);
+
+    if (result.success) {
       this.router.navigate(['/dashboard']);
-    }, 1500);
+    } else {
+      this.errorMessage.set(result.error || 'Error al iniciar sesión');
+    }
   }
 
   /**
@@ -70,15 +61,7 @@ export class LoginComponent {
    */
   onForgotPassword(event: Event): void {
     event.preventDefault();
-    
-    // TODO: Implementar lógica de recuperación de contraseña
-    console.log('Forgot password clicked');
-    
-    // Mostrar mensaje temporal
-    this.errorMessage.set('Funcionalidad de recuperación en desarrollo');
-    
-    setTimeout(() => {
-      this.errorMessage.set(null);
-    }, 3000);
+    this.errorMessage.set('Contacta al administrador para recuperar tu contraseña');
+    setTimeout(() => this.errorMessage.set(null), 3000);
   }
 }

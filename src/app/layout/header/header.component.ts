@@ -10,9 +10,9 @@ import { AuthService } from '../../core/services';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  private authService = inject(AuthService);
+  authService = inject(AuthService);
   
-  currentUser = this.authService.currentUser;
+  currentLeader$ = this.authService.currentLeader$;
   currentDate = new Date();
 
   get greeting(): string {
@@ -20,5 +20,9 @@ export class HeaderComponent {
     if (hour < 12) return 'Buenos días';
     if (hour < 18) return 'Buenas tardes';
     return 'Buenas noches';
+  }
+
+  async onLogout(): Promise<void> {
+    await this.authService.logout();
   }
 }
