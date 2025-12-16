@@ -441,14 +441,13 @@
   position: fixed;
   left: -9999px;
   top: 0;
-  width: 800px;
-  height: 600px;
+  width: 1200px;
+  height: 1200px;
   background: #5e17eb;
   overflow: hidden;
   z-index: -1;
 
   &.visible {
-    // Temporalmente visible durante la generación
     opacity: 1;
   }
 
@@ -461,10 +460,12 @@
 
     .bombillo-icon {
       position: absolute;
-      top: 0px;
+      top: 5px;
       left: 5px;
-      width: 200px;
-      height: 200px;
+      width: 400px;
+      height: 390px;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
     }
 
     .leader-name {
@@ -482,10 +483,10 @@
 
     .title-wrapper {
       position: absolute;
-      top: 0px;
-      right: 60px;
-      width: 480px;
-      height: 150px;
+      top: 20px;
+      right: 200px;
+      width: 650px;
+      height: 250px;
       overflow: hidden;
 
       .title-bg {
@@ -493,69 +494,49 @@
         width: 85%;
         height: 100%;
         object-fit: cover;
-      }
-
-      .title-text {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: #FFFFFF;
-        font-size: 36px;
-        font-weight: bold;
-        text-align: center;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
-        line-height: 1;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
       }
     }
 
     .subtitle-text {
       position: absolute;
-      top: 150px;
-      left: 50%;
+      top: 280px;
+      left:50%;
       transform: translateX(-50%);
       color: #FFFFFF;
       font-family: 'Bowlby One', cursive;
-      font-size: 24px;
+      font-size: 45px;
       font-weight: 700;
       text-align: center;
-      width: 60%;
+      width: 65%;
       word-wrap: break-word;
       overflow: hidden;
       text-overflow: ellipsis;
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     }
 
     .tip-content {
       position: absolute;
-      top: 220px;
-      left: 25px;
-      height: 315px;
+      top: 450px;
+      left: 40px;
+      height: 700px;
       overflow: auto;
-      right: 25px;
+      right: 40px;
       max-width: 1500px;
       white-space: normal;
+      padding: 10px;
+      justify-content: center;
+      text-align: justify;
 
       .tip-text {
         color: #FFFFFF;
         font-family: 'Montserrat', sans-serif;
-        font-size: 26px;
+        font-size: 41px;
         font-weight: 700;
         line-height: 1.5;
         margin: 0;
         word-wrap: break-word;
-      }
-    }
-
-    .arrow-decoration {
-      position: absolute;
-      bottom: 80px;
-      left: 50px;
-
-      .arrow-img {
-        width: 80px;
-        height: auto;
-        display: block;
       }
     }
 
@@ -564,36 +545,12 @@
       bottom: 0;
       left: 0;
       .footer-img {
-        height: 60px;
+        height: 80px;
         width: auto;
         display: block;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
       }
-    }
-
-    .truora-logo {
-      position: absolute;
-      bottom: 50px;
-      left: 50px;
-      color: #FFFFFF;
-      font-size: 32px;
-      font-weight: bold;
-    }
-
-    .leader-signature {
-      position: absolute;
-      bottom: 140px;
-      left: 50px;
-      color: #E0E0E0;
-      font-size: 20px;
-      font-style: italic;
-    }
-
-    .tip-date {
-      position: absolute;
-      bottom: 110px;
-      left: 50px;
-      color: #E0E0E0;
-      font-size: 20px;
     }
   }
 }
