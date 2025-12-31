@@ -10,127 +10,124 @@
     <!-- Input Section -->
     <div class="input-section card">
       <h3 class="section-title">Crea tu tip personalizado</h3>
-      
+
       <div class="form-group">
         <label class="form-label">Título del Tip *</label>
-        <input 
-          type="text"
-          [value]="title()"
-          (input)="title.set($any($event.target).value)"
-          placeholder="Ejemplo: TIP MANUAL, TIP DEL DÍA, CONSEJO..."
-          class="title-input"
-          [disabled]="isGenerating() || isSending()"
-        />
+        <input type="text" [value]="title()" (input)="title.set($any($event.target).value)"
+          placeholder="Ejemplo: TIP MANUAL, TIP DEL DÍA, CONSEJO..." class="title-input"
+          [disabled]="isGenerating() || isSending()" />
       </div>
 
       <div class="form-group">
         <label class="form-label">Contenido del Tip *</label>
-        <textarea 
-          [value]="topic()"
-          (input)="topic.set($any($event.target).value)"
-          placeholder="Ejemplo: La importancia de la comunicación efectiva en equipos remotos..."
-          class="topic-input"
-          rows="4"
-          [disabled]="isGenerating() || isSending()"
-        ></textarea>
+        <textarea [value]="topic()" (input)="topic.set($any($event.target).value)"
+          placeholder="Ejemplo: La importancia de la comunicación efectiva en equipos remotos..." class="topic-input"
+          rows="4" [disabled]="isGenerating() || isSending()"></textarea>
+      </div>
+
+      <!-- Image Upload Section -->
+      <div class="form-group">
+        <label class="form-label">Imagen Decorativa (Opcional)</label>
+        <p class="form-hint">Tamaño máximo: 5MB</p>
+        
+        @if (!decorativeImage()) {
+          <label class="btn-upload-image">
+            <input type="file" accept="image/*" (change)="onImageSelected($event)" 
+              [disabled]="isGenerating() || isSending()" hidden #fileInput />
+            📷 Cargar Imagen
+          </label>
+        } @else {
+          <div class="image-preview-card">
+            <img [src]="decorativeImage()" alt="Imagen decorativa" />
+            <button type="button" class="btn-remove-image" (click)="removeImage()" 
+              [disabled]="isGenerating() || isSending()">
+              ✕
+            </button>
+          </div>
+        }
+        
+        @if (imageErrorMessage()) {
+          <div class="alert alert-error mt-2">
+            ❌ {{ imageErrorMessage() }}
+          </div>
+        }
       </div>
 
       <div class="action-buttons">
-        <button 
-          class="btn-generate"
-          (click)="generateTip()"
-          [disabled]="!canGenerate"
-        >
+        <button class="btn-generate" (click)="generateTip()" [disabled]="!canGenerate">
           @if (isGenerating()) {
-            <span class="spinner"></span>
-            <span class="btn-text">Generando...</span>
+          <span class="spinner"></span>
+          <span class="btn-text">Generando...</span>
           } @else {
-            <span class="btn-text">✨ Generar Tip</span>
+          <span class="btn-text">✨ Generar Tip</span>
           }
         </button>
 
         @if (generatedImage()) {
-          <button 
-            class="btn-reset"
-            (click)="reset()"
-            [disabled]="isSending()"
-          >
-            🔄 Nuevo Tip
-          </button>
+        <button class="btn-reset" (click)="reset()" [disabled]="isSending()">
+          🔄 Nuevo Tip
+        </button>
         }
       </div>
 
       @if (errorMessage()) {
-        <div class="alert alert-error">
-          ❌ {{ errorMessage() }}
-        </div>
+      <div class="alert alert-error">
+        ❌ {{ errorMessage() }}
+      </div>
       }
 
       @if (showSuccess()) {
-        <div class="alert alert-success">
-          ✅ ¡Tip enviado exitosamente a Telegram!
-        </div>
+      <div class="alert alert-success">
+        ✅ ¡Tip enviado exitosamente a Telegram!
+      </div>
       }
     </div>
 
     <!-- Preview Section -->
     @if (generatedImage() || isGenerating()) {
-      <div class="preview-section card">
-        <h3 class="section-title">Vista Previa</h3>
-        
-        @if (isGenerating()) {
-          <div class="loading-preview">
-            <div class="loading-spinner"></div>
-            <p>Generando tu tip...</p>
-          </div>
-        } @else {
-          <div class="image-preview">
-            <img [src]="generatedImage()" alt="Tip generado" />
-          </div>
+    <div class="preview-section card">
+      <h3 class="section-title">Vista Previa</h3>
 
-          <button 
-            class="btn-send"
-            (click)="sendToTelegram()"
-            [disabled]="!canSend"
-          >
-            @if (isSending()) {
-              <span class="spinner"></span>
-              <span>Enviando...</span>
-            } @else {
-              <span>📤 Enviar a Telegram</span>
-            }
-          </button>
-        }
+      @if (isGenerating()) {
+      <div class="loading-preview">
+        <div class="loading-spinner"></div>
+        <p>Generando tu tip...</p>
       </div>
+      } @else {
+      <div class="image-preview">
+        <img [src]="generatedImage()" alt="Tip generado" />
+      </div>
+
+      <button class="btn-send" (click)="sendToTelegram()" [disabled]="!canSend">
+        @if (isSending()) {
+        <span class="spinner"></span>
+        <span>Enviando...</span>
+        } @else {
+        <span>📤 Enviar a Telegram</span>
+        }
+      </button>
+      }
+    </div>
     }
 
     <!-- Hidden Canvas Template -->
     <div #tipCanvas class="tip-canvas-template" [class.visible]="isGenerating()">
       <div class="tip-canvas-content">
-        <!-- Bombillo en la esquina superior izquierda -->
-        <img src="assets/images/bombilloTip.png" alt="Bombillo" class="bombillo-icon" />
-        
-        <!-- Nombre del líder en la esquina superior derecha -->
-        <div class="leader-name">{{ leaderName }}</div>
-        
-        <!-- Imagen del óvalo con TIP fijo -->
-        <div class="title-wrapper">
-          <img src="assets/images/tipTitle.png" alt="Title Background" class="title-bg" />
-        </div>
-
         <!-- Subtítulo dinámico del usuario -->
-        <div class="subtitle-text">{{ title().toUpperCase() }}</div>
 
+        <div class="subtitle-text">{{ title().toUpperCase() }}</div>
         <!-- Contenido del tip -->
         <div class="tip-content">
+          <div class="small-box-spacer">
+            @if (decorativeImage()) {
+              <img [src]="decorativeImage()" alt="Decorativa" class="decorative-image" />
+            }
+          </div>
           <p class="tip-text">{{ topic() }}</p>
         </div>
 
-        <!-- Footer -->
-        <div class="footer-section">
-          <img src="assets/images/footer.png" alt="Footer" class="footer-img" />
-        </div>
-
+        <!-- Nombre del líder -->
+        <div class="leader-name">{{ leaderName }}</div>
       </div>
     </div>
   </div>
@@ -138,7 +135,7 @@
   <!-- Tips History -->
   <div class="tips-history card">
     <h3 class="section-title">💡 Consejos para crear tips efectivos</h3>
-    
+
     <div class="tips-list">
       <div class="tip-item">
         <span class="tip-icon">✓</span>

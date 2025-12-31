@@ -21,11 +21,13 @@ export class TipGeneratorComponent {
   
   title = signal('');
   topic = signal('');
+  decorativeImage = signal<string | null>(null);
   generatedImage = signal<string | null>(null);
   isGenerating = signal(false);
   isSending = signal(false);
   showSuccess = signal(false);
   errorMessage = signal<string | null>(null);
+  imageErrorMessage = signal<string | null>(null);
 
   get canGenerate(): boolean {
     return this.title().trim().length > 0 && this.topic().trim().length > 0 && !this.isGenerating();
@@ -51,15 +53,16 @@ export class TipGeneratorComponent {
     this.generatedImage.set(null);
 
     try {
-      // Esperar un ciclo de renderizado para que Angular actualice el DOM
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Esperar un ciclo de renderizado para que Angular actualice el DOM y las imágenes se carguen
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       const canvas = await html2canvas(this.tipCanvas.nativeElement, {
-        backgroundColor: '#6B46C1',
+        backgroundColor: null,
         scale: 2,
-        logging: false,
+        logging: true,
         useCORS: true,
-        allowTaint: true
+        allowTaint: true,
+        imageTimeout: 0
       });
 
       const imageData = canvas.toDataURL('image/png');
@@ -122,11 +125,47 @@ export class TipGeneratorComponent {
     });
   }
 
+  onImageSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    const maxSizeInMB = 5;
+    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+    // Validar tipo de archivo
+    if (!file.type.startsWith('image/')) {
+      this.imageErrorMessage.set('El archivo debe ser una imagen');
+      return;
+    }
+
+    // Validar peso
+    if (file.size > maxSizeInBytes) {
+      this.imageErrorMessage.set(`La imagen no debe superar ${maxSizeInMB}MB (tamaño: ${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+      return;
+    }
+
+    // Leer y convertir a base64
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.decorativeImage.set(e.target?.result as string);
+      this.imageErrorMessage.set(null);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeImage() {
+    this.decorativeImage.set(null);
+    this.imageErrorMessage.set(null);
+  }
+
   reset() {
     this.title.set('');
     this.topic.set('');
+    this.decorativeImage.set(null);
     this.generatedImage.set(null);
     this.showSuccess.set(false);
     this.errorMessage.set(null);
+    this.imageErrorMessage.set(null);
   }
 }

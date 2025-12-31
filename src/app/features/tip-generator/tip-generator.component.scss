@@ -238,6 +238,85 @@
       cursor: not-allowed;
     }
   }
+
+  .btn-upload-image {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.875rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  .form-hint {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: -0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .image-preview-card {
+    position: relative;
+    display: inline-block;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+
+    img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .btn-remove-image {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(239, 68, 68, 0.95);
+      color: white;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background: #dc2626;
+        transform: scale(1.1);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .mt-2 {
+    margin-top: 0.5rem;
+  }
 }
 
 .alert {
@@ -443,7 +522,10 @@
   top: 0;
   width: 1200px;
   height: 1200px;
-  background: #5e17eb;
+  background-image: url('/assets/images/PlantillaTips.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   overflow: hidden;
   z-index: -1;
 
@@ -458,16 +540,6 @@
     padding: 2rem;
     font-family: Arial, sans-serif;
 
-    .bombillo-icon {
-      position: absolute;
-      top: 5px;
-      left: 5px;
-      width: 400px;
-      height: 390px;
-      image-rendering: -webkit-optimize-contrast;
-      image-rendering: crisp-edges;
-    }
-
     .leader-name {
       position: absolute;
       bottom: 15px;
@@ -481,30 +553,13 @@
       z-index: 10;
     }
 
-    .title-wrapper {
-      position: absolute;
-      top: 20px;
-      right: 200px;
-      width: 650px;
-      height: 250px;
-      overflow: hidden;
-
-      .title-bg {
-        top: 0px;
-        width: 85%;
-        height: 100%;
-        object-fit: cover;
-        image-rendering: -webkit-optimize-contrast;
-        image-rendering: crisp-edges;
-      }
-    }
-
+ 
     .subtitle-text {
       position: absolute;
-      top: 280px;
-      left:50%;
+      top: 180px;
+      left: 60%;
       transform: translateX(-50%);
-      color: #FFFFFF;
+      color: white;
       font-family: 'Bowlby One', cursive;
       font-size: 45px;
       font-weight: 700;
@@ -513,43 +568,60 @@
       word-wrap: break-word;
       overflow: hidden;
       text-overflow: ellipsis;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      text-shadow: 7px 7px 8px rgba(251, 85, 2, 0.5);
     }
 
     .tip-content {
       position: absolute;
-      top: 450px;
-      left: 40px;
-      height: 700px;
+      top: 490px;
+      left: 75px;
+      right: 60px;
+      height: 600px;
       overflow: auto;
-      right: 40px;
       max-width: 1500px;
       white-space: normal;
       padding: 10px;
       justify-content: center;
       text-align: justify;
+      
+      .small-box-spacer {
+        float: right;
+        width: 350px;
+        height: 600px;
+        shape-outside: polygon(
+          0 0,
+          0 300px,
+          590px 150px,
+          590px 440px,
+          0 440px
+        );
+        position: relative;
+        overflow: visible;
+
+        .decorative-image {
+          position: absolute;
+          bottom: 0;
+          right: 0x;
+          left: 30px;
+          width: 335px;
+          height: 250px;
+          object-fit: cover;                   
+          border-radius: 8px;
+          z-index: 5;
+          top: 320px;
+        
+        }
+      }
 
       .tip-text {
-        color: #FFFFFF;
-        font-family: 'Montserrat', sans-serif;
-        font-size: 41px;
+        color: rgb(241, 82, 3);
+        font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        font-size: 35px;
         font-weight: 700;
         line-height: 1.5;
         margin: 0;
         word-wrap: break-word;
-      }
-    }
-
-    .footer-section {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      .footer-img {
-        height: 80px;
-        width: auto;
-        display: block;
-        image-rendering: -webkit-optimize-contrast;
-        image-rendering: crisp-edges;
+        text-shadow: 2px 2px 4px black;
       }
     }
   }
