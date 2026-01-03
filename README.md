@@ -194,10 +194,4 @@ Configura CORS en tu instancia de n8n o usa un proxy
 ### La imagen no se genera
 Verifica que el canvas esté soportado en tu navegador
 
-## 📄 Licencia
 
-Proyecto privado para Truora
-
----
-
-Desarrollado con ❤️ para Truora
