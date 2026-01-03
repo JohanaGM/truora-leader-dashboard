@@ -542,8 +542,8 @@
 
     .leader-name {
       position: absolute;
-      bottom: 15px;
-      right: 20px;
+      bottom: 5px;
+      right: 60px;
       color: #edf205;
       font-size: 30px;
       font-weight: 700;
@@ -576,7 +576,7 @@
       top: 490px;
       left: 75px;
       right: 60px;
-      height: 600px;
+      height: 655px;
       overflow: auto;
       max-width: 1500px;
       white-space: normal;
@@ -586,29 +586,30 @@
       
       .small-box-spacer {
         float: right;
-        width: 350px;
-        height: 600px;
+        width: 360px;
+        min-height: 400px;
+        margin-top: 280px;
+        transform: translateX(25px);
+  
         shape-outside: polygon(
           0 0,
           0 300px,
           590px 150px,
           590px 440px,
-          0 440px
+          0 600px
         );
         position: relative;
         overflow: visible;
 
         .decorative-image {
           position: absolute;
-          bottom: 0;
-          right: 0x;
-          left: 30px;
-          width: 335px;
-          height: 250px;
+          right: 4px;
+          width: 355px;
+          height: 353px;
           object-fit: cover;                   
           border-radius: 8px;
           z-index: 5;
-          top: 320px;
+          top: 6px;
         
         }
       }
