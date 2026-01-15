@@ -4,12 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { TipService } from '../../core/services/tip.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ImageTextWrapperComponent } from '../../shared/components';
+import { AiChatComponent } from '../../shared/components/ai-chat/ai-chat.component';
 import html2canvas from 'html2canvas';
 
 @Component({
   selector: 'app-tip-generator',
   standalone: true,
-  imports: [CommonModule, FormsModule, ImageTextWrapperComponent],
+  imports: [CommonModule, FormsModule, ImageTextWrapperComponent, AiChatComponent],
   templateUrl: './tip-generator.component.html',
   styleUrl: './tip-generator.component.scss'
 })
@@ -157,6 +158,15 @@ export class TipGeneratorComponent {
   removeImage() {
     this.decorativeImage.set(null);
     this.imageErrorMessage.set(null);
+  }
+
+  onTipGeneratedByIA(content: string) {
+    this.topic.set(content);
+    // Scroll hacia el formulario para que el usuario vea el contenido generado
+    const inputSection = document.querySelector('.input-section');
+    if (inputSection) {
+      inputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   reset() {

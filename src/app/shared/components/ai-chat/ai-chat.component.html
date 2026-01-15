@@ -1,0 +1,98 @@
+<div class="ai-chat-container">
+  <div class="chat-header">
+    <h3>Asistente IA</h3>
+    <button class="clear-btn" (click)="clearChat()" title="Limpiar conversación">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="messages-container" #messagesContainer>
+    @if (messages().length === 0) {
+      <div class="welcome-message">
+        <div class="welcome-icon">💡</div>
+        <h4>¡Hola! Soy tu asistente para crear tips</h4>
+        <p>Puedo ayudarte a generar contenido basándome en nuestra base de conocimiento de Truora.</p>
+        <p class="welcome-subtitle">Pregúntame algo como:</p>
+        <div class="suggestions">
+          <button class="suggestion-btn" (click)="useSuggestion('Dame un tip sobre validación de identidad')">
+            Dame un tip sobre validación de identidad
+          </button>
+          <button class="suggestion-btn" (click)="useSuggestion('Crea un tip sobre prevención de fraude')">
+            Crea un tip sobre prevención de fraude
+          </button>
+          <button class="suggestion-btn" (click)="useSuggestion('Genera un consejo sobre KYC')">
+            Genera un consejo sobre KYC
+          </button>
+        </div>
+      </div>
+    } @else {
+      @for (message of messages(); track message.timestamp) {
+        <div class="message" [class.user-message]="message.role === 'user'" [class.assistant-message]="message.role === 'assistant'">
+          <div class="message-avatar">
+            @if (message.role === 'user') {
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+            }
+          </div>
+          <div class="message-content">
+            <div class="message-text">{{ message.content }}</div>
+            @if (message.role === 'assistant') {
+              <button class="use-tip-btn" (click)="tipGenerated.emit(message.content)" title="Usar este contenido en el tip">
+                Usar este tip
+              </button>
+            }
+          </div>
+        </div>
+      }
+    }
+
+    @if (isLoading()) {
+      <div class="message assistant-message">
+        <div class="message-avatar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="message-content">
+          <div class="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="input-container">
+    <input
+      type="text"
+      [(ngModel)]="userMessage"
+      (keyup.enter)="sendMessage()"
+      [disabled]="isLoading()"
+      placeholder="Escribe tu pregunta o tema aquí..."
+      class="message-input"
+    />
+    <button
+      class="send-btn"
+      (click)="sendMessage()"
+      [disabled]="!userMessage.trim() || isLoading()"
+      title="Enviar mensaje"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+</div>

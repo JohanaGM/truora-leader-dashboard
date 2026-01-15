@@ -27,6 +27,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
   margin-bottom: 2rem;
+  align-items: start;
 }
 
 .card {
@@ -522,7 +523,7 @@
   top: 0;
   width: 1200px;
   height: 1200px;
-  background-image: url('/assets/images/PlantillaTips.png');
+  background-image: url('/assets/images/plantillaTipsFinal.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -544,12 +545,12 @@
       position: absolute;
       bottom: 5px;
       right: 60px;
-      color: #edf205;
+      color: white;
       font-size: 30px;
       font-weight: 700;
       opacity: 0.9;
       text-align: right;
-      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+      text-shadow: 7px 7px 8px rgba(251, 85, 2, 0.5);
       z-index: 10;
     }
 
@@ -615,14 +616,14 @@
       }
 
       .tip-text {
-        color: rgb(241, 82, 3);
+        color: rgb(233, 170, 54);
         font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
         font-size: 35px;
         font-weight: 700;
         line-height: 1.5;
         margin: 0;
         word-wrap: break-word;
-        text-shadow: 2px 2px 4px black;
+        text-shadow: 2px 2px 4px rgb(7, 6, 6);
       }
     }
   }

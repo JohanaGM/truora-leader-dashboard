@@ -83,20 +83,24 @@
       }
     </div>
 
-    <!-- Preview Section -->
-    @if (generatedImage() || isGenerating()) {
-    <div class="preview-section card">
-      <h3 class="section-title">Vista Previa</h3>
+    <!-- AI Chat Assistant OR Preview Section -->
+    @if (!generatedImage() && !isGenerating()) {
+      <!-- AI Chat Assistant -->
+      <app-ai-chat (tipGenerated)="onTipGeneratedByIA($event)"></app-ai-chat>
+    } @else {
+      <!-- Preview Section -->
+      <div class="preview-section card">
+        <h3 class="section-title">Vista Previa</h3>
 
-      @if (isGenerating()) {
-      <div class="loading-preview">
-        <div class="loading-spinner"></div>
-        <p>Generando tu tip...</p>
-      </div>
-      } @else {
-      <div class="image-preview">
-        <img [src]="generatedImage()" alt="Tip generado" />
-      </div>
+        @if (isGenerating()) {
+        <div class="loading-preview">
+          <div class="loading-spinner"></div>
+          <p>Generando tu tip...</p>
+        </div>
+        } @else {
+        <div class="image-preview">
+          <img [src]="generatedImage()" alt="Tip generado" />
+        </div>
 
       <button class="btn-send" (click)="sendToTelegram()" [disabled]="!canSend">
         @if (isSending()) {
@@ -107,8 +111,9 @@
         }
       </button>
       }
-    </div>
+      </div>
     }
+  </div>
 
     <!-- Hidden Canvas Template -->
     <div #tipCanvas class="tip-canvas-template" [class.visible]="isGenerating()">
@@ -130,7 +135,6 @@
         <div class="leader-name">{{ leaderName }}</div>
       </div>
     </div>
-  </div>
 
   <!-- Tips History -->
   <div class="tips-history card">
