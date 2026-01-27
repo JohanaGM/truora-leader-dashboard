@@ -14,7 +14,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #dfe0e8 0%, #666363 100%);
   color: white;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
@@ -25,7 +25,7 @@
   }
 
   .clear-btn {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(244, 242, 242, 0.2);
     border: none;
     border-radius: 6px;
     padding: 8px;
@@ -142,26 +142,27 @@
     flex-direction: row-reverse;
 
     .message-avatar {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #23272f 0%, #3a3f4b 100%);
     }
 
     .message-content {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+      background: linear-gradient(135deg, #23272f 0%, #3a3f4b 100%);
+      color: #f3f3f3;
       border-radius: 16px 16px 4px 16px;
+      border: 1px solid #23272f;
     }
   }
 
   &.assistant-message {
     .message-avatar {
-      background: #4299e1;
+      background: #23272f;
     }
 
     .message-content {
-      background: white;
-      color: #2d3748;
+      background: #23272f;
+      color: #f3f3f3;
       border-radius: 16px 16px 16px 4px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #23272f;
     }
   }
 }
@@ -192,23 +193,27 @@
 
 .use-tip-btn {
   margin-top: 8px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
+  background: linear-gradient(135deg, #f7b32b 0%, #23272f 100%);
+  color: #23272f;
+  border: 2px solid #f7b32b;
   border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 12px;
-  font-weight: 500;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(35, 39, 47, 0.10);
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    background: linear-gradient(135deg, #23272f 0%, #f7b32b 100%);
+    color: #f7b32b;
+    border-color: #23272f;
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 4px 16px rgba(35, 39, 47, 0.18);
   }
 
   &:active {
-    transform: translateY(0);
+    transform: translateY(0) scale(0.98);
   }
 }
 

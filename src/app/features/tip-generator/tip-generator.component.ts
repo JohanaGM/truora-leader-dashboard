@@ -131,7 +131,7 @@ export class TipGeneratorComponent {
     if (!input.files || input.files.length === 0) return;
 
     const file = input.files[0];
-    const maxSizeInMB = 5;
+    const maxSizeInMB = 10;
     const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
 
     // Validar tipo de archivo

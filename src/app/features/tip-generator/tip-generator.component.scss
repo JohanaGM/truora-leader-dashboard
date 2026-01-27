@@ -242,7 +242,7 @@
 
   .btn-upload-image {
     display: inline-block;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #dfe0e8 0%, #666363 100%);
     color: white;
     padding: 0.875rem 1.5rem;
     border-radius: 12px;
@@ -272,17 +272,24 @@
 
   .image-preview-card {
     position: relative;
-    display: inline-block;
+    display: block;
     border-radius: 12px;
     overflow: hidden;
     border: 2px solid #e2e8f0;
     background: #f8fafc;
+    width: 100%;
+    max-width: 350px;
+    height: 80px;
+    margin: 0 auto;
+    
+
 
     img {
-      width: 150px;
-      height: 150px;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
       display: block;
+      object-position: center;
     }
 
     .btn-remove-image {
@@ -587,9 +594,9 @@
       
       .small-box-spacer {
         float: right;
-        width: 360px;
-        min-height: 400px;
-        margin-top: 280px;
+        width: 420px;
+        min-height: 420px;
+        margin-top: 260px;
         transform: translateX(25px);
   
         shape-outside: polygon(
@@ -599,25 +606,26 @@
           590px 440px,
           0 600px
         );
-        position: relative;
+        position:relative;
         overflow: visible;
 
         .decorative-image {
           position: absolute;
-          right: 0;
+          right: 100%;
           width: 100%;
           height: 100%;
           object-fit: cover;
           object-position: center;
+          display: block;
           border-radius: 8px;
           z-index: 5;
+          left: 0;
           top: 0;
-        
         }
       }
 
       .tip-text {
-        color: rgb(233, 170, 54);
+        color: rgb(243, 243, 190);
         font-family: 'Poppins', 'Montserrat', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         font-size: 34px;
         font-weight: 700;
