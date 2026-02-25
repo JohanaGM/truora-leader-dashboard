@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { EmojiPickerComponent } from '../../shared/components/emoji-picker/emoji-picker.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, EmojiPickerComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -131,6 +132,22 @@ export class DashboardComponent {
     setTimeout(() => {
       textarea.focus();
       textarea.setSelectionRange(start + mention.length, start + mention.length);
+    }, 0);
+  }
+
+  insertEmoji(emoji: string) {
+    const textarea = this.reminderTextarea.nativeElement;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = this.reminder();
+    const emojiText = emoji + ' ';
+    
+    const newText = text.substring(0, start) + emojiText + text.substring(end);
+    this.reminder.set(newText);
+    
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + emojiText.length, start + emojiText.length);
     }, 0);
   }
 

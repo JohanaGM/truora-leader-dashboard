@@ -11,21 +11,36 @@
   <div class="messages-container" #messagesContainer>
     @if (messages().length === 0) {
       <div class="welcome-message">
-        <div class="welcome-icon">💡</div>
-        <h4>¡Hola! Soy tu asistente para crear tips</h4>
-        <p>Puedo ayudarte a generar contenido basándome en nuestra base de conocimiento de Truora.</p>
-        <p class="welcome-subtitle">Pregúntame algo como:</p>
-        <div class="suggestions">
-          <button class="suggestion-btn" (click)="useSuggestion('Dame un tip sobre validación de identidad')">
-            Dame un tip sobre validación de identidad
-          </button>
-          <button class="suggestion-btn" (click)="useSuggestion('Crea un tip sobre prevención de fraude')">
-            Crea un tip sobre prevención de fraude
-          </button>
-          <button class="suggestion-btn" (click)="useSuggestion('Genera un consejo sobre KYC')">
-            Genera un consejo sobre KYC
-          </button>
+        <div class="welcome-icon">✓</div>
+        <h4>Asistente de Contenido</h4>
+        <p class="welcome-greeting">Bienvenido, {{ leaderName }}</p>
+        <p class="welcome-description">Soy tu herramienta para generar contenido profesional basado en la base de conocimiento de Truora. Puedo ayudarte a crear tips informativos y educativos para tu equipo.</p>
+        
+        <div class="welcome-features">
+          <div class="feature-item">
+            <span class="feature-icon">•</span>
+            <div class="feature-text">
+              <strong>Contenido fundamentado</strong>
+              <p>Basado en metodología y conocimiento de Truora</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">•</span>
+            <div class="feature-text">
+              <strong>Totalmente personalizable</strong>
+              <p>Edita y adapta cada sugerencia según necesites</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">•</span>
+            <div class="feature-text">
+              <strong>Compartible instantáneamente</strong>
+              <p>Genera y envía a tu equipo en segundos</p>
+            </div>
+          </div>
         </div>
+        
+        <p class="welcome-hint">¿En qué puedo ayudarte? Comparte el tema sobre el que deseas crear contenido.</p>
       </div>
     } @else {
       @for (message of messages(); track message.timestamp) {

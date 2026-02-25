@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Output, signal, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, EventEmitter, Output, signal, ViewChild, ElementRef, AfterViewChecked, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AiChatService, ChatMessage } from '../../../core/services/ai-chat.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-ai-chat',
@@ -14,12 +15,20 @@ export class AiChatComponent implements AfterViewChecked {
   @Output() tipGenerated = new EventEmitter<string>();
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
+  private authService = inject(AuthService);
+  private aiChatService: AiChatService;
+
   messages = signal<ChatMessage[]>([]);
   userMessage = '';
   isLoading = signal(false);
   private shouldScroll = false;
 
-  constructor(private aiChatService: AiChatService) {
+  get leaderName(): string {
+    return this.authService.getCurrentLeader()?.full_name || 'Líder';
+  }
+
+  constructor(aiChatService: AiChatService) {
+    this.aiChatService = aiChatService;
     this.messages.set(this.aiChatService.getChatHistory());
   }
 
@@ -54,11 +63,6 @@ export class AiChatComponent implements AfterViewChecked {
         this.shouldScroll = true;
       }
     });
-  }
-
-  useSuggestion(suggestion: string): void {
-    this.userMessage = suggestion;
-    this.sendMessage();
   }
 
   clearChat(): void {

@@ -5,12 +5,13 @@ import { TipService } from '../../core/services/tip.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ImageTextWrapperComponent } from '../../shared/components';
 import { AiChatComponent } from '../../shared/components/ai-chat/ai-chat.component';
+import { EmojiPickerComponent } from '../../shared/components/emoji-picker/emoji-picker.component';
 import html2canvas from 'html2canvas';
 
 @Component({
   selector: 'app-tip-generator',
   standalone: true,
-  imports: [CommonModule, FormsModule, ImageTextWrapperComponent, AiChatComponent],
+  imports: [CommonModule, FormsModule, ImageTextWrapperComponent, AiChatComponent, EmojiPickerComponent],
   templateUrl: './tip-generator.component.html',
   styleUrl: './tip-generator.component.scss'
 })
@@ -29,6 +30,7 @@ export class TipGeneratorComponent {
   showSuccess = signal(false);
   errorMessage = signal<string | null>(null);
   imageErrorMessage = signal<string | null>(null);
+  validationError = signal<string | null>(null);
 
   get canGenerate(): boolean {
     return this.title().trim().length > 0 && this.topic().trim().length > 0 && !this.isGenerating();
@@ -47,7 +49,21 @@ export class TipGeneratorComponent {
   }
 
   async generateTip() {
-    if (!this.canGenerate) return;
+    this.validationError.set(null);
+    
+    if (!this.title().trim()) {
+      this.validationError.set('⚠️ Debes completar el Título del Tip');
+      setTimeout(() => this.validationError.set(null), 4000);
+      return;
+    }
+    
+    if (!this.topic().trim()) {
+      this.validationError.set('⚠️ Debes completar el Contenido del Tip');
+      setTimeout(() => this.validationError.set(null), 4000);
+      return;
+    }
+
+    if (this.isGenerating()) return;
 
     this.isGenerating.set(true);
     this.errorMessage.set(null);
@@ -169,6 +185,24 @@ export class TipGeneratorComponent {
     }
   }
 
+  insertEmoji(emoji: string) {
+    const textarea = document.querySelector('.topic-input') as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = this.topic();
+    const emojiText = emoji + ' ';
+    
+    const newText = text.substring(0, start) + emojiText + text.substring(end);
+    this.topic.set(newText);
+    
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + emojiText.length, start + emojiText.length);
+    }, 0);
+  }
+
   reset() {
     this.title.set('');
     this.topic.set('');
@@ -177,5 +211,6 @@ export class TipGeneratorComponent {
     this.showSuccess.set(false);
     this.errorMessage.set(null);
     this.imageErrorMessage.set(null);
+    this.validationError.set(null);
   }
 }

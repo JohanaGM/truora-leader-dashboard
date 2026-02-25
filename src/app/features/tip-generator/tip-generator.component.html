@@ -25,6 +25,10 @@
           rows="4" [disabled]="isGenerating() || isSending()"></textarea>
       </div>
 
+      <div class="form-actions">
+        <app-emoji-picker (emojiSelected)="insertEmoji($event)"></app-emoji-picker>
+      </div>
+
       <!-- Image Upload Section -->
       <div class="form-group">
         <label class="form-label">Imagen Decorativa (Opcional)</label>
@@ -54,7 +58,7 @@
       </div>
 
       <div class="action-buttons">
-        <button class="btn-generate" (click)="generateTip()" [disabled]="!canGenerate">
+        <button class="btn-generate" (click)="generateTip()" [class.generating]="isGenerating()">
           @if (isGenerating()) {
           <span class="spinner"></span>
           <span class="btn-text">Generando...</span>
@@ -69,6 +73,12 @@
         </button>
         }
       </div>
+
+      @if (validationError()) {
+      <div class="alert alert-error">
+        {{ validationError() }}
+      </div>
+      }
 
       @if (errorMessage()) {
       <div class="alert alert-error">
@@ -143,19 +153,27 @@
     <div class="tips-list">
       <div class="tip-item">
         <span class="tip-icon">✓</span>
-        <p>Sé claro y conciso en tu mensaje</p>
+        <p><strong>Elige un tema puntual:</strong> Consulta la base de conocimiento y selecciona un tema específico que sea relevante para tu equipo</p>
       </div>
       <div class="tip-item">
         <span class="tip-icon">✓</span>
-        <p>Usa un lenguaje positivo y motivador</p>
+        <p><strong>Personaliza la propuesta:</strong> El asistente IA te sugiere contenido, pero tú puedes modificarlo, expandirlo o adaptarlo a tu necesidad</p>
       </div>
       <div class="tip-item">
         <span class="tip-icon">✓</span>
-        <p>Relaciona el tip con situaciones cotidianas</p>
+        <p><strong>Sé claro y conciso:</strong> Usa un lenguaje simple, directo y positivo que tu equipo pueda entender fácilmente</p>
       </div>
       <div class="tip-item">
         <span class="tip-icon">✓</span>
-        <p>Agrega valor práctico al contenido</p>
+        <p><strong>Agrega valor práctico:</strong> Incluye ejemplos, casos reales o acciones específicas que el equipo pueda aplicar inmediatamente</p>
+      </div>
+      <div class="tip-item">
+        <span class="tip-icon">✓</span>
+        <p><strong>Imagen opcional (máx 10MB):</strong> Usa imágenes decorativas que refuercen tu mensaje, pero mantén el foco en el contenido textual</p>
+      </div>
+      <div class="tip-item">
+        <span class="tip-icon">✓</span>
+        <p><strong>Espaciado y formato:</strong> Mantén párrafos cortos y bien distribuidos para facilitar la lectura en dispositivos móviles</p>
       </div>
     </div>
   </div>

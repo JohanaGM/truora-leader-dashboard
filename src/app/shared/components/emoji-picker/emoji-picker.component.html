@@ -1,0 +1,18 @@
+<div class="emoji-picker-container">
+  <button class="emoji-picker-btn" (click)="togglePicker()" title="Agregar emoticón">
+    😊 Emoticones
+  </button>
+
+  @if (isOpen) {
+    <div class="emoji-picker-panel">
+      <div class="emoji-grid">
+        @for (emoji of emojis; track emoji) {
+          <button class="emoji-btn" (click)="selectEmoji(emoji)" title="Insertar {{ emoji }}">
+            {{ emoji }}
+          </button>
+        }
+      </div>
+    </div>
+    <div class="emoji-overlay" (click)="closePicker()"></div>
+  }
+</div>

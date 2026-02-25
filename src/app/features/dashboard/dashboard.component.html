@@ -89,6 +89,10 @@
           </div>
         </div>
 
+        <div class="emoji-actions">
+          <app-emoji-picker (emojiSelected)="insertEmoji($event)"></app-emoji-picker>
+        </div>
+
         <div class="reminder-form">
           <!-- Textarea -->
           <div class="form-group">

@@ -303,6 +303,18 @@
         }
       }
 
+      .form-actions {
+        margin-bottom: 1.5rem;
+        display: flex;
+        gap: 1rem;
+      }
+
+      .emoji-actions {
+        margin-bottom: 1.5rem;
+        display: flex;
+        gap: 1rem;
+      }
+
       .alert {
         padding: 1rem;
         border-radius: 12px;
