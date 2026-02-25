@@ -458,6 +458,58 @@
         transform: none;
       }
     }
+
+    .analysts-section-fixed {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: #f7fafc;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+
+      .analysts-label-fixed {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 1rem;
+      }
+
+      .analysts-grid-fixed {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+
+        .analyst-btn-fixed {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border: 2px solid transparent;
+          color: white;
+          font-weight: 700;
+          font-size: 0.9rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+
+          &:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            border-color: white;
+          }
+
+          &:active {
+            transform: scale(0.95);
+          }
+
+          .analyst-initials {
+            font-size: inherit;
+          }
+        }
+      }
+    }
   }
 }
 
