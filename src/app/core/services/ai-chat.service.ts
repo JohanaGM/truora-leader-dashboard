@@ -32,8 +32,9 @@ export class AiChatService {
     return this.http.post<ChatResponse>(
       environment.n8nChatWebhookUrl,
       { 
-        message,
-        history: this.chatHistory.slice(-5) // Últimos 5 mensajes de contexto
+        message: message,
+        sessionId: 'user-123',
+        history: this.chatHistory,
       }
     );
   }

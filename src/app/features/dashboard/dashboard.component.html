@@ -68,18 +68,37 @@
   <!-- Tips Section -->
   <div class="card tips-card">
     <div class="card-header">
-      <h3 class="card-title">💡 Recordatorios</h3>
+      <h3 class="card-title">💡 AVISOS IMPORTANTES</h3>
     </div>
+
     <div class="card-body">
       <div class="tip-content">
+        <!-- Analysts Grid - Fixed -->
+        <div class="analysts-section-fixed">
+          <label class="analysts-label-fixed">Menciones de Analistas:</label>
+          <div class="analysts-grid-fixed">
+            @for (analyst of analysts; track analyst.name) {
+              <button 
+                class="analyst-btn-fixed"
+                (click)="insertAnalystMention(analyst)"
+                title="{{ analyst.name }}"
+              >
+                <span class="analyst-initials">{{ analyst.initials }}</span>
+              </button>
+            }
+          </div>
+        </div>
+
         <div class="reminder-form">
+          <!-- Textarea -->
           <div class="form-group">
             <textarea 
+              #reminderTextarea
               [value]="reminder()"
               (input)="reminder.set($any($event.target).value)"
-              placeholder="Agrega una frase inspiradora o un recordatorio importante…"
+              placeholder="Agrega una frase inspiradora, recordatorio importante, noticia de interés o mensajes especiales para tu equipo…"
               class="reminder-input"
-              rows="3"
+              rows="8"
               [disabled]="isSending()"
             ></textarea>
           </div>

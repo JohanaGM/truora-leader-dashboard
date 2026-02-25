@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+﻿import { Component, inject, signal, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -12,12 +12,34 @@ import { environment } from '../../../environments/environment';
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
+  @ViewChild('reminderTextarea') reminderTextarea!: ElementRef<HTMLTextAreaElement>;
   private http = inject(HttpClient);
   
   reminder = signal('');
   isSending = signal(false);
   showSuccess = signal(false);
   errorMessage = signal<string | null>(null);
+  
+  analysts = [
+    { name: '@MariAlejandra_Murcia', initials: 'MAM' },
+    { name: '@cynthiaracas', initials: 'CR' },
+    { name: '@JMiroslawaEstrada', initials: 'JME' },
+    { name: '@Karenjuliethh', initials: 'KJ' },
+    { name: '@GrisellQuiroz', initials: 'GQ' },
+    { name: '@JohaGMora', initials: 'JGM' },
+    { name: '@majovelasquez', initials: 'MV' },
+    { name: '@luzrodriguezj', initials: 'LRJ' },
+    { name: '@Erikcastro23', initials: 'EC' }
+  ];
+
+  emojis = [
+    '', '', '', '', '', '', '', '',
+    '', '', '', '', '', '', '', '',
+    '', '', '', '', '', '', '', '',
+    '', '', '', '', '', '', '', '',
+    '', '', '', '', '', '', '', '',
+    '', '', '', '', '', '', '', ''
+  ];
 
   stats = [
     {
@@ -96,6 +118,69 @@ export class DashboardComponent {
     return this.reminder().trim().length > 0 && !this.isSending();
   }
 
+  insertAnalystMention(analyst: { name: string; initials: string }) {
+    const textarea = this.reminderTextarea.nativeElement;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = this.reminder();
+    const mention = analyst.name + ' ';
+    
+    const newText = text.substring(0, start) + mention + text.substring(end);
+    this.reminder.set(newText);
+    
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + mention.length, start + mention.length);
+    }, 0);
+  }
+
+  toggleBold() {
+    const textarea = this.reminderTextarea.nativeElement;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = this.reminder();
+    const selectedText = text.substring(start, end);
+    
+    if (selectedText) {
+      const newText = text.substring(0, start) + '**' + selectedText + '**' + text.substring(end);
+      this.reminder.set(newText);
+    }
+  }
+
+  toggleUppercase() {
+    const textarea = this.reminderTextarea.nativeElement;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = this.reminder();
+    const selectedText = text.substring(start, end);
+    
+    if (selectedText) {
+      const newText = text.substring(0, start) + selectedText.toUpperCase() + text.substring(end);
+      this.reminder.set(newText);
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(end, end);
+      }, 0);
+    }
+  }
+
+  toggleLowercase() {
+    const textarea = this.reminderTextarea.nativeElement;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = this.reminder();
+    const selectedText = text.substring(start, end);
+    
+    if (selectedText) {
+      const newText = text.substring(0, start) + selectedText.toLowerCase() + text.substring(end);
+      this.reminder.set(newText);
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(end, end);
+      }, 0);
+    }
+  }
+
   sendReminder() {
     if (!this.canSend) return;
 
@@ -108,7 +193,6 @@ export class DashboardComponent {
       timestamp: new Date().toISOString()
     };
 
-    // URL del webhook de n8n (mismo que para tips)
     const webhookUrl = environment.n8nWebhookUrl;
 
     this.http.post(webhookUrl, payload).subscribe({
@@ -116,7 +200,6 @@ export class DashboardComponent {
         this.showSuccess.set(true);
         this.isSending.set(false);
         
-        // Reset después de 2 segundos
         setTimeout(() => {
           this.reminder.set('');
           this.showSuccess.set(false);
@@ -125,7 +208,6 @@ export class DashboardComponent {
       error: (error) => {
         console.log('Respuesta del webhook (puede ser CORS):', error);
         
-        // Asumir éxito si el error es de CORS o de red (el webhook ya se ejecutó)
         if (error.status === 0 || error.status === 404) {
           this.showSuccess.set(true);
           this.isSending.set(false);
