@@ -86,9 +86,9 @@
       </div>
       }
 
-      @if (showSuccess()) {
+      @if (successMessage()) {
       <div class="alert alert-success">
-        ✅ ¡Tip enviado exitosamente a Telegram!
+        ✅ {{ successMessage() }}
       </div>
       }
     </div>

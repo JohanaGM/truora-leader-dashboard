@@ -189,11 +189,6 @@ export class TipService {
     return new Blob(byteArrays, { type: contentType });
   }
 
-  saveTip(tip: Tip): void {
-    const tips = this.getTips();
-    tips.push(tip);
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(tips));
-  }
 
   getTips(): Tip[] {
     const stored = localStorage.getItem(this.STORAGE_KEY);

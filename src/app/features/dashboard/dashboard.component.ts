@@ -216,27 +216,14 @@ export class DashboardComponent {
       next: () => {
         this.showSuccess.set(true);
         this.isSending.set(false);
-        
         setTimeout(() => {
           this.reminder.set('');
           this.showSuccess.set(false);
         }, 2000);
       },
       error: (error) => {
-        console.log('Respuesta del webhook (puede ser CORS):', error);
-        
-        if (error.status === 0 || error.status === 404) {
-          this.showSuccess.set(true);
-          this.isSending.set(false);
-          
-          setTimeout(() => {
-            this.reminder.set('');
-            this.showSuccess.set(false);
-          }, 2000);
-        } else {
-          this.errorMessage.set('Error al enviar recordatorio. Intenta nuevamente.');
-          this.isSending.set(false);
-        }
+        this.errorMessage.set('Error al enviar recordatorio. Intenta nuevamente.');
+        this.isSending.set(false);
       }
     });
   }

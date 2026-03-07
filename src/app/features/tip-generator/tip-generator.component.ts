@@ -3,15 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TipService } from '../../core/services/tip.service';
 import { AuthService } from '../../core/services/auth.service';
-import { ImageTextWrapperComponent } from '../../shared/components';
 import { AiChatComponent } from '../../shared/components/ai-chat/ai-chat.component';
 import { EmojiPickerComponent } from '../../shared/components/emoji-picker/emoji-picker.component';
 import html2canvas from 'html2canvas';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-tip-generator',
   standalone: true,
-  imports: [CommonModule, FormsModule, ImageTextWrapperComponent, AiChatComponent, EmojiPickerComponent],
+  imports: [CommonModule, FormsModule, AiChatComponent, EmojiPickerComponent],
   templateUrl: './tip-generator.component.html',
   styleUrl: './tip-generator.component.scss'
 })
@@ -27,7 +27,7 @@ export class TipGeneratorComponent {
   generatedImage = signal<string | null>(null);
   isGenerating = signal(false);
   isSending = signal(false);
-  showSuccess = signal(false);
+  successMessage = signal<string | null>(null);
   errorMessage = signal<string | null>(null);
   imageErrorMessage = signal<string | null>(null);
   validationError = signal<string | null>(null);
@@ -97,7 +97,7 @@ export class TipGeneratorComponent {
 
     this.isSending.set(true);
     this.errorMessage.set(null);
-    this.showSuccess.set(false);
+    this.successMessage.set(null);
 
     const currentLeader = this.authService.getCurrentLeader();
     const tip = {
@@ -110,36 +110,22 @@ export class TipGeneratorComponent {
       leaderName: currentLeader?.full_name || 'Líder de Identidad'
     };
 
-    this.tipService.sendToTelegram(tip).subscribe({
-      next: () => {
-        this.tipService.saveTip(tip);
-        this.showSuccess.set(true);
-        this.isSending.set(false);
-        
-        // Reset form after 3 seconds
-        setTimeout(() => {
-          this.reset();
-        }, 3000);
-      },
-      error: (error) => {
-        // Si el error es de CORS o 404 pero el webhook se ejecutó, considerarlo éxito
-        console.log('Respuesta del webhook (puede ser CORS):', error);
-        
-        // Asumir éxito si el error es de CORS o de red (el webhook ya se ejecutó)
-        if (error.status === 0 || error.status === 404) {
-          this.tipService.saveTip(tip);
-          this.showSuccess.set(true);
+    this.tipService.sendToTelegram(tip)
+      .pipe(
+        finalize(() => {
+          // Esto se ejecuta siempre, tanto en éxito como en error
           this.isSending.set(false);
-          
-          setTimeout(() => {
-            this.reset();
-          }, 5000);
-        } else {
-          this.errorMessage.set('Error al enviar a Telegram. Verifica la configuración.');
-          this.isSending.set(false);
+        })
+      )
+      .subscribe({
+        next: (response) => {       
+          // Mostrar mensaje de éxito
+          this.successMessage.set('¡Tip enviado exitosamente a Telegram!');
+        },
+        error: (error) => {
+          this.errorMessage.set('Error al enviar a Telegram. Por favor, intenta nuevamente.');
         }
-      }
-    });
+      });
   }
 
   onImageSelected(event: Event) {
@@ -208,7 +194,7 @@ export class TipGeneratorComponent {
     this.topic.set('');
     this.decorativeImage.set(null);
     this.generatedImage.set(null);
-    this.showSuccess.set(false);
+    this.successMessage.set(null);
     this.errorMessage.set(null);
     this.imageErrorMessage.set(null);
     this.validationError.set(null);
