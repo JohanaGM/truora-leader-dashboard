@@ -115,6 +115,57 @@
     display: flex;
     gap: 1rem;
     margin-bottom: 1.5rem;
+    align-items: center;
+
+    .font-size-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      border: 2px solid #e2e8f0;
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: #cbd5e0;
+      }
+
+      label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #4a5568;
+        white-space: nowrap;
+      }
+
+      select {
+        padding: 0.5rem 0.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #2d3748;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        outline: none;
+
+        &:hover:not(:disabled) {
+          border-color: #667eea;
+        }
+
+        &:focus {
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          background: #f7fafc;
+        }
+      }
+    }
   }
 
   .action-buttons {
@@ -643,7 +694,8 @@
       }
 
       .tip-text {
-        padding-left: 20px;
+        padding-left: 60px;
+        padding-top: 40px;
         height: 100%;
         color: rgb(243, 243, 190);
         font-family: 'Poppins', 'Montserrat', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;

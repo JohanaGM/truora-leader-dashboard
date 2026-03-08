@@ -27,6 +27,16 @@
 
       <div class="form-actions">
         <app-emoji-picker (emojiSelected)="insertEmoji($event)"></app-emoji-picker>
+        <div class="font-size-selector">
+          <label for="fontSize">📏 Tamaño</label>
+          <select id="fontSize" [value]="fontSize()" (change)="fontSize.set(+$any($event.target).value)" [disabled]="isGenerating() || isSending()">
+            <option value="24">Pequeño</option>
+            <option value="28">Mediano</option>
+            <option value="34" selected>Normal</option>
+            <option value="38">Grande</option>
+            <option value="42">Muy Grande</option>
+          </select>
+        </div>
       </div>
 
       <!-- Image Upload Section -->
@@ -138,7 +148,7 @@
               <img [src]="decorativeImage()" alt="Decorativa" class="decorative-image" />
             }
           </div>
-          <p class="tip-text">{{ topic() }}</p>
+          <p class="tip-text" [style.font-size.px]="fontSize()">{{ topic() }}</p>
         </div>
 
         <!-- Nombre del líder -->

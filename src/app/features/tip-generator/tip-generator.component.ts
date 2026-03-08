@@ -31,6 +31,7 @@ export class TipGeneratorComponent {
   errorMessage = signal<string | null>(null);
   imageErrorMessage = signal<string | null>(null);
   validationError = signal<string | null>(null);
+  fontSize = signal(34);
 
   get canGenerate(): boolean {
     return this.title().trim().length > 0 && this.topic().trim().length > 0 && !this.isGenerating();
@@ -198,5 +199,6 @@ export class TipGeneratorComponent {
     this.errorMessage.set(null);
     this.imageErrorMessage.set(null);
     this.validationError.set(null);
+    this.fontSize.set(34);
   }
 }
