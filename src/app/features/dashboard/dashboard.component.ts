@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { EmojiPickerComponent } from '../../shared/components/emoji-picker/emoji-picker.component';
+import { MessageTemplateComponent } from '../message-template/message-template.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, EmojiPickerComponent],
+  imports: [CommonModule, FormsModule, MessageTemplateComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -29,7 +29,7 @@ export class DashboardComponent {
     { name: '@GrisellQuiroz', initials: 'GQ' },
     { name: '@JohaGMora', initials: 'JGM' },
     { name: '@majovelasquez', initials: 'MV' },
-    { name: '@luzrodriguezj', initials: 'LRJ' },
+    { name: '@KaterineAngarita', initials: 'KA' },
     { name: '@Erikcastro23', initials: 'EC' }
   ];
 
@@ -119,6 +119,10 @@ export class DashboardComponent {
     return this.reminder().trim().length > 0 && !this.isSending();
   }
 
+  onMessageSelected(message: string) {
+    this.reminder.set(message);
+  }
+
   insertAnalystMention(analyst: { name: string; initials: string }) {
     const textarea = this.reminderTextarea.nativeElement;
     const start = textarea.selectionStart;
@@ -140,9 +144,8 @@ export class DashboardComponent {
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const text = this.reminder();
-    const emojiText = emoji + ' ';
-    
-    const newText = text.substring(0, start) + emojiText + text.substring(end);
+      const emojiText = emoji + ' ';    
+      const newText = text.substring(0, start) + emojiText + text.substring(end);
     this.reminder.set(newText);
     
     setTimeout(() => {

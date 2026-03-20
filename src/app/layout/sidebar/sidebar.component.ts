@@ -18,22 +18,22 @@ export class SidebarComponent {
   menuItems = [
     {
       icon: '📊',
-      label: 'Dashboard',
+      label: 'Anuncios',
       route: '/dashboard',
       active: true
     },
-    {
-      icon: '📅',
-      label: 'Cronograma',
-      route: '/schedule',
-      active: false
-    },
-    {
-      icon: '✅',
-      label: 'Tareas',
-      route: '/tasks',
-      active: false
-    },
+    // {
+    //   icon: '📅',
+    //   label: 'Cronograma',
+    //   route: '/schedule',
+    //   active: false
+    // },
+    // {
+    //   icon: '✅',
+    //   label: 'Tareas',
+    //   route: '/tasks',
+    //   active: false
+    // },
     {
       icon: '💡',
       label: 'Generar Tips',

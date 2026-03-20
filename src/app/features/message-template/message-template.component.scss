@@ -1,0 +1,83 @@
+.message-template-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem;
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 14px;
+  align-items: flex-start;
+}
+
+.users-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.select-all {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.chip {
+  background: #f0f0f0;
+  border-radius: 16px;
+  padding: 2px 10px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  min-width: 0;
+}
+
+.templates-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.template-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.template-cards button {
+  border: none;
+  background: #e0e0e0;
+  border-radius: 8px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  transition: background 0.2s;
+}
+
+.template-cards button.active {
+  background: #b3e5fc;
+  font-weight: bold;
+}
+
+.icon {
+  font-size: 1.2em;
+}
+
+.preview {
+  width: 100%;
+  min-height: 70px;
+  font-size: 13px;
+  margin-top: 0.5rem;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fafafa;
+  resize: none;
+}

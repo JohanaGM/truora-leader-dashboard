@@ -1,3 +1,5 @@
+@use 'sass:math';
+
 // Mixins útiles para el proyecto
 
 // Flexbox center
@@ -90,7 +92,7 @@
 
   &::-webkit-scrollbar-thumb {
     background: $thumb-bg;
-    border-radius: $width / 2;
+    border-radius: math.div($width, 2);
 
     &:hover {
       background: darken($thumb-bg, 10%);

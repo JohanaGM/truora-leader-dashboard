@@ -1,0 +1,28 @@
+<div class="message-template-grid" [formGroup]="form">
+  <div class="users-column">
+    <label class="select-all">
+      <input type="checkbox" formControlName="selectAll" (change)="toggleSelectAll()" />
+      Seleccionar todos
+    </label>
+    <div class="chips improved-chips">
+      <ng-container *ngFor="let user of users; let i = index">
+        <label class="chip improved-chip">
+          <input type="checkbox" [formControl]="getUserControl(i)" (change)="onUserChange()" />
+          <span>{{ user.name }}</span>
+        </label>
+      </ng-container>
+    </div>
+  </div>
+  <div class="templates-column">
+    <div class="template-cards">
+      <button
+        *ngFor="let t of templates"
+        [ngClass]="{active: activeTemplate === t.key}"
+        (click)="selectTemplate(t.key)"
+        type="button"
+      >
+        <span class="icon">{{ t.icon }}</span> {{ t.label }}
+      </button>
+    </div>
+  </div>
+</div>

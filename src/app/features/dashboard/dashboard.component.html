@@ -5,7 +5,7 @@
   </div>
 
   <!-- Stats Cards -->
-  <div class="stats-grid">
+  <!-- <div class="stats-grid">
     @for (stat of stats; track stat.label) {
       <div class="stat-card" [style.border-left-color]="stat.color">
         <div class="stat-icon">{{ stat.icon }}</div>
@@ -20,11 +20,11 @@
         </div>
       </div>
     }
-  </div>
+  </div> -->
 
-  <div class="content-grid">
-    <!-- Recent Activities -->
-    <div class="card">
+  <!-- <div class="content-grid"> -->
+  <!-- Recent Activities -->
+  <!-- <div class="card">
       <div class="card-header">
         <h3 class="card-title">Actividades de Hoy</h3>
         <button class="btn-link">Ver todas →</button>
@@ -45,10 +45,10 @@
           }
         </div>
       </div>
-    </div>
+    </div> -->
 
-    <!-- Quick Actions -->
-    <div class="card">
+  <!-- Quick Actions -->
+  <!-- <div class="card">
       <div class="card-header">
         <h3 class="card-title">Acciones Rápidas</h3>
       </div>
@@ -63,7 +63,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <!-- Tips Section -->
   <div class="card tips-card">
@@ -73,62 +73,37 @@
 
     <div class="card-body">
       <div class="tip-content">
-        <!-- Analysts Grid - Fixed -->
-        <div class="analysts-section-fixed">
+        <div class="tip-content_subtitle">
           <label class="analysts-label-fixed">Menciones de Analistas:</label>
-          <div class="analysts-grid-fixed">
-            @for (analyst of analysts; track analyst.name) {
-              <button 
-                class="analyst-btn-fixed"
-                (click)="insertAnalystMention(analyst)"
-                title="{{ analyst.name }}"
-              >
-                <span class="analyst-initials">{{ analyst.initials }}</span>
-              </button>
-            }
-          </div>
         </div>
 
-        <div class="emoji-actions">
-          <app-emoji-picker (emojiSelected)="insertEmoji($event)"></app-emoji-picker>
-        </div>
-
+        <app-message-template (messageSelected)="onMessageSelected($event)"></app-message-template>
         <div class="reminder-form">
           <!-- Textarea -->
           <div class="form-group">
-            <textarea 
-              #reminderTextarea
-              [value]="reminder()"
-              (input)="reminder.set($any($event.target).value)"
+            <textarea #reminderTextarea [value]="reminder()" (input)="reminder.set($any($event.target).value)"
               placeholder="Agrega una frase inspiradora, recordatorio importante, noticia de interés o mensajes especiales para tu equipo…"
-              class="reminder-input"
-              rows="8"
-              [disabled]="isSending()"
-            ></textarea>
+              class="reminder-input" rows="8" [disabled]="isSending()"></textarea>
           </div>
 
           @if (showSuccess()) {
-            <div class="alert alert-success">
-              ✓ Recordatorio enviado exitosamente a Telegram
-            </div>
+          <div class="alert alert-success">
+            ✓ Recordatorio enviado exitosamente a Telegram
+          </div>
           }
 
           @if (errorMessage()) {
-            <div class="alert alert-error">
-              {{ errorMessage() }}
-            </div>
+          <div class="alert alert-error">
+            {{ errorMessage() }}
+          </div>
           }
 
-          <button 
-            class="btn-primary btn-send-reminder"
-            (click)="sendReminder()"
-            [disabled]="!canSend"
-          >
+          <button class="btn-primary btn-send-reminder" (click)="sendReminder()" [disabled]="!canSend">
             @if (isSending()) {
-              <span class="spinner"></span>
-              <span>Enviando...</span>
+            <span class="spinner"></span>
+            <span>Enviando...</span>
             } @else {
-              <span>📤 Enviar a Telegram</span>
+            <span>📤 Enviar a Telegram</span>
             }
           </button>
         </div>
