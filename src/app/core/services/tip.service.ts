@@ -167,7 +167,7 @@ export class TipService {
       timestamp: tip.createdAt.toISOString()
     };
 
-    return this.http.post(environment.n8nWebhookUrl, payload);
+    return this.http.post(environment.n8nWebhookUrlTest, payload);
   }
 
   private base64ToBlob(base64: string, contentType: string = ''): Blob {
