@@ -30,7 +30,7 @@ export class AiChatService {
     });
 
     return this.http.post<ChatResponse>(
-      environment.n8nChatWebhookUrl,
+      environment.n8nChatWebhookUrlTest,
       { 
         message: message,
         sessionId: 'user-123',
