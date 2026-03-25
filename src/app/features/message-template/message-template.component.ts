@@ -61,7 +61,7 @@ export class MessageTemplateComponent {
       key: 'doc',
       label: 'Calidad Documento',
       icon: '📄',
-      text: 'Revisión calidad documento para @usuarios.'
+      text: 'Buenas tardes se asigno revisión calidad documento para @usuarios.'
     },
     {
       key: 'face',

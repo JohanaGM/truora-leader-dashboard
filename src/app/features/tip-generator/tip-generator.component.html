@@ -26,7 +26,7 @@
       </div>
 
       <div class="form-actions">
-        <app-emoji-picker (emojiSelected)="insertEmoji($event)"></app-emoji-picker>
+        <!-- <app-emoji-picker (emojiSelected)="insertEmoji($event)"></app-emoji-picker> -->
         <div class="font-size-selector">
           <label for="fontSize">📏 Tamaño</label>
           <select id="fontSize" [value]="fontSize()" (change)="fontSize.set(+$any($event.target).value)" [disabled]="isGenerating() || isSending()">
@@ -35,6 +35,14 @@
             <option value="34" selected>Normal</option>
             <option value="38">Grande</option>
             <option value="42">Muy Grande</option>
+          </select>
+        </div>
+        
+        <div class="tip-type-selector">
+          <label for="tipType">🎨 Tipo</label>
+          <select id="tipType" [value]="tipType()" (change)="tipType.set($any($event.target).value)" [disabled]="isGenerating() || isSending()">
+            <option value="text">Tip de texto</option>
+            <option value="image">Tip de imagen</option>
           </select>
         </div>
       </div>
@@ -136,19 +144,28 @@
   </div>
 
     <!-- Hidden Canvas Template -->
-    <div #tipCanvas class="tip-canvas-template" [class.visible]="isGenerating()">
+    <div #tipCanvas class="tip-canvas-template" [class.visible]="isGenerating()" [class.image-type]="tipType() === 'image'">
       <div class="tip-canvas-content">
         <!-- Subtítulo dinámico del usuario -->
 
         <div class="subtitle-text">{{ title().toUpperCase() }}</div>
         <!-- Contenido del tip -->
-        <div class="tip-content">
-          <div class="small-box-spacer">
+        <div class="tip-content" [class.image-mode]="tipType() === 'image'">
+          @if (tipType() === 'text') {
+            <div class="small-box-spacer">
+              @if (decorativeImage()) {
+                <img [src]="decorativeImage()" alt="Decorativa" class="decorative-image" />
+              }
+            </div>
+            <p class="tip-text" [style.font-size.px]="fontSize()">{{ topic() }}</p>
+          } @else {
             @if (decorativeImage()) {
-              <img [src]="decorativeImage()" alt="Decorativa" class="decorative-image" />
+              <div class="centered-image-container">
+                <img [src]="decorativeImage()" alt="Imagen principal" class="main-image" />
+              </div>
             }
-          </div>
-          <p class="tip-text" [style.font-size.px]="fontSize()">{{ topic() }}</p>
+            <p class="tip-text-with-image" [style.font-size.px]="fontSize()">{{ topic() }}</p>
+          }
         </div>
 
         <!-- Nombre del líder -->
