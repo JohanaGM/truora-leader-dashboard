@@ -34,7 +34,10 @@ export class MessageTemplateComponent {
     { id: 8, name: '@GrisellQuiroz' },
     { id: 9, name: '@JohaGMora' },
     { id: 10, name: '@majovelasquez' },
-    { id: 11, name: '@Erikcastro23' }
+    { id: 11, name: '@Erikcastro23' },
+    { id: 12, name: '@ValentinaMesaB' },
+    { id: 13, name: '@CristianMRojas' }
+
   ];
 
   form: FormGroup;
@@ -61,19 +64,19 @@ export class MessageTemplateComponent {
       key: 'doc',
       label: 'Calidad Documento',
       icon: '📄',
-      text: 'Buenas tardes se asigno revisión calidad documento para @usuarios.'
+      text: 'Buenas tardes Team,\nse asigno revisión calidad documento para @usuarios.'
     },
     {
       key: 'face',
       label: 'Calidad Face',
       icon: '👤',
-      text: 'Revisión calidad face para @usuarios.'
+      text: ' Buenas tardes Team,\nse asigno revisión calidad face para @usuarios.'
     },
     {
       key: 'risk',
       label: 'Reglas de Riesgo',
       icon: '⚠️',
-      text: 'Revisión reglas de riesgo para @usuarios.'
+      text: 'Buenas tardes Team,\nse asigno revisión de reglas de riesgo para @usuarios.'
     }
   ];
   activeTemplate = this.templates[0].key;
