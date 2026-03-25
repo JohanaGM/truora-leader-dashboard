@@ -58,25 +58,25 @@ export class MessageTemplateComponent {
       key: 'label',
       label: 'Label',
       icon: '🏷️',
-      text: 'Buenas tardes team,\nSe asignó revisión de Label para @usuarios, ya se creó la subtarea en Jira, por favor confirmar cuando esté Done. 📌'
+      text: 'Buenas tardes team,\nSe asignó revisión de Label para @usuarios, ya se creó la subtarea en Jira, por favor confirmar cuando esté Done. 📌 ETA: ' 
     },
     {
       key: 'doc',
       label: 'Calidad Documento',
       icon: '📄',
-      text: 'Buenas tardes Team,\nse asigno revisión calidad documento para @usuarios.'
+      text: 'Buenas tardes Team,\nse asigno revisión calidad documento para @usuarios. ETA:'
     },
     {
       key: 'face',
       label: 'Calidad Face',
       icon: '👤',
-      text: ' Buenas tardes Team,\nse asigno revisión calidad face para @usuarios.'
+      text: ' Buenas tardes Team,\nse asigno revisión calidad face para @usuarios. ETA:'
     },
     {
       key: 'risk',
       label: 'Reglas de Riesgo',
       icon: '⚠️',
-      text: 'Buenas tardes Team,\nse asigno revisión de reglas de riesgo para @usuarios.'
+      text: 'Buenas tardes Team,\nse asigno revisión de reglas de riesgo para @usuarios. ETA:'
     }
   ];
   activeTemplate = this.templates[0].key;
