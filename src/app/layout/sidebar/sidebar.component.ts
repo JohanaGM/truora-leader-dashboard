@@ -18,7 +18,7 @@ export class SidebarComponent {
   menuItems = [
     {
       icon: '📊',
-      label: 'Anuncios',
+      label: 'Inicio',
       route: '/dashboard',
       active: true
     },
@@ -44,6 +44,12 @@ export class SidebarComponent {
       icon: '⚙️',
       label: 'Automatizaciones',
       route: '/automations',
+      active: false
+    },
+    {
+      icon: '📢',
+      label: 'Avisos',
+      route: '/avisos',
       active: false
     }
   ];

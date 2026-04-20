@@ -20,7 +20,7 @@ export interface VirtualEvent {
 
 @Injectable({ providedIn: 'root' })
 export class EventService {
-  private readonly STORAGE_KEY = 'truora_events';
+  private readonly STORAGE_KEY = 'truora_events_v2';
 
   private eventsSignal = signal<AppEvent[]>(this.loadEvents());
   readonly events = this.eventsSignal.asReadonly();
@@ -191,34 +191,6 @@ export class EventService {
   // ─── Seed ─────────────────────────────────────────────────────────────────
 
   private getSeedEvents(): AppEvent[] {
-    const today = new Date();
-    const fmt = (d: Date) => this.toDateStr(d);
-    const next = (offset: number) => { const d = new Date(today); d.setDate(d.getDate() + offset); return d; };
-    return [
-      {
-        id: 'seed_1',
-        title: 'Revisar reportes mensuales',
-        date: fmt(next(1)),
-        startTime: '10:00', endTime: '11:00',
-        type: 'manual', status: 'in-progress', priority: 'high',
-        description: 'Análisis de reportes de identidad',
-      },
-      {
-        id: 'seed_2',
-        title: 'Preparar presentación',
-        date: fmt(next(3)),
-        startTime: '15:00', endTime: '16:00',
-        type: 'manual', status: 'pending', priority: 'medium',
-        description: 'Presentación para stakeholders',
-      },
-      {
-        id: 'seed_3',
-        title: 'Actualizar documentación',
-        date: fmt(next(-2)),
-        startTime: '09:00', endTime: '10:00',
-        type: 'manual', status: 'completed', priority: 'low',
-        description: 'Documentación técnica del equipo',
-      },
-    ];
+    return [];
   }
 }

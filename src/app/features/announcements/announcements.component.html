@@ -1,0 +1,92 @@
+<div class="announcements-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">📢 Avisos Importantes</h1>
+      <p class="page-subtitle">Redacta y envía mensajes a tu equipo vía Telegram</p>
+    </div>
+  </div>
+
+  <div class="announcements-layout">
+
+    <!-- ===== PANEL IZQUIERDO: Selectores ===== -->
+    <aside class="selectors-panel">
+
+      <!-- Analistas del equipo -->
+      <div class="panel-section">
+        <h3 class="panel-section-title">👥 Analistas del equipo</h3>
+        <app-message-template
+          (messageSelected)="onMessageSelected($event)"
+          (mentionAction)="onMentionAction($event)">
+        </app-message-template>
+      </div>
+
+      <!-- Contactos Truora -->
+      <div class="panel-section truora-contacts">
+        <h3 class="panel-section-title">🏢 Menciones Truora</h3>
+        <p class="panel-section-hint">Contactos globales fuera del equipo directo</p>
+        <div class="truora-chips">
+          @for (contact of truoraContacts; track contact.name) {
+            <button class="truora-chip" (click)="insertTruoraContact(contact.name)">
+              <span class="truora-chip__icon">🏢</span>
+              <span class="truora-chip__name">{{ contact.name }}</span>
+              <span class="truora-chip__label">{{ contact.label }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ===== PANEL DERECHO: Editor ===== -->
+    <main class="editor-panel">
+
+      <div class="form-group">
+        <textarea
+          #reminderTextarea
+          [value]="reminder()"
+          (input)="onTextareaInput($any($event.target).value)"
+          placeholder="Agrega una frase inspiradora, recordatorio importante, noticia de interés o mensajes especiales para tu equipo…"
+          class="reminder-input"
+          rows="12"
+          [disabled]="isSending()">
+        </textarea>
+      </div>
+
+      @if (detectedDriveUrl()) {
+        <div class="drive-badge">
+          <span>🔗</span>
+          <span>Archivo de Drive detectado</span>
+        </div>
+        <div class="drive-alias-group">
+          <label class="drive-alias-label">Texto del enlace</label>
+          <input
+            type="text"
+            class="drive-alias-input"
+            [value]="driveAlias()"
+            (input)="driveAlias.set($any($event.target).value)"
+            placeholder="Clic para ver archivo"
+          />
+        </div>
+      }
+
+      @if (showSuccess()) {
+        <div class="alert alert-success">✓ Aviso enviado exitosamente a Telegram</div>
+      }
+
+      @if (errorMessage()) {
+        <div class="alert alert-error">{{ errorMessage() }}</div>
+      }
+
+      <button class="btn-send" (click)="sendReminder()" [disabled]="!canSend">
+        @if (isSending()) {
+          <span class="spinner"></span>
+          <span>Enviando...</span>
+        } @else {
+          <span>📤 Enviar a Telegram</span>
+        }
+      </button>
+
+    </main>
+
+  </div>
+</div>

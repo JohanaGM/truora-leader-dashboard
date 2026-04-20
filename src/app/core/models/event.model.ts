@@ -22,6 +22,6 @@ export const PRIORITY_COLOR: Record<EventPriority, string> = {
 };
 
 export const RECURRING_COLOR: Record<'truface' | 'tips', string> = {
-  truface: '#FF6B9D',
-  tips:    '#9471b9',
+  truface: 'rgb(147, 15, 60)',
+  tips:    'rgb(58, 0, 119)',
 };

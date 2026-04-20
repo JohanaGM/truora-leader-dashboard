@@ -78,6 +78,19 @@ export class MessageTemplateComponent {
       label: 'Reglas de Riesgo',
       icon: '⚠️',
       text: 'Buenas tardes Team,\nse asigno revisión de reglas de riesgo para @usuarios. ETA:'
+    },
+
+     {
+      key: 'Tickets escalados',
+      label: 'Update tickets escalados',
+      icon: '🔄️',
+      text: ' Falla cursor al diligenciar OCR en el campo MRZ - El estado de la solicitud ha pasado a Tech Product review'
+    },
+    {
+      key: ' new',
+      label: 'Nuevos tickets',
+      icon: '🔖',
+      text: ' Buenas tardes Team, se escalo el siguiente ticket a CX SUP - ,  el cual es :'
     }
   ];
   activeTemplate = '';

@@ -36,6 +36,10 @@ export const routes: Routes = [
       {
         path: 'automations',
         loadComponent: () => import('./features/automations/automations.component').then(m => m.AutomationsComponent)
+      },
+      {
+        path: 'avisos',
+        loadComponent: () => import('./features/announcements/announcements.component').then(m => m.AnnouncementsComponent)
       }
     ]
   },

@@ -414,8 +414,8 @@
         color: #ffffff;
         border: 4px solid transparent;
         background-image:
-          linear-gradient(135deg, #667eea 0%, #764ba2 100%),
-          linear-gradient(90deg, #667eea, #764ba2, #ff6b9d, #667eea);
+          linear-gradient(135deg, #052099 0%, #232124 100%),
+          linear-gradient(90deg, #0525b8, #0a0a0a, #9c0739, #031c8a);
         background-origin: border-box;
         background-clip: padding-box, border-box;
         background-size: 100%, 400% 100%;
@@ -425,7 +425,7 @@
         font-size: 1rem;
         cursor: pointer;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 4px 12px rgba(4, 13, 51, 0.4);
         animation: borderShift 4s linear infinite;
         display: block;
         text-align: center;

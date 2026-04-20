@@ -4,7 +4,7 @@
     <p class="page-subtitle">Resumen de tus actividades y tareas</p>
   </div>
 
-  Stats Cards 
+  
   <div class="stats-grid">
     @for (stat of stats(); track stat.key) {
       <div class="stat-card"
@@ -24,7 +24,7 @@
   </div> 
 
   <div class="content-grid">
-  Recent Activities
+
   <div class="card">
       <div class="card-header">
         <h3 class="card-title">Actividades de Hoy</h3>
@@ -51,7 +51,7 @@
       </div>
     </div>
 
-  Quick Actions
+  
   <div class="card">
       <div class="card-header">
         <h3 class="card-title">Acciones Rápidas</h3>
@@ -64,69 +64,6 @@
               <span class="action-label">{{ action.label }}</span>
             </button>
           }
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tips Section -->
-  <div class="card tips-card">
-    <div class="card-header">
-      <h3 class="card-title">💡 AVISOS IMPORTANTES</h3>
-    </div>
-
-    <div class="card-body">
-      <div class="tip-content">
-        <div class="tip-content_subtitle">
-          <label class="analysts-label-fixed">Menciones de Analistas:</label>
-        </div>
-
-        <app-message-template (messageSelected)="onMessageSelected($event)" (mentionAction)="onMentionAction($event)"></app-message-template>
-        <div class="reminder-form">
-          <!-- Textarea -->
-          <div class="form-group">
-            <textarea #reminderTextarea [value]="reminder()" (input)="onTextareaInput($any($event.target).value)"
-              placeholder="Agrega una frase inspiradora, recordatorio importante, noticia de interés o mensajes especiales para tu equipo…"
-              class="reminder-input" rows="8" [disabled]="isSending()"></textarea>
-          </div>
-
-          @if (detectedDriveUrl()) {
-          <div class="drive-badge">
-            <span class="drive-badge__icon">🔗</span>
-            <span>Archivo de Drive detectado</span>
-          </div>
-          <div class="drive-alias-group">
-            <label class="drive-alias-label">Texto del enlace</label>
-            <input
-              type="text"
-              class="drive-alias-input"
-              [value]="driveAlias()"
-              (input)="driveAlias.set($any($event.target).value)"
-              placeholder="Clic para ver archivo"
-            />
-          </div>
-          }
-
-          @if (showSuccess()) {
-          <div class="alert alert-success">
-            ✓ Recordatorio enviado exitosamente a Telegram
-          </div>
-          }
-
-          @if (errorMessage()) {
-          <div class="alert alert-error">
-            {{ errorMessage() }}
-          </div>
-          }
-
-          <button class="btn-primary btn-send-reminder" (click)="sendReminder()" [disabled]="!canSend">
-            @if (isSending()) {
-            <span class="spinner"></span>
-            <span>Enviando...</span>
-            } @else {
-            <span>📤 Enviar a Telegram</span>
-            }
-          </button>
         </div>
       </div>
     </div>

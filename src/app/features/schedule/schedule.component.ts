@@ -18,7 +18,7 @@ export class ScheduleComponent {
 
   readonly PRIORITY_COLOR = PRIORITY_COLOR;
 
-  dayNames = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+  dayNames = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'];
   calendarNavDate = signal(new Date());
 
   calendarTitle = computed(() => {
@@ -115,7 +115,7 @@ export class ScheduleComponent {
   }
 
   deleteEvent(id: string) {
-    if (confirm('¿Eliminar este evento?')) this.eventService.deleteEvent(id);
+    if (confirm('ï¿½Eliminar este evento?')) this.eventService.deleteEvent(id);
   }
 
   updateEventStatus(ev: VirtualEvent, status: EventStatus) {
