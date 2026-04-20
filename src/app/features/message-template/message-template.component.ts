@@ -24,6 +24,7 @@ interface Template {
 })
 export class MessageTemplateComponent {
   @Output() messageSelected = new EventEmitter<string>();
+  @Output() mentionAction = new EventEmitter<{ name: string; checked: boolean }>();
 
   users: User[] = [
     { id: 1, name: '@KaterineAngarita' },
@@ -79,8 +80,8 @@ export class MessageTemplateComponent {
       text: 'Buenas tardes Team,\nse asigno revisión de reglas de riesgo para @usuarios. ETA:'
     }
   ];
-  activeTemplate = this.templates[0].key;
-  messageText = this.templates[0].text.replace('@usuarios', '');
+  activeTemplate = '';
+  messageText = '';
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
@@ -96,13 +97,22 @@ export class MessageTemplateComponent {
   toggleSelectAll() {
     const checked = this.form.get('selectAll')?.value;
     this.usersArray.controls.forEach(ctrl => ctrl.setValue(checked));
-    this.updateMessage();
+    if (this.activeTemplate) {
+      this.updateMessage();
+    } else {
+      this.users.forEach(u => this.mentionAction.emit({ name: u.name, checked }));
+    }
   }
 
-  onUserChange() {
+  onUserChange(index: number) {
     const allSelected = this.usersArray.value.every((v: boolean) => v);
     this.form.get('selectAll')?.setValue(allSelected, { emitEvent: false });
-    this.updateMessage();
+    if (this.activeTemplate) {
+      this.updateMessage();
+    } else {
+      const checked = this.usersArray.value[index] as boolean;
+      this.mentionAction.emit({ name: this.users[index].name, checked });
+    }
   }
 
   get selectedUsers(): string[] {
@@ -117,6 +127,11 @@ export class MessageTemplateComponent {
   }
 
   selectTemplate(key: string) {
+    if (this.activeTemplate === key) {
+      // Desactivar: entrar en modo manual, no emitir nada
+      this.activeTemplate = '';
+      return;
+    }
     this.activeTemplate = key;
     this.updateMessage();
   }
@@ -125,6 +140,10 @@ export class MessageTemplateComponent {
     const template = this.templates.find(t => t.key === this.activeTemplate);
     this.messageText = template ? template.text.replace('@usuarios', this.selectedUsers.join(', ')) : '';
     this.messageSelected.emit(this.messageText);
+  }
+
+  clearActiveTemplate() {
+    this.activeTemplate = '';
   }
 
   getUserControl(i: number): FormControl {

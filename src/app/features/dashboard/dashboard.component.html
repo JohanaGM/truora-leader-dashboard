@@ -4,34 +4,38 @@
     <p class="page-subtitle">Resumen de tus actividades y tareas</p>
   </div>
 
-  <!-- Stats Cards -->
-  <!-- <div class="stats-grid">
-    @for (stat of stats; track stat.label) {
-      <div class="stat-card" [style.border-left-color]="stat.color">
+  Stats Cards 
+  <div class="stats-grid">
+    @for (stat of stats(); track stat.key) {
+      <div class="stat-card"
+           [style.border-left-color]="stat.color"
+           [class.stat-card--clickable]="stat.key === 'tips'"
+           [title]="stat.key === 'tips' ? 'Abrir carpeta de tips en Drive' : ''"
+           (click)="stat.key === 'tips' ? openTipsFolder() : null">
         <div class="stat-icon">{{ stat.icon }}</div>
         <div class="stat-content">
           <p class="stat-label">{{ stat.label }}</p>
           <div class="stat-value-row">
             <h3 class="stat-value">{{ stat.value }}</h3>
-            <span class="stat-trend" [class.positive]="stat.trend.includes('+')">
-              {{ stat.trend }}
-            </span>
           </div>
         </div>
       </div>
     }
-  </div> -->
+  </div> 
 
-  <!-- <div class="content-grid"> -->
-  <!-- Recent Activities -->
-  <!-- <div class="card">
+  <div class="content-grid">
+  Recent Activities
+  <div class="card">
       <div class="card-header">
         <h3 class="card-title">Actividades de Hoy</h3>
-        <button class="btn-link">Ver todas →</button>
-      </div>
+        <a class="btn-link" routerLink="/schedule">Ver todas →</a>
+      </div> 
       <div class="card-body">
         <div class="activities-list">
-          @for (activity of recentActivities; track activity.title) {
+          @if (todayActivities().length === 0) {
+            <div class="empty-activities">No hay actividades programadas para hoy 📥</div>
+          }
+          @for (activity of todayActivities(); track activity.title) {
             <div class="activity-item">
               <div class="activity-indicator" [style.background-color]="activity.color"></div>
               <div class="activity-content">
@@ -45,17 +49,17 @@
           }
         </div>
       </div>
-    </div> -->
+    </div>
 
-  <!-- Quick Actions -->
-  <!-- <div class="card">
+  Quick Actions
+  <div class="card">
       <div class="card-header">
         <h3 class="card-title">Acciones Rápidas</h3>
       </div>
       <div class="card-body">
         <div class="quick-actions">
           @for (action of quickActions; track action.label) {
-            <button class="action-button" [style.background]="action.color">
+            <button class="action-button" [style.background]="action.color" (click)="navigateTo(action.route)">
               <span class="action-icon">{{ action.icon }}</span>
               <span class="action-label">{{ action.label }}</span>
             </button>
@@ -63,7 +67,7 @@
         </div>
       </div>
     </div>
-  </div> -->
+  </div>
 
   <!-- Tips Section -->
   <div class="card tips-card">
@@ -77,14 +81,31 @@
           <label class="analysts-label-fixed">Menciones de Analistas:</label>
         </div>
 
-        <app-message-template (messageSelected)="onMessageSelected($event)"></app-message-template>
+        <app-message-template (messageSelected)="onMessageSelected($event)" (mentionAction)="onMentionAction($event)"></app-message-template>
         <div class="reminder-form">
           <!-- Textarea -->
           <div class="form-group">
-            <textarea #reminderTextarea [value]="reminder()" (input)="reminder.set($any($event.target).value)"
+            <textarea #reminderTextarea [value]="reminder()" (input)="onTextareaInput($any($event.target).value)"
               placeholder="Agrega una frase inspiradora, recordatorio importante, noticia de interés o mensajes especiales para tu equipo…"
               class="reminder-input" rows="8" [disabled]="isSending()"></textarea>
           </div>
+
+          @if (detectedDriveUrl()) {
+          <div class="drive-badge">
+            <span class="drive-badge__icon">🔗</span>
+            <span>Archivo de Drive detectado</span>
+          </div>
+          <div class="drive-alias-group">
+            <label class="drive-alias-label">Texto del enlace</label>
+            <input
+              type="text"
+              class="drive-alias-input"
+              [value]="driveAlias()"
+              (input)="driveAlias.set($any($event.target).value)"
+              placeholder="Clic para ver archivo"
+            />
+          </div>
+          }
 
           @if (showSuccess()) {
           <div class="alert alert-success">

@@ -1,8 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivityService } from '../../core/services';
-import { Activity } from '../../core/models';
+import { EventService, VirtualEvent } from '../../core/services/event.service';
+import { AppEvent, EventPriority, EventStatus, PRIORITY_COLOR } from '../../core/models/event.model';
+
+interface CalendarDay { date: Date; isCurrentMonth: boolean; }
 
 @Component({
   selector: 'app-schedule',
@@ -12,145 +14,142 @@ import { Activity } from '../../core/models';
   styleUrl: './schedule.component.scss'
 })
 export class ScheduleComponent {
-  private activityService = inject(ActivityService);
-  
-  activities = this.activityService.activities;
-  showModal = signal(false);
-  editingActivity = signal<Activity | null>(null);
-  
-  formData = signal<{
-    title: string;
-    date: string;
-    startTime: string;
-    endTime: string;
-    status: Activity['status'];
-    description: string;
-    color: string;
-  }>({
-    title: '',
-    date: new Date().toISOString().split('T')[0],
-    startTime: '09:00',
-    endTime: '10:00',
-    status: 'pending',
-    description: '',
-    color: '#FF6B9D'
+  private eventService = inject(EventService);
+
+  readonly PRIORITY_COLOR = PRIORITY_COLOR;
+
+  dayNames = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+  calendarNavDate = signal(new Date());
+
+  calendarTitle = computed(() => {
+    const d = this.calendarNavDate();
+    return d.toLocaleDateString('es-CO', { month: 'long', year: 'numeric', timeZone: 'America/Bogota' });
   });
 
-  colors = ['#FF6B9D', '#4ECDC4', '#FFD93D', '#95E1D3', '#667eea', '#764ba2'];
+  calendarDays = computed((): CalendarDay[] => {
+    this.eventService.events(); // track for reactivity
+    const nav = this.calendarNavDate();
+    const year = nav.getFullYear();
+    const month = nav.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const startOffset = (firstDay.getDay() + 6) % 7;
+    const start = new Date(year, month, 1 - startOffset);
+    return Array.from({ length: 42 }, (_, i) => {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      return { date: new Date(d), isCurrentMonth: d.getMonth() === month };
+    });
+  });
 
-  get todayActivities() {
-    const today = new Date().toDateString();
-    return this.activities().filter(a => 
-      new Date(a.date).toDateString() === today
-    );
+  prevMonth() {
+    const d = this.calendarNavDate();
+    this.calendarNavDate.set(new Date(d.getFullYear(), d.getMonth() - 1, 1));
   }
 
-  get upcomingActivities() {
-    const today = new Date();
-    return this.activities().filter(a => 
-      new Date(a.date) > today
-    ).sort((a, b) => 
-      new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
+  nextMonth() {
+    const d = this.calendarNavDate();
+    this.calendarNavDate.set(new Date(d.getFullYear(), d.getMonth() + 1, 1));
   }
 
-  openModal(activity?: Activity) {
-    if (activity) {
-      this.editingActivity.set(activity);
+  isToday(date: Date): boolean {
+    return date.toDateString() === new Date().toDateString();
+  }
+
+  getEventsForDay(date: Date): VirtualEvent[] {
+    return this.eventService.getAllForDate(date);
+  }
+
+  // ---- Modal ----
+  showModal = signal(false);
+  editingId  = signal<string | null>(null);
+
+  formData = signal<{
+    title: string; date: string; startTime: string; endTime: string;
+    priority: EventPriority; status: EventStatus; description: string;
+  }>({
+    title: '', date: this.eventService.toDateStr(new Date()),
+    startTime: '09:00', endTime: '10:00',
+    priority: 'medium', status: 'pending', description: '',
+  });
+
+  patchForm(patch: Partial<{
+    title: string; date: string; startTime: string; endTime: string;
+    priority: EventPriority; status: EventStatus; description: string;
+  }>) {
+    this.formData.set({ ...this.formData(), ...patch });
+  }
+
+  openModal(prefillDate?: Date, ev?: AppEvent) {
+    if (ev) {
+      this.editingId.set(ev.id);
       this.formData.set({
-        title: activity.title,
-        date: new Date(activity.date).toISOString().split('T')[0],
-        startTime: activity.startTime,
-        endTime: activity.endTime,
-        status: activity.status,
-        description: activity.description || '',
-        color: activity.color || '#FF6B9D'
+        title: ev.title, date: ev.date,
+        startTime: ev.startTime, endTime: ev.endTime,
+        priority: ev.priority, status: ev.status,
+        description: ev.description ?? '',
       });
     } else {
-      this.editingActivity.set(null);
+      this.editingId.set(null);
       this.formData.set({
         title: '',
-        date: new Date().toISOString().split('T')[0],
-        startTime: '09:00',
-        endTime: '10:00',
-        status: 'pending',
-        description: '',
-        color: '#FF6B9D'
+        date: prefillDate ? this.eventService.toDateStr(prefillDate) : this.eventService.toDateStr(new Date()),
+        startTime: '09:00', endTime: '10:00',
+        priority: 'medium', status: 'pending', description: '',
       });
     }
     this.showModal.set(true);
   }
 
-  closeModal() {
-    this.showModal.set(false);
-    this.editingActivity.set(null);
-  }
+  closeModal() { this.showModal.set(false); this.editingId.set(null); }
 
-  saveActivity() {
-    const data = this.formData();
-    const editing = this.editingActivity();
-
-    if (editing) {
-      this.activityService.updateActivity(editing.id, {
-        ...data,
-        date: new Date(data.date)
-      });
+  saveEvent() {
+    const d = this.formData();
+    if (!d.title.trim()) return;
+    const id = this.editingId();
+    if (id) {
+      this.eventService.updateEvent(id, { ...d, type: 'manual' });
     } else {
-      this.activityService.addActivity({
-        ...data,
-        date: new Date(data.date)
-      });
+      this.eventService.addEvent({ ...d, type: 'manual' });
     }
-
     this.closeModal();
   }
 
-  deleteActivity(id: string) {
-    if (confirm('Â¿EstÃ¡s seguro de eliminar esta actividad?')) {
-      this.activityService.deleteActivity(id);
+  deleteEvent(id: string) {
+    if (confirm('¿Eliminar este evento?')) this.eventService.deleteEvent(id);
+  }
+
+  updateEventStatus(ev: VirtualEvent, status: EventStatus) {
+    if (ev.isRecurring) {
+      this.eventService.updateRecurringStatus(ev.type as 'truface' | 'tips', ev.date, status);
+    } else {
+      this.eventService.updateEvent(ev.id, { status });
     }
   }
 
-  updateStatus(id: string, status: Activity['status']) {
-    this.activityService.updateActivity(id, { status });
+  openEditModal(ev: VirtualEvent) {
+    if (ev.isRecurring) return;
+    const stored = this.eventService.events().find(e => e.id === ev.id);
+    if (stored) this.openModal(undefined, stored);
   }
 
-  getStatusLabel(status: Activity['status']): string {
-    const labels = {
-      'pending': 'Pendiente',
-      'in-progress': 'En Progreso',
-      'completed': 'Completada',
-      'cancelled': 'Cancelada'
-    };
-    return labels[status];
+  getStatusLabel(s: EventStatus): string {
+    return ({ pending: 'Pendiente', 'in-progress': 'En Progreso', completed: 'Completada' } as Record<string,string>)[s] ?? s;
   }
 
-  // Helper methods para actualizar formData
-  updateFormTitle(title: string) {
-    this.formData.set({ ...this.formData(), title });
+  getPriorityLabel(p: EventPriority): string {
+    return ({ low: 'Baja', medium: 'Media', high: 'Alta' } as Record<string,string>)[p] ?? p;
   }
 
-  updateFormDate(date: string) {
-    this.formData.set({ ...this.formData(), date });
-  }
+  todayEvents = computed((): VirtualEvent[] => {
+    this.eventService.events();
+    return this.eventService.getAllForDate(new Date());
+  });
 
-  updateFormStartTime(startTime: string) {
-    this.formData.set({ ...this.formData(), startTime });
-  }
-
-  updateFormEndTime(endTime: string) {
-    this.formData.set({ ...this.formData(), endTime });
-  }
-
-  updateFormDescription(description: string) {
-    this.formData.set({ ...this.formData(), description });
-  }
-
-  updateFormColor(color: string) {
-    this.formData.set({ ...this.formData(), color });
-  }
-
-  updateFormActivityStatus(status: Activity['status']) {
-    this.formData.set({ ...this.formData(), status });
-  }
+  upcomingEvents = computed((): VirtualEvent[] => {
+    const todayStr = this.eventService.toDateStr(new Date());
+    return this.eventService.events()
+      .filter(e => e.date > todayStr && e.type === 'manual')
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map(e => ({ ...e, color: PRIORITY_COLOR[e.priority], isRecurring: false } as VirtualEvent));
+  });
 }

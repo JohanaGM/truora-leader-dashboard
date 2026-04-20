@@ -1,54 +1,92 @@
-<div class="schedule">
+﻿<div class="schedule">
   <div class="page-header">
     <div class="header-content">
       <h1 class="page-title">📅 Cronograma de Actividades</h1>
       <p class="page-subtitle">Gestiona tus eventos y reuniones</p>
     </div>
     <button class="btn-primary" (click)="openModal()">
-      ➕ Nueva Actividad
+      ➕ Nuevo Evento
     </button>
   </div>
 
-  <!-- Today's Activities -->
+  <!-- ===== CALENDARIO MENSUAL ===== -->
   <div class="section">
-    <h2 class="section-title">Actividades de Hoy</h2>
-    
-    @if (todayActivities.length === 0) {
+    <div class="calendar-wrapper">
+      <div class="calendar-nav">
+        <button class="cal-nav-btn" (click)="prevMonth()">&#8249;</button>
+        <h2 class="cal-month-title">{{ calendarTitle() }}</h2>
+        <button class="cal-nav-btn" (click)="nextMonth()">&#8250;</button>
+      </div>
+      <div class="cal-legend">
+        <span class="legend-dot" style="background:#FF6B9D"></span> Truface (Lun/Mie/Vie)
+        <span class="legend-dot" style="background:#9471b9; margin-left:1rem"></span> Generar Tips (Jue)
+        <span class="legend-dot" style="background:#e53e3e; margin-left:1rem"></span> Alta
+        <span class="legend-dot" style="background:#d69e2e; margin-left:0.5rem"></span> Media
+        <span class="legend-dot" style="background:#3182ce; margin-left:0.5rem"></span> Baja
+      </div>
+      <div class="cal-day-names">
+        @for (name of dayNames; track name) {
+          <div class="cal-day-name">{{ name }}</div>
+        }
+      </div>
+      <div class="calendar-grid">
+        @for (cell of calendarDays(); track cell.date.toISOString()) {
+          <div class="cal-cell"
+               [class.other-month]="!cell.isCurrentMonth"
+               [class.is-today]="isToday(cell.date)"
+               (click)="cell.isCurrentMonth ? openModal(cell.date) : null">
+            <span class="cal-day-num">{{ cell.date.getDate() }}</span>
+            <div class="cal-events">
+              @for (ev of getEventsForDay(cell.date); track ev.id; let i = $index) {
+                @if (i < 3) {
+                  <span class="cal-event-chip"
+                        [style.background-color]="ev.color"
+                        [title]="ev.title">
+                    {{ ev.title.length > 11 ? (ev.title | slice:0:10) + '...' : ev.title }}
+                  </span>
+                }
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Eventos de Hoy -->
+  <div class="section">
+    <h2 class="section-title">Eventos de Hoy</h2>
+    @if (todayEvents().length === 0) {
       <div class="empty-state">
         <span class="empty-icon">📭</span>
-        <p>No tienes actividades programadas para hoy</p>
+        <p>No tienes eventos programados para hoy</p>
       </div>
     } @else {
       <div class="activities-grid">
-        @for (activity of todayActivities; track activity.id) {
-          <div class="activity-card" [style.border-left-color]="activity.color">
+        @for (ev of todayEvents(); track ev.id) {
+          <div class="activity-card" [style.border-left-color]="ev.color">
             <div class="activity-header">
-              <div class="activity-time">
-                <span class="time">{{ activity.startTime }} - {{ activity.endTime }}</span>
-              </div>
+              <span class="time">{{ ev.startTime }} - {{ ev.endTime }}</span>
               <div class="activity-actions">
-                <button class="btn-icon" (click)="openModal(activity)">✏️</button>
-                <button class="btn-icon" (click)="deleteActivity(activity.id)">🗑️</button>
+                @if (!ev.isRecurring) {
+                  <button class="btn-icon" (click)="openEditModal(ev); $event.stopPropagation()">✏️</button>
+                  <button class="btn-icon" (click)="deleteEvent(ev.id); $event.stopPropagation()">🗑️</button>
+                }
               </div>
             </div>
-            
-            <h3 class="activity-title">{{ activity.title }}</h3>
-            
-            @if (activity.description) {
-              <p class="activity-description">{{ activity.description }}</p>
+            <h3 class="activity-title">
+              {{ ev.isRecurring ? '' : '📅 ' }}{{ ev.title }}
+            </h3>
+            @if (ev.description) {
+              <p class="activity-description">{{ ev.description }}</p>
             }
-            
             <div class="activity-footer">
-              <select 
-                [value]="activity.status" 
-                (change)="updateStatus(activity.id, $any($event.target).value)"
-                class="status-select"
-                [class]="activity.status"
-              >
+              <select [value]="ev.status"
+                      (change)="updateEventStatus(ev, $any($event.target).value)"
+                      class="status-select" [class]="ev.status">
                 <option value="pending">Pendiente</option>
                 <option value="in-progress">En Progreso</option>
                 <option value="completed">Completada</option>
-                <option value="cancelled">Cancelada</option>
               </select>
             </div>
           </div>
@@ -57,33 +95,30 @@
     }
   </div>
 
-  <!-- Upcoming Activities -->
+  <!-- Proximos Eventos Manuales -->
   <div class="section">
-    <h2 class="section-title">Próximas Actividades</h2>
-    
-    @if (upcomingActivities.length === 0) {
+    <h2 class="section-title">Próximos Eventos</h2>
+    @if (upcomingEvents().length === 0) {
       <div class="empty-state">
         <span class="empty-icon">📅</span>
-        <p>No tienes actividades próximas programadas</p>
+        <p>No tienes eventos próximos programados</p>
       </div>
     } @else {
       <div class="activities-list">
-        @for (activity of upcomingActivities; track activity.id) {
+        @for (ev of upcomingEvents(); track ev.id) {
           <div class="activity-item">
-            <div class="activity-indicator" [style.background-color]="activity.color"></div>
+            <div class="activity-indicator" [style.background-color]="ev.color"></div>
             <div class="activity-info">
-              <h4 class="item-title">{{ activity.title }}</h4>
+              <h4 class="item-title">📅 {{ ev.title }}</h4>
               <div class="item-meta">
-                <span class="item-date">{{ activity.date | date:'dd/MM/yyyy' }}</span>
-                <span class="item-time">{{ activity.startTime }} - {{ activity.endTime }}</span>
-                <span class="item-status" [class]="activity.status">
-                  {{ getStatusLabel(activity.status) }}
-                </span>
+                <span class="item-date">{{ ev.date }}</span>
+                <span class="item-time">{{ ev.startTime }} - {{ ev.endTime }}</span>
+                <span class="item-status" [class]="ev.status">{{ getStatusLabel(ev.status) }}</span>
               </div>
             </div>
             <div class="activity-actions">
-              <button class="btn-icon" (click)="openModal(activity)">✏️</button>
-              <button class="btn-icon" (click)="deleteActivity(activity.id)">🗑️</button>
+              <button class="btn-icon" (click)="openEditModal(ev)">✏️</button>
+              <button class="btn-icon" (click)="deleteEvent(ev.id)">🗑️</button>
             </div>
           </div>
         }
@@ -92,108 +127,77 @@
   </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal Nuevo Evento -->
 @if (showModal()) {
   <div class="modal-overlay" (click)="closeModal()">
     <div class="modal" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>{{ editingActivity() ? 'Editar Actividad' : 'Nueva Actividad' }}</h3>
-        <button class="btn-close" (click)="closeModal()">✕</button>
+        <h3>{{ editingId() ? 'Editar Evento' : 'Nuevo Evento' }}</h3>
+        <button class="btn-close" (click)="closeModal()">x</button>
       </div>
-      
       <div class="modal-body">
         <div class="form-group">
           <label>Título *</label>
-          <input 
-            type="text" 
-            [(ngModel)]="formData().title"
-            (ngModelChange)="updateFormTitle($event)"
-            placeholder="Nombre de la actividad"
-            class="form-input"
-          />
+          <input type="text" [value]="formData().title"
+                 (input)="patchForm({title: $any($event.target).value})"
+                 placeholder="Nombre del evento" class="form-input" />
         </div>
-
         <div class="form-row">
           <div class="form-group">
             <label>Fecha *</label>
-            <input 
-              type="date" 
-              [(ngModel)]="formData().date"
-              (ngModelChange)="updateFormDate($event)"
-              class="form-input"
-            />
+            <input type="date" [value]="formData().date"
+                   (change)="patchForm({date: $any($event.target).value})"
+                   class="form-input" />
           </div>
-
           <div class="form-group">
-            <label>Hora Inicio *</label>
-            <input 
-              type="time" 
-              [(ngModel)]="formData().startTime"
-              (ngModelChange)="updateFormStartTime($event)"
-              class="form-input"
-            />
+            <label>Hora Inicio</label>
+            <input type="time" [value]="formData().startTime"
+                   (change)="patchForm({startTime: $any($event.target).value})"
+                   class="form-input" />
           </div>
-
           <div class="form-group">
-            <label>Hora Fin *</label>
-            <input 
-              type="time" 
-              [(ngModel)]="formData().endTime"
-              (ngModelChange)="updateFormEndTime($event)"
-              class="form-input"
-            />
+            <label>Hora Fin</label>
+            <input type="time" [value]="formData().endTime"
+                   (change)="patchForm({endTime: $any($event.target).value})"
+                   class="form-input" />
           </div>
         </div>
-
         <div class="form-group">
-          <label>Descripción</label>
-          <textarea 
-            [(ngModel)]="formData().description"
-            (ngModelChange)="updateFormDescription($event)"
-            placeholder="Detalles de la actividad"
-            class="form-textarea"
-            rows="3"
-          ></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Color</label>
-          <div class="color-picker">
-            @for (color of colors; track color) {
-              <button 
-                type="button"
-                class="color-option"
-                [class.active]="formData().color === color"
-                [style.background-color]="color"
-                (click)="updateFormColor(color)"
-              ></button>
-            }
+          <label>Prioridad</label>
+          <div class="priority-buttons">
+            <button type="button" class="priority-btn high"
+                    [class.active]="formData().priority === 'high'"
+                    (click)="patchForm({priority: 'high'})">Alta</button>
+            <button type="button" class="priority-btn medium"
+                    [class.active]="formData().priority === 'medium'"
+                    (click)="patchForm({priority: 'medium'})">Media</button>
+            <button type="button" class="priority-btn low"
+                    [class.active]="formData().priority === 'low'"
+                    (click)="patchForm({priority: 'low'})">Baja</button>
           </div>
         </div>
-
         <div class="form-group">
           <label>Estado</label>
-          <select 
-            [(ngModel)]="formData().status"
-            (ngModelChange)="updateFormActivityStatus($event)"
-            class="form-select"
-          >
+          <select [value]="formData().status"
+                  (change)="patchForm({status: $any($event.target).value})"
+                  class="form-select">
             <option value="pending">Pendiente</option>
             <option value="in-progress">En Progreso</option>
             <option value="completed">Completada</option>
-            <option value="cancelled">Cancelada</option>
           </select>
         </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea [value]="formData().description"
+                    (input)="patchForm({description: $any($event.target).value})"
+                    placeholder="Detalles del evento"
+                    class="form-textarea" rows="3"></textarea>
+        </div>
       </div>
-
       <div class="modal-footer">
         <button class="btn-secondary" (click)="closeModal()">Cancelar</button>
-        <button 
-          class="btn-primary" 
-          (click)="saveActivity()"
-          [disabled]="!formData().title"
-        >
-          {{ editingActivity() ? 'Guardar Cambios' : 'Crear Actividad' }}
+        <button class="btn-primary" (click)="saveEvent()" [disabled]="!formData().title">
+          {{ editingId() ? 'Guardar Cambios' : 'Crear Evento' }}
         </button>
       </div>
     </div>

@@ -1,26 +1,26 @@
-<div class="tasks">
+﻿<div class="tasks">
   <div class="page-header">
     <div class="header-content">
-      <h1 class="page-title">✅ Tareas de la Semana</h1>
-      <p class="page-subtitle">Organiza y da seguimiento a tus tareas</p>
+      <h1 class="page-title">&#9989; Tareas de la Semana</h1>
+      <p class="page-subtitle">Eventos de esta semana (manuales + recurrentes)</p>
     </div>
-    <button class="btn-primary" (click)="openSidePanel()">
-      ➕ Nueva Tarea
+    <button class="btn-primary" (click)="openPanel()">
+      &#43; Nuevo Evento
     </button>
   </div>
 
-  <!-- Stats Summary -->
+  <!-- Stats -->
   <div class="stats-summary">
     <div class="stat-item pending">
-      <span class="stat-number">{{ pendingTasks() }}</span>
+      <span class="stat-number">{{ pendingCount() }}</span>
       <span class="stat-label">Pendientes</span>
     </div>
     <div class="stat-item in-progress">
-      <span class="stat-number">{{ inProgressTasks() }}</span>
+      <span class="stat-number">{{ inProgressCount() }}</span>
       <span class="stat-label">En Progreso</span>
     </div>
     <div class="stat-item completed">
-      <span class="stat-number">{{ completedTasks() }}</span>
+      <span class="stat-number">{{ completedCount() }}</span>
       <span class="stat-label">Completadas</span>
     </div>
   </div>
@@ -29,25 +29,20 @@
   <div class="filters">
     <div class="filter-group">
       <label>Estado:</label>
-      <select 
-        [value]="filterStatus()" 
-        (change)="filterStatus.set($any($event.target).value)"
-        class="filter-select"
-      >
+      <select [value]="filterStatus()"
+              (change)="filterStatus.set($any($event.target).value)"
+              class="filter-select">
         <option value="all">Todos</option>
         <option value="pending">Pendientes</option>
         <option value="in-progress">En Progreso</option>
         <option value="completed">Completadas</option>
       </select>
     </div>
-
     <div class="filter-group">
       <label>Prioridad:</label>
-      <select 
-        [value]="filterPriority()" 
-        (change)="filterPriority.set($any($event.target).value)"
-        class="filter-select"
-      >
+      <select [value]="filterPriority()"
+              (change)="filterPriority.set($any($event.target).value)"
+              class="filter-select">
         <option value="all">Todas</option>
         <option value="high">Alta</option>
         <option value="medium">Media</option>
@@ -56,40 +51,44 @@
     </div>
   </div>
 
-  <!-- Tasks List -->
-  @if (filteredTasks().length === 0) {
+  <!-- List -->
+  @if (filteredEvents().length === 0) {
     <div class="empty-state">
-      <span class="empty-icon">📝</span>
-      <p>No hay tareas que coincidan con los filtros</p>
+      <span class="empty-icon">&#128203;</span>
+      <p>No hay eventos que coincidan con los filtros</p>
     </div>
   } @else {
     <div class="tasks-grid">
-      @for (task of filteredTasks(); track task.id) {
-        <div class="task-card" [class]="task.status">
+      @for (ev of filteredEvents(); track ev.id) {
+        <div class="task-card" [class]="ev.status"
+             [style.border-left-color]="getPriorityBorderColor(ev.priority)">
           <div class="task-header">
-            <div class="task-priority" [class]="getPriorityClass(task.priority)">
-              {{ getPriorityLabel(task.priority) }}
+            <div class="task-priority" [class]="'priority-' + ev.priority">
+              {{ getPriorityLabel(ev.priority) }}
             </div>
             <div class="task-actions">
-              <button class="btn-icon" (click)="openSidePanel(task)">✏️</button>
-              <button class="btn-icon" (click)="deleteTask(task.id)">🗑️</button>
+              @if (!ev.isRecurring) {
+                <button class="btn-icon" (click)="openPanel(ev)">&#9999;&#65039;</button>
+                <button class="btn-icon" (click)="deleteEvent(ev)">&#128465;&#65039;</button>
+              }
             </div>
           </div>
 
-          <h3 class="task-title">{{ task.title }}</h3>
-          <p class="task-description">{{ task.description }}</p>
+          <h3 class="task-title" [class.completed-title]="ev.status === 'completed'">
+            @if (!ev.isRecurring) {
+              <span class="calendar-badge" title="Evento manual">&#128197;</span>
+            }
+            {{ ev.title }}
+          </h3>
+          @if (ev.description) {
+            <p class="task-description">{{ ev.description }}</p>
+          }
 
           <div class="task-footer">
-            <div class="task-meta">
-              <span class="task-date">📅 {{ task.dueDate | date:'dd/MM/yyyy' }}</span>
-            </div>
-            
-            <select 
-              [value]="task.status" 
-              (change)="updateStatus(task.id, $any($event.target).value)"
-              class="status-badge"
-              [class]="task.status"
-            >
+            <span class="task-date">&#128197; {{ ev.date }}</span>
+            <select [value]="ev.status"
+                    (change)="updateStatus(ev, $any($event.target).value)"
+                    class="status-badge" [class]="ev.status">
               <option value="pending">Pendiente</option>
               <option value="in-progress">En Progreso</option>
               <option value="completed">Completada</option>
@@ -103,98 +102,76 @@
 
 <!-- Side Panel -->
 @if (showSidePanel()) {
-  <div class="side-panel-overlay" (click)="closeSidePanel()">
+  <div class="side-panel-overlay" (click)="closePanel()">
     <div class="side-panel" (click)="$event.stopPropagation()">
       <div class="panel-header">
-        <h3>{{ editingTask() ? 'Editar Tarea' : 'Nueva Tarea' }}</h3>
-        <button class="btn-close" (click)="closeSidePanel()">✕</button>
+        <h3>{{ editingId() ? 'Editar Evento' : 'Nuevo Evento' }}</h3>
+        <button class="btn-close" (click)="closePanel()">x</button>
       </div>
-
       <div class="panel-body">
         <div class="form-group">
           <label>Título *</label>
-          <input 
-            type="text" 
-            [(ngModel)]="formData().title"
-            (ngModelChange)="updateTitle($event)"
-            placeholder="Nombre de la tarea"
-            class="form-input"
-          />
+          <input type="text" [value]="formData().title"
+                 (input)="patchForm({title: $any($event.target).value})"
+                 placeholder="Nombre del evento" class="form-input" />
         </div>
-
         <div class="form-group">
-          <label>Descripción *</label>
-          <textarea 
-            [(ngModel)]="formData().description"
-            (ngModelChange)="updateDescription($event)"
-            placeholder="Detalles de la tarea"
-            class="form-textarea"
-            rows="4"
-          ></textarea>
+          <label>Descripción</label>
+          <textarea [value]="formData().description"
+                    (input)="patchForm({description: $any($event.target).value})"
+                    placeholder="Detalles del evento"
+                    class="form-textarea" rows="3"></textarea>
         </div>
-
+        <div class="form-group">
+          <label>Fecha *</label>
+          <input type="date" [value]="formData().date"
+                 (change)="patchForm({date: $any($event.target).value})"
+                 class="form-input" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Hora Inicio</label>
+            <input type="time" [value]="formData().startTime"
+                   (change)="patchForm({startTime: $any($event.target).value})"
+                   class="form-input" />
+          </div>
+          <div class="form-group">
+            <label>Hora Fin</label>
+            <input type="time" [value]="formData().endTime"
+                   (change)="patchForm({endTime: $any($event.target).value})"
+                   class="form-input" />
+          </div>
+        </div>
         <div class="form-group">
           <label>Prioridad *</label>
           <div class="priority-buttons">
-            <button 
-              type="button"
-              class="priority-btn low"
-              [class.active]="formData().priority === 'low'"
-              (click)="updatePriority('low')"
-            >
-              Baja
-            </button>
-            <button 
-              type="button"
-              class="priority-btn medium"
-              [class.active]="formData().priority === 'medium'"
-              (click)="updatePriority('medium')"
-            >
-              Media
-            </button>
-            <button 
-              type="button"
-              class="priority-btn high"
-              [class.active]="formData().priority === 'high'"
-              (click)="updatePriority('high')"
-            >
-              Alta
-            </button>
+            <button type="button" class="priority-btn high"
+                    [class.active]="formData().priority === 'high'"
+                    (click)="patchForm({priority: 'high'})">Alta</button>
+            <button type="button" class="priority-btn medium"
+                    [class.active]="formData().priority === 'medium'"
+                    (click)="patchForm({priority: 'medium'})">Media</button>
+            <button type="button" class="priority-btn low"
+                    [class.active]="formData().priority === 'low'"
+                    (click)="patchForm({priority: 'low'})">Baja</button>
           </div>
         </div>
-
         <div class="form-group">
-          <label>Fecha de vencimiento *</label>
-          <input 
-            type="date" 
-            [(ngModel)]="formData().dueDate"
-            (ngModelChange)="updateDueDate($event)"
-            class="form-input"
-          />
-        </div>
-
-        <div class="form-group">
-          <label>Estado *</label>
-          <select 
-            [(ngModel)]="formData().status"
-            (ngModelChange)="updateFormStatus($event)"
-            class="form-select"
-          >
+          <label>Estado</label>
+          <select [value]="formData().status"
+                  (change)="patchForm({status: $any($event.target).value})"
+                  class="form-select">
             <option value="pending">Pendiente</option>
             <option value="in-progress">En Progreso</option>
             <option value="completed">Completada</option>
           </select>
         </div>
       </div>
-
       <div class="panel-footer">
-        <button class="btn-secondary" (click)="closeSidePanel()">Cancelar</button>
-        <button 
-          class="btn-primary" 
-          (click)="saveTask()"
-          [disabled]="!formData().title || !formData().description"
-        >
-          {{ editingTask() ? 'Guardar Cambios' : 'Crear Tarea' }}
+        <button class="btn-secondary" (click)="closePanel()">Cancelar</button>
+        <button class="btn-primary" (click)="saveEvent()"
+                [disabled]="!formData().title">
+          {{ editingId() ? 'Guardar Cambios' : 'Crear Evento' }}
         </button>
       </div>
     </div>

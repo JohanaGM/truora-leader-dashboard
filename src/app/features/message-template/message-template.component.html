@@ -7,7 +7,7 @@
     <div class="chips improved-chips">
       <ng-container *ngFor="let user of users; let i = index">
         <label class="chip improved-chip">
-          <input type="checkbox" [formControl]="getUserControl(i)" (change)="onUserChange()" />
+          <input type="checkbox" [formControl]="getUserControl(i)" (change)="onUserChange(i)" />
           <span>{{ user.name }}</span>
         </label>
       </ng-container>

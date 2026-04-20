@@ -1,0 +1,176 @@
+<div class="automations-page">
+  <div class="welcome-section">
+    <h1 class="page-title">⚙️ Automatizaciones</h1>
+    <p class="page-subtitle">Dispara flujos de automatización conectados a n8n</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button
+      class="tab-btn"
+      [class.active]="activeTab() === 'telegram'"
+      (click)="setTab('telegram')"
+    >
+      📨 Telegram → Sheets
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab() === 'snowflake'"
+      (click)="setTab('snowflake')"
+    >
+      ❄️ Extracción Snowflake
+    </button>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- FLUJO 1: Telegram a Sheets                                   -->
+  <!-- ============================================================ -->
+  @if (activeTab() === 'telegram') {
+    <div class="flow-card">
+      <div class="flow-header">
+        <div class="flow-icon">📨</div>
+        <div>
+          <h2 class="flow-title">Automatización Telegram → Google Sheets</h2>
+          <p class="flow-desc">
+            Sube el archivo <strong>.json</strong> exportado de Telegram. n8n lo almacenará en Drive
+            e iniciará la conversión a CSV en Google Sheets.
+          </p>
+        </div>
+      </div>
+
+      <!-- Drag & Drop Zone -->
+      <div
+        class="dropzone"
+        [class.dragover]="dragOver()"
+        [class.has-file]="!!selectedFile()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave()"
+        (drop)="onDrop($event)"
+        (click)="fileInput.click()"
+      >
+        <input
+          #fileInput
+          type="file"
+          accept=".json"
+          class="file-input-hidden"
+          (change)="onFileSelected($event)"
+        />
+
+        @if (selectedFile()) {
+          <div class="file-preview">
+            <span class="file-icon">📄</span>
+            <span class="file-name">{{ selectedFile()!.name }}</span>
+            <span class="file-size">{{ (selectedFile()!.size / 1024).toFixed(1) }} KB</span>
+          </div>
+        } @else {
+          <div class="dropzone-placeholder">
+            <span class="drop-icon">☁️</span>
+            <p class="drop-text">Arrastra tu archivo <strong>.json</strong> aquí</p>
+            <p class="drop-hint">o haz clic para seleccionarlo</p>
+          </div>
+        }
+      </div>
+
+      @if (telegramError()) {
+        <div class="alert alert-error">⚠️ {{ telegramError() }}</div>
+      }
+
+      @if (telegramSuccess()) {
+        <div class="alert alert-success">
+          ✅ Archivo enviado correctamente. n8n está procesando: almacenando en Drive e iniciando conversión a CSV en Sheets.
+        </div>
+      }
+
+      <button
+        class="btn-primary"
+        (click)="sendTelegramFile()"
+        [disabled]="!canSendTelegram"
+      >
+        @if (telegramLoading()) {
+          <span class="spinner"></span>
+          <span>Procesando...</span>
+        } @else {
+          <span>🚀 Iniciar Procesamiento</span>
+        }
+      </button>
+    </div>
+  }
+
+  <!-- ============================================================ -->
+  <!-- FLUJO 2: Extracción Snowflake                                -->
+  <!-- ============================================================ -->
+  @if (activeTab() === 'snowflake') {
+    <div class="flow-card">
+      <div class="flow-header">
+        <div class="flow-icon">❄️</div>
+        <div>
+          <h2 class="flow-title">Extracción de Datos Snowflake</h2>
+          <p class="flow-desc">
+            Ingresa los IDs y el rango de fechas. n8n inyectará estos valores en la query de
+            Snowflake y actualizará la Google Sheet automáticamente.
+          </p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <!-- IDs -->
+        <div class="form-group full-width">
+          <label class="form-label">IDs de usuarios <span class="required">*</span></label>
+          <textarea
+            class="form-control"
+            rows="3"
+            placeholder="Ej: 12345, 67890, 11223, 44556"
+            [value]="snowflakeIds()"
+            (input)="snowflakeIds.set($any($event.target).value)"
+          ></textarea>
+          <span class="form-hint">Separa los IDs con comas</span>
+        </div>
+
+        <!-- Fecha inicio -->
+        <div class="form-group">
+          <label class="form-label">Fecha inicio <span class="required">*</span></label>
+          <input
+            type="date"
+            class="form-control"
+            [value]="dateStart()"
+            (change)="dateStart.set($any($event.target).value)"
+          />
+        </div>
+
+        <!-- Fecha fin -->
+        <div class="form-group">
+          <label class="form-label">Fecha fin <span class="required">*</span></label>
+          <input
+            type="date"
+            class="form-control"
+            [value]="dateEnd()"
+            (change)="dateEnd.set($any($event.target).value)"
+          />
+        </div>
+      </div>
+
+      @if (snowflakeError()) {
+        <div class="alert alert-error">⚠️ {{ snowflakeError() }}</div>
+      }
+
+      @if (snowflakeSuccess()) {
+        <div class="alert alert-success">
+          ✅ Query enviada correctamente. n8n está ejecutando la extracción en Snowflake y actualizando la Sheet.
+        </div>
+      }
+
+      <button
+        class="btn-primary btn-snow"
+        (click)="runSnowflake()"
+        [disabled]="!canRunSnowflake"
+      >
+        @if (snowflakeLoading()) {
+          <span class="spinner"></span>
+          <span>Ejecutando...</span>
+        } @else {
+          <span>❄️ Ejecutar Query Snowflake</span>
+        }
+      </button>
+    </div>
+  }
+</div>

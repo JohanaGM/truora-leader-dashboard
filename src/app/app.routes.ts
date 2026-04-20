@@ -32,6 +32,10 @@ export const routes: Routes = [
       {
         path: 'tip-generator',
         loadComponent: () => import('./features/tip-generator/tip-generator.component').then(m => m.TipGeneratorComponent)
+      },
+      {
+        path: 'automations',
+        loadComponent: () => import('./features/automations/automations.component').then(m => m.AutomationsComponent)
       }
     ]
   },

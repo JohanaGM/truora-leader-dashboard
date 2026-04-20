@@ -22,22 +22,28 @@ export class SidebarComponent {
       route: '/dashboard',
       active: true
     },
-    // {
-    //   icon: '📅',
-    //   label: 'Cronograma',
-    //   route: '/schedule',
-    //   active: false
-    // },
-    // {
-    //   icon: '✅',
-    //   label: 'Tareas',
-    //   route: '/tasks',
-    //   active: false
-    // },
+    {
+      icon: '📅',
+      label: 'Cronograma',
+      route: '/schedule',
+      active: false
+    },
+    {
+      icon: '✅',
+      label: 'Tareas',
+      route: '/tasks',
+      active: false
+    },
     {
       icon: '💡',
       label: 'Generar Tips',
       route: '/tip-generator',
+      active: false
+    },
+    {
+      icon: '⚙️',
+      label: 'Automatizaciones',
+      route: '/automations',
       active: false
     }
   ];

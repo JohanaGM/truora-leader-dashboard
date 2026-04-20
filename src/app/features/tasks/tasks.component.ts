@@ -1,8 +1,8 @@
-import { Component, inject, signal, computed } from '@angular/core';
+﻿import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TaskService } from '../../core/services';
-import { Task } from '../../core/models';
+import { EventService, VirtualEvent } from '../../core/services/event.service';
+import { AppEvent, EventPriority, EventStatus } from '../../core/models/event.model';
 
 @Component({
   selector: 'app-tasks',
@@ -12,153 +12,107 @@ import { Task } from '../../core/models';
   styleUrl: './tasks.component.scss'
 })
 export class TasksComponent {
-  private taskService = inject(TaskService);
-  
-  tasks = this.taskService.tasks;
-  showSidePanel = signal(false);
-  editingTask = signal<Task | null>(null);
-  filterStatus = signal<Task['status'] | 'all'>('all');
-  filterPriority = signal<Task['priority'] | 'all'>('all');
-  
+  private eventService = inject(EventService);
+
+  filterStatus   = signal<EventStatus | 'all'>('all');
+  filterPriority = signal<EventPriority | 'all'>('all');
+
+  weekEvents = computed((): VirtualEvent[] => {
+    this.eventService.events(); // track
+    return this.eventService.getEventsForWeek();
+  });
+
+  filteredEvents = computed((): VirtualEvent[] => {
+    let list = this.weekEvents();
+    const st = this.filterStatus();
+    if (st !== 'all') list = list.filter(e => e.status === st);
+    const pr = this.filterPriority();
+    if (pr !== 'all') list = list.filter(e => e.priority === pr);
+    return list;
+  });
+
+  pendingCount    = computed(() => this.weekEvents().filter(e => e.status === 'pending').length);
+  inProgressCount = computed(() => this.weekEvents().filter(e => e.status === 'in-progress').length);
+  completedCount  = computed(() => this.weekEvents().filter(e => e.status === 'completed').length);
+
+  updateStatus(ev: VirtualEvent, status: EventStatus) {
+    if (ev.isRecurring) {
+      this.eventService.updateRecurringStatus(ev.type as 'truface' | 'tips', ev.date, status);
+    } else {
+      this.eventService.updateEvent(ev.id, { status });
+    }
+  }
+
+  deleteEvent(ev: VirtualEvent) {
+    if (ev.isRecurring) return;
+    if (confirm('¿Eliminar este evento?')) this.eventService.deleteEvent(ev.id);
+  }
+
+  // ---- Side panel for creating/editing manual events ----
+  showSidePanel  = signal(false);
+  editingId      = signal<string | null>(null);
+
   formData = signal<{
-    title: string;
-    description: string;
-    priority: Task['priority'];
-    status: Task['status'];
-    dueDate: string;
+    title: string; date: string; startTime: string; endTime: string;
+    priority: EventPriority; status: EventStatus; description: string;
   }>({
-    title: '',
-    description: '',
-    priority: 'medium',
-    status: 'pending',
-    dueDate: new Date().toISOString().split('T')[0]
+    title: '', date: this.eventService.toDateStr(new Date()),
+    startTime: '09:00', endTime: '10:00',
+    priority: 'medium', status: 'pending', description: '',
   });
 
-  filteredTasks = computed(() => {
-    let filtered = this.tasks();
-    
-    const status = this.filterStatus();
-    if (status !== 'all') {
-      filtered = filtered.filter(t => t.status === status);
-    }
-    
-    const priority = this.filterPriority();
-    if (priority !== 'all') {
-      filtered = filtered.filter(t => t.priority === priority);
-    }
-    
-    return filtered;
-  });
+  patchForm(patch: Partial<{
+    title: string; date: string; startTime: string; endTime: string;
+    priority: EventPriority; status: EventStatus; description: string;
+  }>) {
+    this.formData.set({ ...this.formData(), ...patch });
+  }
 
-  pendingTasks = computed(() => 
-    this.tasks().filter(t => t.status === 'pending').length
-  );
-
-  inProgressTasks = computed(() => 
-    this.tasks().filter(t => t.status === 'in-progress').length
-  );
-
-  completedTasks = computed(() => 
-    this.tasks().filter(t => t.status === 'completed').length
-  );
-
-  openSidePanel(task?: Task) {
-    if (task) {
-      this.editingTask.set(task);
+  openPanel(ev?: VirtualEvent) {
+    if (ev && !ev.isRecurring) {
+      const stored = this.eventService.events().find(e => e.id === ev.id);
+      if (!stored) return;
+      this.editingId.set(stored.id);
       this.formData.set({
-        title: task.title,
-        description: task.description,
-        priority: task.priority,
-        status: task.status,
-        dueDate: new Date(task.dueDate).toISOString().split('T')[0]
+        title: stored.title, date: stored.date,
+        startTime: stored.startTime, endTime: stored.endTime,
+        priority: stored.priority, status: stored.status,
+        description: stored.description ?? '',
       });
     } else {
-      this.editingTask.set(null);
+      this.editingId.set(null);
       this.formData.set({
-        title: '',
-        description: '',
-        priority: 'medium',
-        status: 'pending',
-        dueDate: new Date().toISOString().split('T')[0]
+        title: '', date: this.eventService.toDateStr(new Date()),
+        startTime: '09:00', endTime: '10:00',
+        priority: 'medium', status: 'pending', description: '',
       });
     }
     this.showSidePanel.set(true);
   }
 
-  closeSidePanel() {
-    this.showSidePanel.set(false);
-    this.editingTask.set(null);
-  }
+  closePanel() { this.showSidePanel.set(false); this.editingId.set(null); }
 
-  saveTask() {
-    const data = this.formData();
-    const editing = this.editingTask();
-
-    if (editing) {
-      this.taskService.updateTask(editing.id, {
-        ...data,
-        dueDate: new Date(data.dueDate)
-      });
+  saveEvent() {
+    const d = this.formData();
+    if (!d.title.trim()) return;
+    const id = this.editingId();
+    if (id) {
+      this.eventService.updateEvent(id, { ...d, type: 'manual' });
     } else {
-      this.taskService.addTask({
-        ...data,
-        dueDate: new Date(data.dueDate)
-      });
+      this.eventService.addEvent({ ...d, type: 'manual' });
     }
-
-    this.closeSidePanel();
+    this.closePanel();
   }
 
-  deleteTask(id: string) {
-    if (confirm('¿Estás seguro de eliminar esta tarea?')) {
-      this.taskService.deleteTask(id);
-    }
+  getPriorityLabel(p: EventPriority): string {
+    return ({ low: 'Baja', medium: 'Media', high: 'Alta' } as Record<string,string>)[p] ?? p;
   }
 
-  updateStatus(id: string, status: Task['status']) {
-    this.taskService.updateTask(id, { status });
+  getStatusLabel(s: EventStatus): string {
+    return ({ pending: 'Pendiente', 'in-progress': 'En Progreso', completed: 'Completada' } as Record<string,string>)[s] ?? s;
   }
 
-  getPriorityLabel(priority: Task['priority']): string {
-    const labels = {
-      'low': 'Baja',
-      'medium': 'Media',
-      'high': 'Alta'
-    };
-    return labels[priority];
-  }
-
-  getStatusLabel(status: Task['status']): string {
-    const labels = {
-      'pending': 'Pendiente',
-      'in-progress': 'En Progreso',
-      'completed': 'Completada'
-    };
-    return labels[status];
-  }
-
-  getPriorityClass(priority: Task['priority']): string {
-    return `priority-${priority}`;
-  }
-
-  // Helper methods para actualizar formData
-  updateTitle(title: string) {
-    this.formData.set({ ...this.formData(), title });
-  }
-
-  updateDescription(description: string) {
-    this.formData.set({ ...this.formData(), description });
-  }
-
-  updatePriority(priority: Task['priority']) {
-    this.formData.set({ ...this.formData(), priority });
-  }
-
-  updateDueDate(dueDate: string) {
-    this.formData.set({ ...this.formData(), dueDate });
-  }
-
-  updateFormStatus(status: Task['status']) {
-    this.formData.set({ ...this.formData(), status });
+  getPriorityBorderColor(p: EventPriority): string {
+    return { high: '#e53e3e', medium: '#d69e2e', low: '#3182ce' }[p];
   }
 }

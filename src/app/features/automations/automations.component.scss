@@ -1,0 +1,314 @@
+.automations-page {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.welcome-section {
+  margin-bottom: 2rem;
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .page-subtitle {
+    font-size: 1rem;
+    color: #718096;
+    margin: 0;
+  }
+}
+
+// ---- Tabs ----
+.tabs {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #718096;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #4a5568;
+    background: #f7fafc;
+  }
+
+  &.active {
+    color: #6373a7;
+    border-bottom-color: #6373a7;
+    background: #f0f4ff;
+  }
+}
+
+// ---- Flow Card ----
+.flow-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.flow-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+
+  .flow-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .flow-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 0.35rem 0;
+  }
+
+  .flow-desc {
+    font-size: 0.9rem;
+    color: #718096;
+    margin: 0;
+    line-height: 1.6;
+  }
+}
+
+// ---- Drag & Drop ----
+.dropzone {
+  border: 2px dashed #cbd5e0;
+  border-radius: 12px;
+  padding: 2.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #f7fafc;
+
+  &:hover,
+  &.dragover {
+    border-color: #6373a7;
+    background: #eef2ff;
+  }
+
+  &.has-file {
+    border-color: #48bb78;
+    background: #f0fff4;
+  }
+}
+
+.file-input-hidden {
+  display: none;
+}
+
+.file-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+
+  .file-icon {
+    font-size: 2rem;
+  }
+
+  .file-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+    word-break: break-all;
+  }
+
+  .file-size {
+    font-size: 0.8rem;
+    color: #718096;
+    background: #e2e8f0;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+  }
+}
+
+.dropzone-placeholder {
+  .drop-icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  .drop-text {
+    font-size: 1rem;
+    color: #4a5568;
+    margin: 0 0 0.35rem 0;
+  }
+
+  .drop-hint {
+    font-size: 0.85rem;
+    color: #a0aec0;
+    margin: 0;
+  }
+}
+
+// ---- Form ----
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+
+  .full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #4a5568;
+
+  .required {
+    color: #e53e3e;
+    margin-left: 2px;
+  }
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: #2d3748;
+  background: #f7fafc;
+  transition: border-color 0.2s ease;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+
+  &:focus {
+    outline: none;
+    border-color: #6373a7;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(99, 115, 167, 0.15);
+  }
+}
+
+.form-hint {
+  font-size: 0.78rem;
+  color: #a0aec0;
+}
+
+// ---- Alerts ----
+.alert {
+  padding: 0.9rem 1.25rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.5;
+
+  &.alert-success {
+    background: #f0fff4;
+    color: #276749;
+    border: 1px solid #9ae6b4;
+  }
+
+  &.alert-error {
+    background: #fff5f5;
+    color: #c53030;
+    border: 1px solid #feb2b2;
+  }
+}
+
+// ---- Button ----
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 2rem;
+  background: linear-gradient(135deg, #6373a7, #9471b9);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 115, 167, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.btn-snow {
+    background: linear-gradient(135deg, #4299e1, #6eaad3);
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
+    }
+  }
+}
+
+// ---- Spinner ----
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// ---- Responsive ----
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tabs {
+    flex-direction: column;
+    border-bottom: none;
+    gap: 0.5rem;
+  }
+
+  .tab-btn {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    margin-bottom: 0;
+
+    &.active {
+      border-color: #6373a7;
+    }
+  }
+}
