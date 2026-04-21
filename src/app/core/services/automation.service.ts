@@ -9,20 +9,24 @@ import { Observable } from 'rxjs';
 export class AutomationService {
   private http = inject(HttpClient);
 
-  sendTelegramJson(file: File): Observable<unknown> {
+  sendTelegramJson(file: File): Observable<string> {
     const formData = new FormData();
     formData.append('file', file, file.name);
     formData.append('timestamp', new Date().toISOString());
-    return this.http.post(environment.n8nTelegramWebhookUrl, formData);
+    return this.http.post(environment.n8nTelegramWebhookUrl, formData, {
+      responseType: 'text'
+    });
   }
 
-  runSnowflakeQuery(ids: string, dateStart: string, dateEnd: string): Observable<unknown> {
+  runSnowflakeQuery(ids: string, dateStart: string, dateEnd: string): Observable<string> {
     const payload = {
       ids: ids.split(',').map(id => id.trim()).filter(id => id.length > 0),
       dateStart,
       dateEnd,
       timestamp: new Date().toISOString()
     };
-    return this.http.post(environment.n8nSnowflakeWebhookUrl, payload);
+    return this.http.post(environment.n8nSnowflakeWebhookUrl, payload, {
+      responseType: 'text'
+    });
   }
 }

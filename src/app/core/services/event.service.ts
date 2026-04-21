@@ -1,4 +1,6 @@
-import { Injectable, signal, computed } from '@angular/core';
+﻿import { Injectable, signal, computed } from '@angular/core';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { environment } from '../../../environments/environment';
 import {
   AppEvent, EventStatus, EventPriority,
   PRIORITY_COLOR, RECURRING_COLOR
@@ -21,24 +23,84 @@ export interface VirtualEvent {
 @Injectable({ providedIn: 'root' })
 export class EventService {
   private readonly STORAGE_KEY = 'truora_events_v2';
+  private supabase: SupabaseClient = createClient(
+    environment.supabase.url,
+    environment.supabase.key
+  );
 
-  private eventsSignal = signal<AppEvent[]>(this.loadEvents());
+  private eventsSignal = signal<AppEvent[]>(this.loadCache());
   readonly events = this.eventsSignal.asReadonly();
 
-  // ─── Helpers ───────────────────────────────────────────────────────────────
+  constructor() {
+    this.syncFromSupabase();
+  }
 
-  private loadEvents(): AppEvent[] {
+  // ── Cache (localStorage) ──────────────────────────────────────────────────
+
+  private loadCache(): AppEvent[] {
     try {
       const raw = localStorage.getItem(this.STORAGE_KEY);
-      return raw ? JSON.parse(raw) : this.getSeedEvents();
+      return raw ? JSON.parse(raw) : [];
     } catch {
-      return this.getSeedEvents();
+      return [];
     }
   }
 
-  private save(events: AppEvent[]): void {
+  private saveCache(events: AppEvent[]): void {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(events));
   }
+
+  // ── Supabase sync ─────────────────────────────────────────────────────────
+
+  private async currentUserId(): Promise<string | null> {
+    const { data: { session } } = await this.supabase.auth.getSession();
+    return session?.user?.id ?? null;
+  }
+
+  private async syncFromSupabase(): Promise<void> {
+    const userId = await this.currentUserId();
+    if (!userId) return;
+
+    const { data } = await this.supabase
+      .from('app_events')
+      .select('*')
+      .eq('leader_id', userId);
+
+    if (data) {
+      const events: AppEvent[] = data.map((r: Record<string, unknown>) => ({
+        id:          r['id'] as string,
+        title:       r['title'] as string,
+        date:        r['date'] as string,
+        startTime:   r['start_time'] as string,
+        endTime:     r['end_time'] as string,
+        type:        r['type']     as AppEvent['type'],
+        status:      r['status']   as EventStatus,
+        priority:    r['priority'] as EventPriority,
+        description: r['description'] as string | undefined ?? undefined,
+      }));
+      this.eventsSignal.set(events);
+      this.saveCache(events);
+    }
+  }
+
+  private async pushToSupabase(ev: AppEvent): Promise<void> {
+    const userId = await this.currentUserId();
+    if (!userId) return;
+    await this.supabase.from('app_events').upsert({
+      id:          ev.id,
+      leader_id:   userId,
+      title:       ev.title,
+      date:        ev.date,
+      start_time:  ev.startTime,
+      end_time:    ev.endTime,
+      type:        ev.type,
+      status:      ev.status,
+      priority:    ev.priority,
+      description: ev.description ?? null,
+    });
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
 
   private generateId(): string {
     return `ev_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
@@ -54,13 +116,16 @@ export class EventService {
     return PRIORITY_COLOR[ev.priority];
   }
 
-  // ─── CRUD ──────────────────────────────────────────────────────────────────
+  // ── CRUD ──────────────────────────────────────────────────────────────────
 
   addEvent(data: Omit<AppEvent, 'id'>): AppEvent {
-    const ev: AppEvent = { ...data, id: this.generateId() };
+    // Support recurring override keys passed via cast (e.g. truface_2026-04-21)
+    const overrideId = (data as AppEvent).id;
+    const ev: AppEvent = { ...data, id: overrideId || this.generateId() };
     const updated = [...this.eventsSignal(), ev];
     this.eventsSignal.set(updated);
-    this.save(updated);
+    this.saveCache(updated);
+    this.pushToSupabase(ev);
     return ev;
   }
 
@@ -69,17 +134,19 @@ export class EventService {
       e.id === id ? { ...e, ...patch } : e
     );
     this.eventsSignal.set(updated);
-    this.save(updated);
+    this.saveCache(updated);
+    const ev = updated.find(e => e.id === id);
+    if (ev) this.pushToSupabase(ev);
   }
 
   deleteEvent(id: string): void {
     const updated = this.eventsSignal().filter(e => e.id !== id);
     this.eventsSignal.set(updated);
-    this.save(updated);
+    this.saveCache(updated);
+    this.supabase.from('app_events').delete().eq('id', id);
   }
 
   updateRecurringStatus(recurringId: string, date: string, status: EventStatus): void {
-    // Recurring events are virtual — we materialise an override record
     const key = `${recurringId}_${date}`;
     const existing = this.eventsSignal().find(e => e.id === key);
     if (existing) {
@@ -102,10 +169,10 @@ export class EventService {
     }
   }
 
-  // ─── Recurring generation ──────────────────────────────────────────────────
+  // ── Recurring generation ──────────────────────────────────────────────────
 
   getRecurringForDate(date: Date): VirtualEvent[] {
-    const dow   = date.getDay();
+    const dow     = date.getDay();
     const dateStr = this.toDateStr(date);
     const result: VirtualEvent[] = [];
 
@@ -142,13 +209,12 @@ export class EventService {
     return [...this.getRecurringForDate(date), ...this.getManualForDate(date)];
   }
 
-  // ─── Week helpers ─────────────────────────────────────────────────────────
+  // ── Week helpers ──────────────────────────────────────────────────────────
 
   getWeekBounds(ref = new Date()): { start: Date; end: Date } {
     const d   = new Date(ref);
-    const day = d.getDay(); // 0=Sun, 6=Sat
+    const day = d.getDay();
 
-    // On weekends show the UPCOMING Mon–Sun work week
     if (day === 0 || day === 6) {
       const daysToMonday = day === 0 ? 1 : 2;
       const start = new Date(d);
@@ -160,8 +226,7 @@ export class EventService {
       return { start, end };
     }
 
-    // On weekdays: current Mon–Sun
-    const dow   = (day + 6) % 7; // Mon = 0
+    const dow   = (day + 6) % 7;
     const start = new Date(d); start.setDate(d.getDate() - dow); start.setHours(0, 0, 0, 0);
     const end   = new Date(start); end.setDate(start.getDate() + 6); end.setHours(23, 59, 59, 999);
     return { start, end };
@@ -176,10 +241,10 @@ export class EventService {
     return days.sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
   }
 
-  // ─── Computed stats ────────────────────────────────────────────────────────
+  // ── Computed stats ────────────────────────────────────────────────────────
 
   readonly weekStats = computed(() => {
-    this.eventsSignal(); // track
+    this.eventsSignal();
     const week = this.getEventsForWeek();
     return {
       pending:    week.filter(e => e.status === 'pending').length,
@@ -187,10 +252,4 @@ export class EventService {
       completed:  week.filter(e => e.status === 'completed').length,
     };
   });
-
-  // ─── Seed ─────────────────────────────────────────────────────────────────
-
-  private getSeedEvents(): AppEvent[] {
-    return [];
-  }
 }
