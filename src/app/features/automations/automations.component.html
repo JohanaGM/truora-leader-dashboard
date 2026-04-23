@@ -12,14 +12,14 @@
       [class.active]="activeTab() === 'telegram'"
       (click)="setTab('telegram')"
     >
-      📨 Telegram → Sheets
+      📨 Data Truface
     </button>
     <button
       class="tab-btn"
       [class.active]="activeTab() === 'snowflake'"
       (click)="setTab('snowflake')"
     >
-      ❄️ Extracción Snowflake
+      � Desbloqueo de ACC ID
     </button>
   </div>
 
@@ -31,7 +31,7 @@
       <div class="flow-header">
         <div class="flow-icon">📨</div>
         <div>
-          <h2 class="flow-title">Automatización Telegram → Google Sheets</h2>
+          <h2 class="flow-title">Automatización Truface</h2>
           <p class="flow-desc">
             Sube el archivo <strong>.json</strong> exportado de Telegram. n8n lo almacenará en Drive
             e iniciará la conversión a CSV en Google Sheets.
@@ -76,102 +76,79 @@
         <div class="alert alert-error">⚠️ {{ telegramError() }}</div>
       }
 
-      @if (telegramSuccess()) {
-        <div class="alert alert-success">
-          ✅ Archivo enviado correctamente. n8n está procesando: almacenando en Drive e iniciando conversión a CSV en Sheets.
+      @if (isCompleted()) {
+        <div class="completed-block">
+          <p class="completed-hint">✅ El archivo ha sido procesado y cargado correctamente en Sheets.</p>
+          <a
+            class="btn-completed"
+            [href]="DOC_GENERAL_PROMIGAS_URL"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span>📂 ¡Listo! Ir al Documento General Promigas</span>
+            <span class="btn-completed__arrow">↗</span>
+          </a>
         </div>
+      } @else {
+        <button
+          class="btn-primary"
+          (click)="sendTelegramFile()"
+          [disabled]="!canSendTelegram"
+        >
+          @if (telegramLoading()) {
+            <span class="spinner"></span>
+            <span>Procesando...</span>
+          } @else {
+            <span>🚀 Iniciar Procesamiento</span>
+          }
+        </button>
       }
-
-      <button
-        class="btn-primary"
-        (click)="sendTelegramFile()"
-        [disabled]="!canSendTelegram"
-      >
-        @if (telegramLoading()) {
-          <span class="spinner"></span>
-          <span>Procesando...</span>
-        } @else {
-          <span>🚀 Iniciar Procesamiento</span>
-        }
-      </button>
     </div>
   }
 
   <!-- ============================================================ -->
-  <!-- FLUJO 2: Extracción Snowflake                                -->
+  <!-- Herramientas y Recursos                                      -->
   <!-- ============================================================ -->
   @if (activeTab() === 'snowflake') {
     <div class="flow-card">
       <div class="flow-header">
-        <div class="flow-icon">❄️</div>
+        <div class="flow-icon">�</div>
         <div>
-          <h2 class="flow-title">Extracción de Datos Snowflake</h2>
-          <p class="flow-desc">
-            Ingresa los IDs y el rango de fechas. n8n inyectará estos valores en la query de
-            Snowflake y actualizará la Google Sheet automáticamente.
-          </p>
+          <h2 class="flow-title">Desbloqueo de ACC ID</h2>
+          <p class="flow-desc">Acceso rápido a las hojas de cálculo y plataformas clave del equipo.</p>
         </div>
       </div>
 
-      <div class="form-grid">
-        <!-- IDs -->
-        <div class="form-group full-width">
-          <label class="form-label">IDs de usuarios <span class="required">*</span></label>
-          <textarea
-            class="form-control"
-            rows="3"
-            placeholder="Ej: 12345, 67890, 11223, 44556"
-            [value]="snowflakeIds()"
-            (input)="snowflakeIds.set($any($event.target).value)"
-          ></textarea>
-          <span class="form-hint">Separa los IDs con comas</span>
-        </div>
+      <div class="quick-links-grid">
 
-        <!-- Fecha inicio -->
-        <div class="form-group">
-          <label class="form-label">Fecha inicio <span class="required">*</span></label>
-          <input
-            type="date"
-            class="form-control"
-            [value]="dateStart()"
-            (change)="dateStart.set($any($event.target).value)"
-          />
-        </div>
+        <a class="quick-link-card" href="https://docs.google.com/spreadsheets/d/1Gqf7jPhgEpry5yoEu3jaJEbI91_xJQCWtVGYlkiicYw/edit?gid=1010462962#gid=1010462962" target="_blank" rel="noopener noreferrer">
+          <div class="qlc-icon">📄</div>
+          <div class="qlc-body">
+            <span class="qlc-title">Documento General Promigas</span>
+            <span class="qlc-desc">Consulta de lineamientos y procesos generales</span>
+          </div>
+          <span class="qlc-arrow">↗</span>
+        </a>
 
-        <!-- Fecha fin -->
-        <div class="form-group">
-          <label class="form-label">Fecha fin <span class="required">*</span></label>
-          <input
-            type="date"
-            class="form-control"
-            [value]="dateEnd()"
-            (change)="dateEnd.set($any($event.target).value)"
-          />
-        </div>
+        <a class="quick-link-card" href="https://docs.google.com/spreadsheets/d/1DLCsOGjSp5U5P-Ic0d9GRwYHUGN70R2s1sRKYsTZ8cI/edit?gid=78988245#gid=78988245" target="_blank" rel="noopener noreferrer">
+          <div class="qlc-icon">🌌</div>
+          <div class="qlc-body">
+            <span class="qlc-title">Promigas Deneb</span>
+            <span class="qlc-desc">Acceso al entorno de análisis Deneb</span>
+          </div>
+          <span class="qlc-arrow">↗</span>
+        </a>
+
+        <a class="quick-link-card" href="https://app.snowflake.com/" target="_blank" rel="noopener noreferrer">
+          <div class="qlc-icon">❄️</div>
+          <div class="qlc-body">
+            <span class="qlc-title">Herramienta Snowflake</span>
+            <span class="qlc-desc">Consola de consultas SQL en Snowflake</span>
+          </div>
+          <span class="qlc-arrow">↗</span>
+        </a>
+
       </div>
-
-      @if (snowflakeError()) {
-        <div class="alert alert-error">⚠️ {{ snowflakeError() }}</div>
-      }
-
-      @if (snowflakeSuccess()) {
-        <div class="alert alert-success">
-          ✅ Query enviada correctamente. n8n está ejecutando la extracción en Snowflake y actualizando la Sheet.
-        </div>
-      }
-
-      <button
-        class="btn-primary btn-snow"
-        (click)="runSnowflake()"
-        [disabled]="!canRunSnowflake"
-      >
-        @if (snowflakeLoading()) {
-          <span class="spinner"></span>
-          <span>Ejecutando...</span>
-        } @else {
-          <span>❄️ Ejecutar Query Snowflake</span>
-        }
-      </button>
     </div>
   }
 </div>

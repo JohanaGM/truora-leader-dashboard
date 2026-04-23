@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TipService } from '../../core/services/tip.service';
 import { AuthService } from '../../core/services/auth.service';
+import { TipsCounterService } from '../../core/services/tips-counter.service';
 import { AiChatComponent } from '../../shared/components/ai-chat/ai-chat.component';
 import { EmojiPickerComponent } from '../../shared/components/emoji-picker/emoji-picker.component';
 import html2canvas from 'html2canvas';
@@ -18,6 +19,7 @@ import { finalize } from 'rxjs';
 export class TipGeneratorComponent {
   private tipService = inject(TipService);
   authService = inject(AuthService);
+  private tipsCounter = inject(TipsCounterService);
   
   @ViewChild('tipCanvas', { static: false }) tipCanvas!: ElementRef<HTMLDivElement>;
   
@@ -121,7 +123,7 @@ export class TipGeneratorComponent {
       )
       .subscribe({
         next: (response) => {       
-          // Mostrar mensaje de éxito
+          this.tipsCounter.increment();
           this.successMessage.set('¡Tip enviado exitosamente a Telegram!');
         },
         error: (error) => {

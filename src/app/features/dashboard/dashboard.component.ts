@@ -2,6 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { EventService } from '../../core/services/event.service';
+import { TipsCounterService } from '../../core/services/tips-counter.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,9 +14,7 @@ import { EventService } from '../../core/services/event.service';
 export class DashboardComponent {
   private router = inject(Router);
   private eventService = inject(EventService);
-
-  // TODO: en el futuro obtener dinámicamente de un servicio según el líder autenticado
-  private readonly TIPS_FOLDER_URL = 'https://drive.google.com/drive/folders/example-folder-id';
+  private tipsCounter = inject(TipsCounterService);
 
   // ---- Computed stats (datos reales) ----
   statsActivitiesToday = computed(() => {
@@ -31,15 +30,11 @@ export class DashboardComponent {
     this.eventService.getEventsForWeek().filter(e => e.status === 'pending').length
   );
 
-  tipsCount = computed(() =>
-    this.eventService.getEventsForWeek().filter(e => e.type === 'tips' && e.status === 'completed').length
-  );
-
   stats = computed(() => [
-    { key: 'activities', icon: '📅', label: 'Actividades Hoy',    value: this.statsActivitiesToday(), color: 'rgb(99 25 50)' },
-    { key: 'completed',  icon: '✅', label: 'Tareas Completadas', value: this.statsTasksCompleted(),  color: 'rgb(7 56 65)' },
-    { key: 'pending',    icon: '⏰', label: 'Tareas Pendientes',  value: this.statsTasksPending(),    color: 'rgb(131 110 27)'   },
-    { key: 'tips',       icon: '💡', label: 'Tips Generados',     value: this.tipsCount(),            color: 'rgb(113 18 137)' },
+    { key: 'activities', icon: '📅', label: 'Actividades Hoy',    value: this.statsActivitiesToday(),      color: 'rgb(99 25 50)' },
+    { key: 'completed',  icon: '✅', label: 'Tareas Completadas', value: this.statsTasksCompleted(),       color: 'rgb(7 56 65)' },
+    { key: 'pending',    icon: '⏰', label: 'Tareas Pendientes',  value: this.statsTasksPending(),         color: 'rgb(131 110 27)' },
+    { key: 'tips',       icon: '💡', label: 'Tips Generados',     value: this.tipsCounter.tipsCount(),    color: 'rgb(113 18 137)' },
   ]);
 
   todayActivities = computed(() => {
@@ -47,17 +42,21 @@ export class DashboardComponent {
     return this.eventService.getAllForDate(new Date())
       .map(e => ({ title: e.title, time: e.startTime, status: e.status, color: e.color }));
   });
-  
+
   quickActions = [
-    { icon: '📅', label: 'Cronograma', route: '/schedule', color: 'rgb(153 171 158)' },
-    { icon: '✏️', label: 'Crear Tarea',     route: '/tasks',    color: 'rgb(159 143 143)' },
-    { icon: '💡', label: 'Generar Tip',     route: '/tip-generator', color: 'rgb(26 54 73)'},
-    { icon: '⚙️', label: 'Automatizaciones', route: '/automations', color: 'rgb(101 118 175)' },
-    { icon: '📢', label: 'Crear Aviso',    route: '/avisos',       color: 'rgb(14 80 110)' }
+    { icon: '📅', label: 'Cronograma',      route: '/schedule',     url: null,                              color: 'rgb(153 171 158)' },
+    { icon: '✏️', label: 'Crear Tarea',      route: '/tasks',        url: null,                              color: 'rgb(159 143 143)' },
+    { icon: '💡', label: 'Generar Tip',      route: '',              url: this.tipsCounter.TIPS_FOLDER_URL,  color: 'rgb(26 54 73)' },
+    { icon: '⚙️', label: 'Automatizaciones', route: '/automations',  url: null,                              color: 'rgb(101 118 175)' },
+    { icon: '📢', label: 'Crear Aviso',      route: '/avisos',       url: null,                              color: 'rgb(14 80 110)' }
   ];
 
   openTipsFolder() {
-    window.open(this.TIPS_FOLDER_URL, '_blank', 'noopener,noreferrer');
+    window.open(this.tipsCounter.TIPS_FOLDER_URL, '_blank', 'noopener,noreferrer');
+  }
+
+  openUrl(url: string) {
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
   navigateTo(route: string) {

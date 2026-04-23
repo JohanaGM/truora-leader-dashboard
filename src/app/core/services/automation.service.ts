@@ -17,16 +17,4 @@ export class AutomationService {
       responseType: 'text'
     });
   }
-
-  runSnowflakeQuery(ids: string, dateStart: string, dateEnd: string): Observable<string> {
-    const payload = {
-      ids: ids.split(',').map(id => id.trim()).filter(id => id.length > 0),
-      dateStart,
-      dateEnd,
-      timestamp: new Date().toISOString()
-    };
-    return this.http.post(environment.n8nSnowflakeWebhookUrl, payload, {
-      responseType: 'text'
-    });
-  }
 }
