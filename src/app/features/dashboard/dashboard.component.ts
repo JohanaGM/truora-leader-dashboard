@@ -46,7 +46,7 @@ export class DashboardComponent {
   quickActions = [
     { icon: '📅', label: 'Cronograma',      route: '/schedule',     url: null,                              color: 'rgb(153 171 158)' },
     { icon: '✏️', label: 'Crear Tarea',      route: '/tasks',        url: null,                              color: 'rgb(159 143 143)' },
-    { icon: '💡', label: 'Generar Tip',      route: '',              url: this.tipsCounter.TIPS_FOLDER_URL,  color: 'rgb(26 54 73)' },
+    { icon: '💡', label: 'Generar Tip',      route: '/tip-generator', url: null,                              color: 'rgb(26 54 73)' },
     { icon: '⚙️', label: 'Automatizaciones', route: '/automations',  url: null,                              color: 'rgb(101 118 175)' },
     { icon: '📢', label: 'Crear Aviso',      route: '/avisos',       url: null,                              color: 'rgb(14 80 110)' }
   ];
