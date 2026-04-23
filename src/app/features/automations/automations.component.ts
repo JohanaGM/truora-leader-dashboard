@@ -19,7 +19,7 @@ export class AutomationsComponent {
 
   activeTab = signal<FlowTab>('telegram');
 
-  readonly DOC_GENERAL_PROMIGAS_URL = 'https://docs.google.com/spreadsheets/d/1Gqf7jPhgEpry5yoEu3jaJEbI91_xJQCWtVGYlkiicYw/edit?gid=1010462962#gid=1010462962';
+  readonly DOC_GENERAL_PROMIGAS_URL = 'https://docs.google.com/spreadsheets/d/1Gqf7jPhgEpry5yoEu3jaJEbI91_xJQCWtVGYlkiicYw/edit?gid=1569152008#gid=1569152008';
 
   // --- Flujo 1: Telegram ---
   dragOver      = signal(false);

@@ -3,7 +3,7 @@ import { Injectable, signal } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class TipsCounterService {
   readonly TIPS_FOLDER_URL =
-    'https://docs.google.com/presentation/d/1H0el_2CImXBYxXbwHkiBC2OjBgFL_7baDY/edit?slide=id.g34550ae3661_0_268#slide=id.g34550ae3661_0_268';
+    'https://drive.google.com/drive/folders/1Ek-AwsnHK6oFwXNfNohj_13fFjty1qlg';
 
   private readonly STORAGE_KEY = 'truora_tips_count';
 
