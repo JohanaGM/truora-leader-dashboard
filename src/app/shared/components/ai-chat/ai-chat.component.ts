@@ -18,6 +18,13 @@ export class AiChatComponent implements AfterViewChecked {
   private authService = inject(AuthService);
   private aiChatService: AiChatService;
 
+  botLogoSrc = 'assets/images/formactman.png';
+  showBotFallback = false;
+
+  onBotImgError() {
+    this.showBotFallback = true;
+  }
+
   messages = signal<ChatMessage[]>([]);
   userMessage = '';
   isLoading = signal(false);

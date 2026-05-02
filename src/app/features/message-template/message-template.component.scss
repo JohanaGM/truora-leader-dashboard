@@ -81,3 +81,44 @@
   background: #fafafa;
   resize: none;
 }
+
+// ── Dark Theme ────────────────────────────────────────────────────────────
+:host-context(body.dark-theme) {
+  .select-all {
+    color: #cbd5e0;
+  }
+
+  input[type="checkbox"] {
+    accent-color: #667eea;
+  }
+
+  .chip {
+    background: #252b3b;
+    color: #cbd5e0;
+    border: 1px solid #2d3748;
+  }
+
+  .template-cards button {
+    background: #252b3b;
+    color: #cbd5e0;
+    border: 1px solid #2d3748;
+
+    &:hover {
+      background: #2d3748;
+      color: #f1f5f9;
+    }
+
+    &.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      border-color: transparent;
+      font-weight: bold;
+    }
+  }
+
+  .preview {
+    background: #252b3b;
+    border-color: #2d3748;
+    color: #e2e8f0;
+  }
+}

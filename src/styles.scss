@@ -23,6 +23,411 @@ body {
   color: $text-primary;
   line-height: 1.6;
   overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+// ── Dark Theme ────────────────────────────────────────────────────────────
+body.dark-theme {
+  background: #0f1117 !important;
+  color: #e2e8f0 !important;
+
+  // Layout areas
+  .dashboard-layout { background: #0f1117 !important; }
+  .main-content      { background: #0f1117 !important; }
+  .content-area      { background: #0f1117 !important; }
+
+  // Cards / white boxes
+  .card,
+  .settings-card,
+  .task-card,
+  .activity-card,
+  .calendar-wrapper,
+  .input-section,
+  .preview-section,
+  .schedule,
+  .tasks {
+    background: #1a1f2e !important;
+    color: #e2e8f0 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
+  }
+
+  // Generic white backgrounds
+  [style*="background: #fff"],
+  [style*="background:#fff"],
+  [style*="background: white"] {
+    background: #1a1f2e !important;
+  }
+
+  // Text
+  h1, h2, h3, h4, h5, h6,
+  .page-title, .section-title, .card-title,
+  .greeting, .task-title, .activity-title {
+    color: #f7fafc !important;
+  }
+
+  p, span, label,
+  .page-subtitle, .form-label, .form-hint,
+  .task-date, .stat-label, .toggle-desc {
+    color: #a0aec0 !important;
+  }
+
+  // Inputs
+  .form-input, .form-select, .form-textarea,
+  input, textarea, select {
+    background: #252b3b !important;
+    border-color: #2d3748 !important;
+    color: #e2e8f0 !important;
+    &:focus { border-color: #667eea !important; }
+    &::placeholder { color: #4a5568 !important; }
+  }
+
+  // Filters / selects
+  .filter-select, .status-badge, .status-select {
+    background: #252b3b !important;
+    color: #e2e8f0 !important;
+    border-color: #2d3748 !important;
+  }
+
+  // Stats bar
+  .stats-summary .stat-item {
+    background: #1a1f2e !important;
+    border-color: #2d3748 !important;
+    border-left-color: inherit !important;
+    .stat-number { color: #f1f5f9 !important; }
+    .stat-label  { color: #94a3b8 !important; }
+    &.pending     { border-left-color: #ffd93d !important; }
+    &.in-progress { border-left-color: #38bdf8 !important; }
+    &.completed   { border-left-color: #4ade80 !important; }
+  }
+
+  // Calendar cells
+  .cal-cell {
+    background: #1a1f2e !important;
+    border-color: #2d3748 !important;
+    &:hover { background: #252b3b !important; }
+    &.is-holiday { background: #2a1a1a !important; }
+    &.other-month { background: #141824 !important; }
+  }
+
+  .cal-day-num { color: #a0aec0 !important; }
+  .cal-day-name { color: #4a5568 !important; }
+
+  // Buttons
+  .btn-icon {
+    background: #252b3b !important;
+    color: #a0aec0 !important;
+    &:hover { background: #2d3748 !important; }
+  }
+
+  .btn-secondary {
+    background: #252b3b !important;
+    color: #a0aec0 !important;
+    border-color: #2d3748 !important;
+  }
+
+  // Recommendations box (tip-generator)
+  .recommendations-box {
+    background: #1e2433 !important;
+    border-color: #2d3748 !important;
+    .rec-title { color: #93c5fd !important; }
+    .rec-desc  { color: #64748b !important; }
+  }
+
+  // Notification popover
+  .notif-popover {
+    background: #1a1f2e !important;
+    border-color: #2d3748 !important;
+    .notif-title, .notif-task-title { color: #f7fafc !important; }
+    .notif-task-date  { color: #718096 !important; }
+    .notif-item:hover { background: #252b3b !important; }
+    .notif-see-all    { background: #141824 !important; &:hover { background: #1e2433 !important; } }
+  }
+
+  // ── Dashboard ─────────────────────────────────────────────────────────
+  .stat-card {
+    background: #1a1f2e !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
+    .stat-label  { color: #94a3b8 !important; }
+    .stat-value  { color: #f1f5f9 !important; }
+    .stat-trend  { background: rgba(255,255,255,0.08) !important; color: #94a3b8 !important;
+      &.positive { background: rgba(72,187,120,0.15) !important; color: #68d391 !important; }
+    }
+  }
+
+  .card {
+    background: #1a1f2e !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
+    border: 1px solid #2d3748 !important;
+    .card-header {
+      border-bottom-color: #2d3748 !important;
+      .card-title { color: #f1f5f9 !important; }
+    }
+  }
+
+  .activity-item {
+    background: #252b3b !important;
+    &:hover { background: #2d3748 !important; }
+    .activity-title { color: #f1f5f9 !important; }
+    .activity-time  { color: #94a3b8 !important; }
+  }
+
+  .quick-action-btn {
+    background: #252b3b !important;
+    border-color: #2d3748 !important;
+    color: #e2e8f0 !important;
+    &:hover { background: #2d3748 !important; }
+    .action-label { color: #cbd5e0 !important; }
+  }
+
+  // ── Tasks ─────────────────────────────────────────────────────────────
+  .stats-summary .stat-item {
+    background: #1a1f2e !important;
+    border-color: #2d3748 !important;
+    .stat-number { color: #f1f5f9 !important; }
+    .stat-label  { color: #94a3b8 !important; }
+    &.pending     { border-left-color: #ffd93d !important; }
+    &.in-progress { border-left-color: #38bdf8 !important; }
+    &.completed   { border-left-color: #4ade80 !important; }
+  }
+
+  .task-card {
+    background: #1a1f2e !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
+    .task-title { color: #f1f5f9 !important; }
+    .task-description { color: #94a3b8 !important; }
+    .task-date  { color: #64748b !important; }
+
+    .priority-low    { background: rgba(46,125,50,0.18) !important;  color: #86efac !important; }
+    .priority-medium { background: rgba(230,81,0,0.18)  !important;  color: #fbbf24 !important; }
+    .priority-high   { background: rgba(198,40,40,0.18) !important;  color: #fca5a5 !important; }
+    .priority-tips   { background: rgba(91,33,182,0.2)  !important;  color: #c4b5fd !important; }
+
+    .status-badge {
+      &.pending     { background: rgba(255,217,61,0.15)  !important; color: #fcd34d !important; }
+      &.in-progress { background: rgba(33,150,243,0.15)  !important; color: #93c5fd !important; }
+      &.completed   { background: rgba(76,175,80,0.15)   !important; color: #86efac !important; }
+    }
+
+    .btn-icon {
+      background: #252b3b !important;
+      color: #94a3b8 !important;
+      &:hover { background: #2d3748 !important; }
+    }
+  }
+
+  .empty-state {
+    background: #1a1f2e !important;
+    border: 1px solid #2d3748 !important;
+    box-shadow: none !important;
+    p { color: #64748b !important; }
+  }
+
+  // ── Automations ───────────────────────────────────────────────────────
+  .tabs {
+    border-bottom-color: #2d3748 !important;
+  }
+
+  .tab-btn {
+    color: #64748b !important;
+    &:hover { background: #252b3b !important; color: #94a3b8 !important; }
+    &.active {
+      background: #1e2433 !important;
+      color: #93c5fd !important;
+      border-bottom-color: #93c5fd !important;
+    }
+  }
+
+  .flow-card {
+    background: #1a1f2e !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4) !important;
+    border: 1px solid #2d3748 !important;
+    .flow-title { color: #f1f5f9 !important; }
+    .flow-desc  { color: #94a3b8 !important; }
+  }
+
+  .dropzone {
+    background: #252b3b !important;
+    border-color: #2d3748 !important;
+    &:hover, &.dragover { background: #1e2d4a !important; border-color: #93c5fd !important; }
+    &.has-file { background: #1a2e1a !important; border-color: #48bb78 !important; }
+    .drop-text { color: #cbd5e0 !important; }
+    .drop-hint { color: #64748b !important; }
+    .file-name { color: #f1f5f9 !important; }
+    .file-size { background: #2d3748 !important; color: #94a3b8 !important; }
+  }
+
+  .quick-link-card {
+    background: #1e2433 !important;
+    border-color: #2d3748 !important;
+    .qlc-title { color: #e2e8f0 !important; }
+    .qlc-desc  { color: #64748b !important; }
+    &:hover {
+      background: #252b3b !important;
+      border-color: #3d4a63 !important;
+      .qlc-title { color: #f1f5f9 !important; }
+    }
+  }
+
+  // ── Schedule extras ───────────────────────────────────────────────────
+  .cal-month-title { color: #f1f5f9 !important; }
+  .cal-nav-btn {
+    border-color: #2d3748 !important;
+    color: #94a3b8 !important;
+    &:hover { background: #252b3b !important; }
+  }
+  .cal-legend { color: #64748b !important; }
+
+  // ── AI Chat ───────────────────────────────────────────────────────────
+  .ai-chat-container {
+    background: #141824 !important;
+    border-color: #2d3748 !important;
+  }
+
+  .chat-header {
+    background: #1a1f2e !important;
+    border-bottom-color: #2d3748 !important;
+    h3 { color: #f1f5f9 !important; }
+    .clear-btn {
+      background: #252b3b !important;
+      border-color: #2d3748 !important;
+      color: #94a3b8 !important;
+      &:hover { background: #2d3748 !important; color: #e2e8f0 !important; }
+    }
+  }
+
+  .messages-container {
+    background: #141824 !important;
+    &::-webkit-scrollbar-track { background: #1a1f2e !important; }
+    &::-webkit-scrollbar-thumb { background: #2d3748 !important; }
+  }
+
+  .welcome-message {
+    color: #94a3b8 !important;
+    h4 { color: #f1f5f9 !important; }
+
+    .welcome-icon {
+      background: rgba(255, 217, 125, 0.2) !important;
+      box-shadow: 0 4px 12px rgba(255, 217, 125, 0.1) !important;
+    }
+
+    .welcome-description { color: #64748b !important; }
+
+    .feature-item {
+      background: #1e2433 !important;
+      border-color: #2d3748 !important;
+      &:hover { border-color: #3d4a63 !important; box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important; }
+
+      .feature-icon { background: #252b3b !important; }
+      .feature-text strong { color: #e2e8f0 !important; }
+      .feature-text p       { color: #64748b !important; }
+    }
+
+    .welcome-footer { color: #475569 !important; }
+  }
+
+  .message-bubble {
+    &.user   { background: linear-gradient(135deg, #3b4a6b, #2d3a5a) !important; }
+    &.assistant {
+      background: #1e2433 !important;
+      border-color: #2d3748 !important;
+      color: #e2e8f0 !important;
+    }
+  }
+
+  .chat-input-area {
+    background: #1a1f2e !important;
+    border-top-color: #2d3748 !important;
+
+    .chat-input {
+      background: #252b3b !important;
+      border-color: #2d3748 !important;
+      color: #e2e8f0 !important;
+      &::placeholder { color: #4a5568 !important; }
+      &:focus { border-color: #667eea !important; }
+    }
+  }
+
+  // ── Tip Generator buttons ─────────────────────────────────────────────
+  .btn-template {
+    background: #252b3b !important;
+    border-color: #2d3748 !important;
+    color: #94a3b8 !important;
+    &:hover:not(:disabled) {
+      background: #1e2d4a !important;
+      border-color: #667eea !important;
+      color: #93c5fd !important;
+    }
+    &.active {
+      background: linear-gradient(135deg, #667eea, #764ba2) !important;
+      border-color: transparent !important;
+      color: #fff !important;
+    }
+  }
+
+  .font-size-selector {
+    label { color: #94a3b8 !important; }
+    select {
+      background: #252b3b !important;
+      border-color: #2d3748 !important;
+      color: #e2e8f0 !important;
+    }
+  }
+
+  .tip-type-selector {
+    label { color: #94a3b8 !important; }
+  }
+
+  // ── AI Chat: hint box ─────────────────────────────────────────────────
+  .welcome-hint {
+    background: #1e2433 !important;
+    border-color: #2d3748 !important;
+    color: #94a3b8 !important;
+    svg { color: #4a5568 !important; }
+  }
+
+  // ── AI Chat: messages area (when chat has messages) ───────────────────
+  .messages-container {
+    background: #141824 !important;
+    &::-webkit-scrollbar-track { background: #1a1f2e !important; }
+    &::-webkit-scrollbar-thumb { background: #2d3748 !important; }
+  }
+
+  // ── Tip Generator: form-actions bar ──────────────────────────────────
+  .form-actions {
+    .font-size-selector,
+    .tip-type-selector {
+      background: #1e2433 !important;
+      border-color: #2d3748 !important;
+      &:hover { border-color: #3d4a63 !important; }
+
+      label { color: #94a3b8 !important; }
+
+      select {
+        background: #252b3b !important;
+        border-color: #2d3748 !important;
+        color: #e2e8f0 !important;
+      }
+    }
+  }
+
+  // ── Tip Generator: Consejos cards ─────────────────────────────────────
+  .tips-history {
+    background: #1a1f2e !important;
+    border: 1px solid #2d3748 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
+    .section-title { color: #f1f5f9 !important; }
+
+    .tip-item {
+      background: linear-gradient(135deg, #1e2433 0%, #252b3b 100%) !important;
+      border-left-color: #38a169 !important;
+      &:hover {
+        background: linear-gradient(135deg, #252b3b 0%, #2d3748 100%) !important;
+      }
+      p { color: #cbd5e0 !important; }
+      p strong { color: #93c5fd !important; }
+      .tip-icon { color: #48bb78 !important; }
+    }
+  }
 }
 
 // Tipografía global

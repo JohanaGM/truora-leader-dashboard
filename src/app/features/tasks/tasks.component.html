@@ -61,10 +61,10 @@
     <div class="tasks-grid">
       @for (ev of filteredEvents(); track ev.id) {
         <div class="task-card" [class]="ev.status"
-             [style.border-left-color]="getPriorityBorderColor(ev.priority)">
+             [style.border-left-color]="getTaskBorderColor(ev)">
           <div class="task-header">
-            <div class="task-priority" [class]="'priority-' + ev.priority">
-              {{ getPriorityLabel(ev.priority) }}
+            <div class="task-priority" [class]="getPriorityTagClass(ev)">
+              {{ ev.type === 'tips' ? 'Tips' : getPriorityLabel(ev.priority) }}
             </div>
             <div class="task-actions">
               @if (!ev.isRecurring) {
@@ -79,6 +79,11 @@
               <span class="calendar-badge" title="Evento manual">&#128197;</span>
             }
             {{ ev.title }}
+            @if (ev.isRescheduled) {
+              <span class="rescheduled-badge" [title]="'Reprogramado por festivo. Fecha original: ' + ev.originalDate">
+                ➔ Reprogramado
+              </span>
+            }
           </h3>
           @if (ev.description) {
             <p class="task-description">{{ ev.description }}</p>
@@ -88,7 +93,7 @@
             <span class="task-date">&#128197; {{ ev.date }}</span>
             <select [value]="ev.status"
                     (change)="updateStatus(ev, $any($event.target).value)"
-                    class="status-badge" [class]="ev.status">
+                    [class]="getStatusBadgeClass(ev.status)">
               <option value="pending">Pendiente</option>
               <option value="in-progress">En Progreso</option>
               <option value="completed">Completada</option>
@@ -111,9 +116,17 @@
       <div class="panel-body">
         <div class="form-group">
           <label>Título *</label>
-          <input type="text" [value]="formData().title"
-                 (input)="patchForm({title: $any($event.target).value})"
-                 placeholder="Nombre del evento" class="form-input" />
+          <select [value]="formData().title"
+                  (change)="patchForm({title: $any($event.target).value})"
+                  class="form-input form-select">
+            <option value="" disabled [selected]="!formData().title">Selecciona el tipo de evento</option>
+            <option value="Descarga y asignacion de acc id">Descarga y asignacion de acc id</option>
+            <option value="Seguimiento tickets cx">Seguimiento tickets cx</option>
+            <option value="Revision calidad Face">Revision calidad Face</option>
+            <option value="Revision calidad documento">Revision calidad documento</option>
+            <option value="Revision reglas de riesgo">Revision reglas de riesgo</option>
+            <option value="Revision label">Revision label</option>
+          </select>
         </div>
         <div class="form-group">
           <label>Descripción</label>

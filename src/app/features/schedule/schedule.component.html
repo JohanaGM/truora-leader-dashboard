@@ -23,6 +23,7 @@
         <span class="legend-dot" style="background:#fa0202; margin-left:1rem"></span> Alta
         <span class="legend-dot" style="background:#f1a50b; margin-left:0.5rem"></span> Media
         <span class="legend-dot" style="background:#1178da; margin-left:0.5rem"></span> Baja
+        <span class="legend-holiday-dot" style="margin-left:1rem"></span> Festivo
       </div>
       <div class="cal-day-names">
         @for (name of dayNames; track name) {
@@ -34,14 +35,19 @@
           <div class="cal-cell"
                [class.other-month]="!cell.isCurrentMonth"
                [class.is-today]="isToday(cell.date)"
+               [class.is-holiday]="cell.isCurrentMonth && isHolidayDate(cell.date)"
                (click)="cell.isCurrentMonth ? openModal(cell.date) : null">
-            <span class="cal-day-num">{{ cell.date.getDate() }}</span>
+            <span class="cal-day-num" [class.holiday-num]="cell.isCurrentMonth && isHolidayDate(cell.date)">
+              {{ cell.date.getDate() }}
+            </span>
             <div class="cal-events">
               @for (ev of getEventsForDay(cell.date); track ev.id; let i = $index) {
                 @if (i < 3) {
                   <span class="cal-event-chip"
+                        [class.chip-rescheduled]="ev.isRescheduled"
                         [style.background-color]="ev.color"
-                        [title]="ev.title">
+                        [title]="ev.isRescheduled ? 'Reprogramado por festivo (orig: ' + ev.originalDate + ')' : ev.title">
+                    @if (ev.isRescheduled) { <span class="chip-arrow">➔</span> }
                     {{ ev.title.length > 11 ? (ev.title | slice:0:10) + '...' : ev.title }}
                   </span>
                 }
@@ -138,9 +144,17 @@
       <div class="modal-body">
         <div class="form-group">
           <label>Título *</label>
-          <input type="text" [value]="formData().title"
-                 (input)="patchForm({title: $any($event.target).value})"
-                 placeholder="Nombre del evento" class="form-input" />
+          <select [value]="formData().title"
+                  (change)="patchForm({title: $any($event.target).value})"
+                  class="form-input form-select">
+            <option value="" disabled [selected]="!formData().title">Selecciona el tipo de evento</option>
+            <option value="Descarga y asignacion de acc id">Descarga y asignacion de acc id</option>
+            <option value="Seguimiento tickets cx">Seguimiento tickets cx</option>
+            <option value="Revision calidad Face">Revision calidad Face</option>
+            <option value="Revision calidad documento">Revision calidad documento</option>
+            <option value="Revision reglas de riesgo">Revision reglas de riesgo</option>
+            <option value="Revision label">Revision label</option>
+          </select>
         </div>
         <div class="form-row">
           <div class="form-group">

@@ -112,7 +112,19 @@ export class TasksComponent {
     return ({ pending: 'Pendiente', 'in-progress': 'En Progreso', completed: 'Completada' } as Record<string,string>)[s] ?? s;
   }
 
-  getPriorityBorderColor(p: EventPriority): string {
-    return { high: '#e53e3e', medium: '#d69e2e', low: '#3182ce' }[p];
+  /** Returns the border-left color based on task type (tips → purple) or priority */
+  getTaskBorderColor(ev: VirtualEvent): string {
+    if (ev.type === 'tips') return 'rgb(58, 0, 119)';
+    return { high: '#e53e3e', medium: '#d69e2e', low: '#3182ce' }[ev.priority];
+  }
+
+  /** Returns the CSS class for the priority tag, overriding to 'tips' accent for tips tasks */
+  getPriorityTagClass(ev: VirtualEvent): string {
+    return ev.type === 'tips' ? 'priority-tips' : 'priority-' + ev.priority;
+  }
+
+  /** Returns both the base class and the status-specific class for the status badge */
+  getStatusBadgeClass(status: EventStatus): string {
+    return 'status-badge ' + status;
   }
 }

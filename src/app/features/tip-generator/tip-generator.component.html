@@ -6,6 +6,25 @@
     </div>
   </div>
 
+  <!-- Sección de Recomendaciones -->
+  <div class="recommendations-box">
+    <div class="rec-column">
+      <div class="rec-icon">📄</div>
+      <div class="rec-body">
+        <p class="rec-title">Plantilla de Texto</p>
+        <p class="rec-desc">Utiliza esta plantilla si tu contenido es extenso o requiere una explicación detallada.</p>
+      </div>
+    </div>
+    <div class="rec-divider"></div>
+    <div class="rec-column">
+      <div class="rec-icon">🖼️</div>
+      <div class="rec-body">
+        <p class="rec-title">Plantilla de Imagen</p>
+        <p class="rec-desc">Utiliza esta plantilla si buscas un impacto visual fuerte con mensajes breves y directos.</p>
+      </div>
+    </div>
+  </div>
+
   <div class="generator-container">
     <!-- Input Section -->
     <div class="input-section card">
@@ -39,11 +58,29 @@
         </div>
         
         <div class="tip-type-selector">
-          <label for="tipType">🎨 Tipo</label>
-          <select id="tipType" [value]="tipType()" (change)="tipType.set($any($event.target).value)" [disabled]="isGenerating() || isSending()">
-            <option value="text">Tip de texto</option>
-            <option value="image">Tip de imagen</option>
-          </select>
+          <label>🎨 Tipo de Plantilla</label>
+          <div class="template-buttons">
+            <div class="tooltip-wrapper">
+              <button type="button"
+                class="btn-template"
+                [class.active]="tipType() === 'text'"
+                (click)="tipType.set('text')"
+                [disabled]="isGenerating() || isSending()">
+                📄 Texto
+              </button>
+              <span class="tooltip-bubble">Ideal para tips con más texto</span>
+            </div>
+            <div class="tooltip-wrapper">
+              <button type="button"
+                class="btn-template"
+                [class.active]="tipType() === 'image'"
+                (click)="tipType.set('image')"
+                [disabled]="isGenerating() || isSending()">
+                🖼️ Imagen
+              </button>
+              <span class="tooltip-bubble">Ideal para tips más visuales</span>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -133,6 +133,49 @@
   }
 }
 
+// ── Asistente IA section ──────────────────────────────────────────────────
+.ia-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  margin: 0 0.75rem 0.75rem;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  transition: background 0.2s;
+
+  &:hover { background: rgba(255, 255, 255, 0.12); }
+}
+
+.ia-text-block {
+  .ia-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 2px;
+  }
+
+  .ia-sublabel {
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+  }
+}
+
+// Contenedor de ambos logos
+.ia-logos-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+// Cada logo + etiqueta
+.ia-logo-item {
+  display: flex;
+  // ...existing code...
+}
+
 .sidebar-footer {
   padding: 1.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);

@@ -5,6 +5,7 @@ import {
   AppEvent, EventStatus, EventPriority,
   PRIORITY_COLOR, RECURRING_COLOR
 } from '../models/event.model';
+import { HolidayService } from './holiday.service';
 
 export interface VirtualEvent {
   id: string;
@@ -18,6 +19,10 @@ export interface VirtualEvent {
   color: string;
   isRecurring: boolean;
   description?: string;
+  /** True when this Truface was displaced from a holiday to this date */
+  isRescheduled?: boolean;
+  /** The original Mon/Wed/Fri (YYYY-MM-DD) that was a holiday, if displaced */
+  originalDate?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -30,6 +35,19 @@ export class EventService {
 
   private eventsSignal = signal<AppEvent[]>(this.loadCache());
   readonly events = this.eventsSignal.asReadonly();
+
+  private holidayService = new HolidayService();
+
+  /** Cache: "YYYY-M" → Truface schedule map */
+  private trufaceCache = new Map<string, Map<string, { isRescheduled: boolean; originalDate?: string }>>();
+
+  private getTrufaceSchedule(year: number, month: number) {
+    const key = `${year}-${month}`;
+    if (!this.trufaceCache.has(key)) {
+      this.trufaceCache.set(key, this.holidayService.computeTrufaceSchedule(year, month));
+    }
+    return this.trufaceCache.get(key)!;
+  }
 
   constructor() {
     this.syncFromSupabase();
@@ -110,6 +128,10 @@ export class EventService {
     return d.toISOString().split('T')[0];
   }
 
+  isHoliday(date: Date): boolean {
+    return this.holidayService.isHoliday(date);
+  }
+
   colorFor(ev: AppEvent | VirtualEvent): string {
     if (ev.type === 'truface') return RECURRING_COLOR.truface;
     if (ev.type === 'tips')    return RECURRING_COLOR.tips;
@@ -172,28 +194,46 @@ export class EventService {
   // ── Recurring generation ──────────────────────────────────────────────────
 
   getRecurringForDate(date: Date): VirtualEvent[] {
-    const dow     = date.getDay();
     const dateStr = this.toDateStr(date);
     const result: VirtualEvent[] = [];
 
-    const addRecurring = (id: string, title: string, type: 'truface' | 'tips', time: string) => {
-      const override = this.eventsSignal().find(e => e.id === `${id}_${dateStr}`);
+    // ── Truface (holiday-aware schedule) ──────────────────────────────────
+    const schedule = this.getTrufaceSchedule(date.getFullYear(), date.getMonth());
+    const trufaceEntry = schedule.get(dateStr);
+    if (trufaceEntry) {
+      const override = this.eventsSignal().find(e => e.id === `truface_${dateStr}`);
       result.push({
-        id:          `${id}_${dateStr}`,
-        title,
+        id:           `truface_${dateStr}`,
+        title:        'Truface',
+        date:         dateStr,
+        startTime:    '08:00',
+        endTime:      '08:00',
+        type:         'truface',
+        status:       override?.status ?? 'pending',
+        priority:     'medium',
+        color:        RECURRING_COLOR.truface,
+        isRecurring:  true,
+        isRescheduled: trufaceEntry.isRescheduled,
+        originalDate:  trufaceEntry.originalDate,
+      });
+    }
+
+    // ── Tips (Thursdays, no holiday displacement) ─────────────────────────
+    if (date.getDay() === 4) {
+      const override = this.eventsSignal().find(e => e.id === `tips_${dateStr}`);
+      result.push({
+        id:          `tips_${dateStr}`,
+        title:       'Generar Tips',
         date:        dateStr,
-        startTime:   time,
-        endTime:     time,
-        type,
+        startTime:   '14:00',
+        endTime:     '14:00',
+        type:        'tips',
         status:      override?.status ?? 'pending',
         priority:    'medium',
-        color:       RECURRING_COLOR[type],
+        color:       RECURRING_COLOR.tips,
         isRecurring: true,
       });
-    };
-
-    if ([1, 3, 5].includes(dow)) addRecurring('truface', 'Truface',      'truface', '08:00');
-    if (dow === 4)                addRecurring('tips',    'Generar Tips', 'tips',    '14:00');
+    }
 
     return result;
   }

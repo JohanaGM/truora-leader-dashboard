@@ -14,7 +14,9 @@ export class SidebarComponent {
   authService = inject(AuthService);
   
   currentLeader$ = this.authService.currentLeader$;
+  showBotFallback = false;
 
+  onBotImgError() { this.showBotFallback = true; }
   menuItems = [
     {
       icon: '📊',
@@ -50,6 +52,12 @@ export class SidebarComponent {
       icon: '📢',
       label: 'Avisos',
       route: '/avisos',
+      active: false
+    },
+    {
+      icon: '📈',
+      label: 'Métricas',
+      route: '/metricas',
       active: false
     }
   ];

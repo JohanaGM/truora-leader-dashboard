@@ -1,0 +1,143 @@
+<div class="metrics-page">
+
+  <!-- ── Admin Gate ──────────────────────────────────────────────────────── -->
+  @if (!isAdmin()) {
+    <div class="access-denied">
+      <div class="denied-icon">🔒</div>
+      <h2>Acceso Restringido</h2>
+      <p>Esta sección es exclusiva para administradores.</p>
+    </div>
+  } @else {
+
+    <!-- ── Header ────────────────────────────────────────────────────────── -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">📊 Métricas Avanzadas</h1>
+        <p class="page-subtitle">Análisis del rendimiento operacional</p>
+      </div>
+      <span class="admin-badge">👤 Admin</span>
+    </div>
+
+    <!-- ── Filters ───────────────────────────────────────────────────────── -->
+    <div class="filters-bar">
+      <div class="filter-group">
+        <span class="filter-label">Período</span>
+        <div class="range-buttons">
+          @for (r of dateRanges; track r.value) {
+            <button class="range-btn" [class.active]="dateRange() === r.value"
+                    (click)="dateRange.set(r.value)">
+              {{ r.label }}
+            </button>
+          }
+        </div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Proceso</span>
+        <select class="process-select"
+                [value]="processFilter()"
+                (change)="processFilter.set($any($event.target).value)">
+          @for (p of processTypes; track p.value) {
+            <option [value]="p.value">{{ p.label }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- ── KPI Cards ─────────────────────────────────────────────────────── -->
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-total">
+        <div class="kpi-icon">📋</div>
+        <div class="kpi-content">
+          <span class="kpi-value">{{ totalTasks() }}</span>
+          <span class="kpi-label">Total Tareas</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-completed">
+        <div class="kpi-icon">✅</div>
+        <div class="kpi-content">
+          <span class="kpi-value">{{ completedTasks() }}</span>
+          <span class="kpi-label">Completadas</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-rate">
+        <div class="kpi-icon">🎯</div>
+        <div class="kpi-content">
+          <span class="kpi-value">{{ completionRate() }}%</span>
+          <span class="kpi-label">% Cumplimiento</span>
+        </div>
+        <div class="kpi-progress">
+          <div class="kpi-progress-fill" [style.width.%]="completionRate()"></div>
+        </div>
+      </div>
+      <div class="kpi-card kpi-pending">
+        <div class="kpi-icon">⏳</div>
+        <div class="kpi-content">
+          <span class="kpi-value">{{ pendingTasks() }}</span>
+          <span class="kpi-label">Pendientes</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Charts ────────────────────────────────────────────────────────── -->
+    <div class="charts-grid">
+
+      <!-- Bar Chart -->
+      <div class="chart-card">
+        <h3 class="chart-title">📈 Productividad por Proceso</h3>
+        @if (barChartData().length === 0) {
+          <div class="chart-empty">
+            <span>📭</span>
+            <p>Sin datos para el período seleccionado</p>
+          </div>
+        } @else {
+          <div class="bar-chart">
+            @for (bar of barChartData(); track bar.label) {
+              <div class="bar-row">
+                <span class="bar-label">{{ bar.label }}</span>
+                <div class="bar-track">
+                  <div class="bar-fill" [style.width.%]="bar.pct"></div>
+                </div>
+                <span class="bar-count">{{ bar.count }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Pie Chart -->
+      <div class="chart-card">
+        <h3 class="chart-title">🍩 Estado de la Operación</h3>
+        @if (pieSlices().length === 0) {
+          <div class="chart-empty">
+            <span>📭</span>
+            <p>Sin datos para el período seleccionado</p>
+          </div>
+        } @else {
+          <div class="pie-container">
+            <svg viewBox="0 0 180 180" class="pie-svg">
+              @for (slice of pieSlices(); track slice.label) {
+                <path [attr.d]="arcPath(slice.startAngle, slice.endAngle)"
+                      [attr.fill]="slice.color"
+                      class="pie-slice" />
+              }
+              <!-- center text -->
+              <text x="90" y="85" text-anchor="middle" class="pie-center-num">{{ totalTasks() }}</text>
+              <text x="90" y="103" text-anchor="middle" class="pie-center-label">Tareas</text>
+            </svg>
+            <div class="pie-legend">
+              @for (slice of pieSlices(); track slice.label) {
+                <div class="legend-row">
+                  <span class="legend-dot" [style.background]="slice.color"></span>
+                  <span class="legend-text">{{ slice.label }}</span>
+                  <span class="legend-count">{{ slice.count }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+    </div>
+
+  }<!-- /isAdmin -->
+</div>

@@ -104,6 +104,11 @@
     .cal-day-num { color: #cbd5e0; }
   }
 
+  &.is-holiday {
+    background: #fff5f5;
+    &:hover { background: #ffe8e8; }
+  }
+
   &.is-today .cal-day-num {
     background: linear-gradient(135deg, #667eea, #764ba2);
     color: #fff;
@@ -115,6 +120,11 @@
     justify-content: center;
     font-weight: 700;
   }
+}
+
+.holiday-num {
+  color: #c53030 !important;
+  font-weight: 700;
 }
 
 .cal-day-num {
@@ -142,6 +152,26 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+
+  &.chip-rescheduled {
+    border: 1.5px dashed rgba(255, 255, 255, 0.7);
+    opacity: 0.9;
+  }
+
+  .chip-arrow {
+    font-style: normal;
+    margin-right: 2px;
+    font-size: 0.62rem;
+  }
+}
+
+.legend-holiday-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff5f5;
+  border: 1.5px solid #c53030;
 }
 
 // ===== REST =====
@@ -589,6 +619,62 @@
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+// ── Dark Theme – Modal ────────────────────────────────────────────────────
+:host-context(body.dark-theme) {
+  .modal {
+    background: #1a1f2e;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+
+    .modal-header {
+      border-bottom-color: #2d3748;
+      h3 { color: #f1f5f9; }
+      .btn-close {
+        background: #252b3b;
+        color: #94a3b8;
+        &:hover { background: #2d3748; color: #f1f5f9; }
+      }
+    }
+
+    .modal-footer {
+      border-top-color: #2d3748;
+    }
+  }
+
+  .form-group {
+    label { color: #94a3b8; }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+      background: #252b3b;
+      border-color: #2d3748;
+      color: #e2e8f0;
+
+      option {
+        background: #252b3b;
+        color: #e2e8f0;
+      }
+
+      &::placeholder { color: #4a5568; }
+      &:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        background: #1e2433;
+      }
+    }
+  }
+
+  .color-option.active {
+    border-color: #f1f5f9;
+  }
+
+  .btn-secondary {
+    background: #252b3b;
+    color: #cbd5e0;
+    &:hover { background: #2d3748; }
   }
 }
 

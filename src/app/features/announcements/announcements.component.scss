@@ -254,3 +254,77 @@
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+// ── Dark Theme ────────────────────────────────────────────────────────────────
+:host-context(body.dark-theme) {
+  .page-title  { color: #f1f5f9; }
+  .page-subtitle { color: #64748b; }
+
+  .panel-section {
+    background: #1a1f2e;
+    border: 1px solid #2d3748;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+
+  .panel-section-title { color: #94a3b8; }
+  .panel-section-hint  { color: #475569; }
+
+  // Member checkboxes area (rendered by browser default, style the label text)
+  label { color: #cbd5e0; }
+  input[type="checkbox"] { accent-color: #667eea; }
+
+  // Truora contact chips
+  .truora-chip {
+    background: linear-gradient(135deg, #1e2433, #252b3b);
+    border-color: #2d3748;
+
+    &:hover {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-color: transparent;
+    }
+
+    &__name  { color: #93c5fd; }
+    &__label { color: #64748b; }
+  }
+
+  // Editor panel
+  .editor-panel {
+    background: #1a1f2e;
+    border: 1px solid #2d3748;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+
+  .reminder-input {
+    background: #252b3b;
+    border-color: #2d3748;
+    color: #e2e8f0;
+
+    &::placeholder { color: #4a5568; }
+    &:focus {
+      border-color: #667eea;
+      background: #1e2433;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.2);
+    }
+  }
+
+  .drive-badge {
+    background: #1e2433;
+    border-color: #2d3748;
+    color: #93c5fd;
+  }
+
+  .drive-alias-group {
+    .drive-alias-label { color: #94a3b8; }
+    .drive-alias-input {
+      background: #252b3b;
+      border-color: #2d3748;
+      color: #e2e8f0;
+      &:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.2); }
+    }
+  }
+
+  .alert {
+    &.alert-success { background: rgba(72,187,120,0.12); color: #68d391; border-color: #276749; }
+    &.alert-error   { background: rgba(245,101,101,0.12); color: #fc8181; border-color: #c53030; }
+  }
+}

@@ -1,3 +1,129 @@
+// ===== RECOMMENDATIONS BOX =====
+.recommendations-box {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: #f8f9fa;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1.75rem;
+
+  .rec-column {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0 0.75rem;
+
+    &:first-child { padding-left: 0; }
+    &:last-child  { padding-right: 0; }
+  }
+
+  .rec-divider {
+    width: 1px;
+    background: #e2e8f0;
+    margin: 0.25rem 0.25rem;
+    align-self: stretch;
+  }
+
+  .rec-icon {
+    font-size: 1.2rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .rec-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #4a5568;
+    margin: 0 0 0.15rem 0;
+  }
+
+  .rec-desc {
+    font-size: 0.74rem;
+    color: #718096;
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+// ===== TEMPLATE BUTTONS WITH TOOLTIPS =====
+.template-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+
+  &:hover .tooltip-bubble {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+  }
+}
+
+.btn-template {
+  padding: 0.45rem 0.9rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f7fafc;
+  color: #4a5568;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+
+  &:hover:not(:disabled) {
+    border-color: #667eea;
+    background: #eef2ff;
+    color: #4338ca;
+  }
+
+  &.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.35);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.tooltip-bubble {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #1a202c;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 500;
+  white-space: nowrap;
+  padding: 0.35rem 0.7rem;
+  border-radius: 7px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  z-index: 100;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #1a202c;
+  }
+}
+
 .tip-generator {
   max-width: 1200px;
   margin: 0 auto;
@@ -314,6 +440,11 @@
     cursor: pointer;
     transition: all 0.2s ease;
     border: none;
+
+    :host-context(body.dark-theme) & {
+      background: linear-gradient(135deg, #3b4a6b 0%, #2d3a5a 100%);
+      color: #f1f5f9;
+    }
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);

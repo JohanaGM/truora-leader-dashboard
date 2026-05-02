@@ -1,0 +1,93 @@
+<div class="settings-page">
+  <div class="page-header">
+    <h1 class="page-title">⚙️ Configuración</h1>
+    <p class="page-subtitle">Personaliza tu experiencia en el dashboard</p>
+  </div>
+
+  <div class="settings-grid">
+
+    <!-- Perfil -->
+    <div class="settings-card">
+      <div class="card-header">
+        <span class="card-icon">👤</span>
+        <h2 class="card-title">Perfil</h2>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nombre de usuario</label>
+        <input type="text"
+               class="form-input"
+               [value]="displayName()"
+               (input)="displayName.set($any($event.target).value)"
+               placeholder="Tu nombre completo" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Correo electrónico</label>
+        <input type="email"
+               class="form-input disabled"
+               [value]="(authService.currentLeader$ | async)?.email ?? ''"
+               disabled />
+        <span class="form-hint">El correo no puede modificarse desde aquí.</span>
+      </div>
+      <button class="btn-save" (click)="saveProfile()">
+        Guardar cambios
+      </button>
+      @if (saveSuccess()) {
+        <div class="alert-success">✅ ¡Cambios guardados correctamente!</div>
+      }
+    </div>
+
+    <!-- Notificaciones -->
+    <div class="settings-card">
+      <div class="card-header">
+        <span class="card-icon">🔔</span>
+        <h2 class="card-title">Preferencias de Notificación</h2>
+      </div>
+      <div class="toggle-item">
+        <div class="toggle-info">
+          <p class="toggle-label">Alertas de Telegram</p>
+          <p class="toggle-desc">Recibe notificaciones de tareas por Telegram</p>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox"
+                 [checked]="telegramAlerts()"
+                 (change)="telegramAlerts.set($any($event.target).checked)" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="toggle-item">
+        <div class="toggle-info">
+          <p class="toggle-label">Resumen semanal</p>
+          <p class="toggle-desc">Recibe un resumen de tu semana cada lunes</p>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox"
+                 [checked]="telegramWeeklySummary()"
+                 (change)="telegramWeeklySummary.set($any($event.target).checked)" />
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Tema -->
+    <div class="settings-card">
+      <div class="card-header">
+        <span class="card-icon">🎨</span>
+        <h2 class="card-title">Personalización</h2>
+      </div>
+      <p class="form-label" style="margin-bottom:1rem">Tema de la aplicación</p>
+      <div class="theme-options">
+        <button class="theme-btn"
+                [class.active]="theme() === 'light'"
+                (click)="applyTheme('light')">
+          ☀️ Claro
+        </button>
+        <button class="theme-btn"
+                [class.active]="theme() === 'dark'"
+                (click)="applyTheme('dark')">
+          🌙 Oscuro
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

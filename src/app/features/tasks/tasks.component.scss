@@ -221,6 +221,11 @@
         background: #ffebee;
         color: #c62828;
       }
+
+      &.priority-tips {
+        background: #ede9fe;
+        color: #5b21b6;
+      }
     }
 
     .task-actions {
@@ -235,6 +240,20 @@
     color: #2d3748;
     margin: 0 0 0.75rem 0;
     line-height: 1.4;
+
+    .rescheduled-badge {
+      display: inline-block;
+      margin-left: 0.5rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+      border-radius: 6px;
+      padding: 1px 6px;
+      vertical-align: middle;
+      cursor: help;
+    }
   }
 
   .task-description {
@@ -265,23 +284,33 @@
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s ease;
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 1.5rem;
+      background-repeat: no-repeat;
+      background-position: right 0.4rem center;
+      background-size: 0.8rem;
 
       &.pending {
-        background: #fef5e7;
-        color: #f39c12;
-        border-color: #f39c12;
+        background-color: rgba(251, 191, 36, 0.12);
+        color: #92400e;
+        border-color: rgba(251, 191, 36, 0.5);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%2392400e' d='M1.5 4.5l6.5 7 6.5-7'/%3E%3C/svg%3E");
       }
 
       &.in-progress {
-        background: #e3f2fd;
-        color: #2196f3;
-        border-color: #2196f3;
+        background-color: rgba(59, 130, 246, 0.12);
+        color: #1e40af;
+        border-color: rgba(59, 130, 246, 0.5);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%231e40af' d='M1.5 4.5l6.5 7 6.5-7'/%3E%3C/svg%3E");
       }
 
       &.completed {
-        background: #e8f5e9;
-        color: #4caf50;
-        border-color: #4caf50;
+        background-color: rgba(34, 197, 94, 0.12);
+        color: #166534;
+        border-color: rgba(34, 197, 94, 0.5);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23166534' d='M1.5 4.5l6.5 7 6.5-7'/%3E%3C/svg%3E");
+        option { color: #fff; }
       }
     }
   }
@@ -518,5 +547,87 @@
   }
   100% {
     background-position: 0% 0%, 400% 0%;
+  }
+}
+
+// ── Dark Theme – Side Panel ───────────────────────────────────────────────
+:host-context(body.dark-theme) {
+  .page-header {
+    .page-title    { color: #f1f5f9; }
+    .page-subtitle { color: #64748b; }
+  }
+
+  .stats-summary .stat-item {
+    background: #1a1f2e;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+
+    &.pending     { border-left-color: #ffd93d; }
+    &.in-progress { border-left-color: #38bdf8; }
+    &.completed   { border-left-color: #4ade80; }
+
+    .stat-number { color: #f1f5f9; }
+    .stat-label  { color: #94a3b8; }
+  }
+
+  .filters .filter-group label { color: #94a3b8; }
+
+  .side-panel-overlay {
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .side-panel {
+    background: #1a1f2e;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
+
+    .panel-header {
+      border-bottom-color: #2d3748;
+      h3 { color: #f1f5f9; }
+      .btn-close {
+        background: #252b3b;
+        color: #94a3b8;
+        &:hover { background: #2d3748; color: #f1f5f9; }
+      }
+    }
+
+    .panel-footer {
+      border-top-color: #2d3748;
+    }
+  }
+
+  .form-group {
+    label { color: #94a3b8; }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+      background: #252b3b;
+      border-color: #2d3748;
+      color: #e2e8f0;
+
+      option {
+        background: #252b3b;
+        color: #e2e8f0;
+      }
+
+      &::placeholder { color: #4a5568; }
+      &:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        background: #1e2433;
+      }
+    }
+  }
+
+  .priority-btn {
+    background: #252b3b !important;
+    &.low    { border-color: #4caf50; color: #86efac; &:hover, &.active { background: #4caf50 !important; color: #fff; } }
+    &.medium { border-color: #ff9800; color: #fbbf24; &:hover, &.active { background: #ff9800 !important; color: #fff; } }
+    &.high   { border-color: #f44336; color: #fca5a5; &:hover, &.active { background: #f44336 !important; color: #fff; } }
+  }
+
+  .btn-secondary {
+    background: #252b3b;
+    color: #cbd5e0;
+    &:hover { background: #2d3748; }
   }
 }

@@ -40,6 +40,14 @@ export const routes: Routes = [
       {
         path: 'avisos',
         loadComponent: () => import('./features/announcements/announcements.component').then(m => m.AnnouncementsComponent)
+      },
+      {
+        path: 'configuracion',
+        loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent)
+      },
+      {
+        path: 'metricas',
+        loadComponent: () => import('./features/metrics/metrics.component').then(m => m.MetricsComponent)
       }
     ]
   },

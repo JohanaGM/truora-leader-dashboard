@@ -41,6 +41,10 @@ export class ScheduleComponent {
     });
   });
 
+  isHolidayDate(date: Date): boolean {
+    return this.eventService.isHoliday(date);
+  }
+
   prevMonth() {
     const d = this.calendarNavDate();
     this.calendarNavDate.set(new Date(d.getFullYear(), d.getMonth() - 1, 1));
