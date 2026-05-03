@@ -23,33 +23,25 @@ export class HeaderComponent {
   notifOpen = signal(false);
 
   /**
-   * All events with status 'pending' from the past 14 days up to today.
-   * Deduped by event id.
+   * Pending tasks for the current week (Mon–Sun), sorted oldest → newest.
+   * Reacts in real time when any event's status changes.
    */
   pendingTasks = computed((): VirtualEvent[] => {
     this.eventService.events(); // track signal for reactivity
     const todayStr = this.eventService.toDateStr(new Date());
-    const seen = new Set<string>();
-    const result: VirtualEvent[] = [];
-
-    for (let i = -14; i <= 0; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() + i);
-      for (const ev of this.eventService.getAllForDate(d)) {
-        if (!seen.has(ev.id) && ev.status === 'pending' && ev.date <= todayStr) {
-          seen.add(ev.id);
-          result.push(ev);
-        }
-      }
-    }
-    return result.sort((a, b) => a.date.localeCompare(b.date));
+    return this.eventService
+      .getEventsForWeek()
+      .filter(ev => ev.status === 'pending')
+      .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
   });
 
   pendingCount = computed(() => this.pendingTasks().length);
-  topThree     = computed(() => this.pendingTasks().slice(0, 3));
-  hasUrgent    = computed(() =>
-    this.pendingTasks().some(e => e.date < this.eventService.toDateStr(new Date()))
-  );
+
+  /** True when at least one pending task is on or before today (overdue within the week). */
+  hasUrgent = computed(() => {
+    const todayStr = this.eventService.toDateStr(new Date());
+    return this.pendingTasks().some(e => e.date <= todayStr);
+  });
 
   toggleNotif() { this.notifOpen.update(v => !v); }
   closeNotif()  { this.notifOpen.set(false); }

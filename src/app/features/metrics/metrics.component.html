@@ -1,143 +1,332 @@
-<div class="metrics-page">
+<div class="metrics-page" (click)="calendarOpen.set(false)">
 
   <!-- ── Admin Gate ──────────────────────────────────────────────────────── -->
   @if (!isAdmin()) {
     <div class="access-denied">
       <div class="denied-icon">🔒</div>
       <h2>Acceso Restringido</h2>
-      <p>Esta sección es exclusiva para administradores.</p>
+      <p>Esta sección es exclusiva para el liderazgo (Johana Galindo y María Alejandra).</p>
     </div>
   } @else {
 
-    <!-- ── Header ────────────────────────────────────────────────────────── -->
+    <!-- ── Page Header ───────────────────────────────────────────────────── -->
     <div class="page-header">
       <div>
-        <h1 class="page-title">📊 Métricas Avanzadas</h1>
-        <p class="page-subtitle">Análisis del rendimiento operacional</p>
+        <h1 class="page-title">📊 Control de Métricas</h1>
+        <p class="page-subtitle">Visión global y auditoría individual por período</p>
       </div>
-      <span class="admin-badge">👤 Admin</span>
+      <span class="admin-badge">👤 Liderazgo</span>
     </div>
 
-    <!-- ── Filters ───────────────────────────────────────────────────────── -->
-    <div class="filters-bar">
-      <div class="filter-group">
-        <span class="filter-label">Período</span>
-        <div class="range-buttons">
-          @for (r of dateRanges; track r.value) {
-            <button class="range-btn" [class.active]="dateRange() === r.value"
-                    (click)="dateRange.set(r.value)">
-              {{ r.label }}
-            </button>
-          }
-        </div>
-      </div>
-      <div class="filter-group">
-        <span class="filter-label">Proceso</span>
-        <select class="process-select"
-                [value]="processFilter()"
-                (change)="processFilter.set($any($event.target).value)">
-          @for (p of processTypes; track p.value) {
-            <option [value]="p.value">{{ p.label }}</option>
+    <!-- ── Filters Bar ───────────────────────────────────────────────────── -->
+    <div class="filters-bar" (click)="stopProp($event)">
+
+      <!-- Analyst selector -->
+      <div class="select-wrapper">
+        <select class="filter-select analyst-select"
+                (change)="onAnalystChange($event)">
+          <option value="all">👥 Todos los Analistas</option>
+          @for (analyst of analysts; track analyst.id) {
+            <option [value]="analyst.id">{{ analyst.displayName }}</option>
           }
         </select>
       </div>
-    </div>
 
-    <!-- ── KPI Cards ─────────────────────────────────────────────────────── -->
-    <div class="kpi-grid">
-      <div class="kpi-card kpi-total">
-        <div class="kpi-icon">📋</div>
-        <div class="kpi-content">
-          <span class="kpi-value">{{ totalTasks() }}</span>
-          <span class="kpi-label">Total Tareas</span>
-        </div>
-      </div>
-      <div class="kpi-card kpi-completed">
-        <div class="kpi-icon">✅</div>
-        <div class="kpi-content">
-          <span class="kpi-value">{{ completedTasks() }}</span>
-          <span class="kpi-label">Completadas</span>
-        </div>
-      </div>
-      <div class="kpi-card kpi-rate">
-        <div class="kpi-icon">🎯</div>
-        <div class="kpi-content">
-          <span class="kpi-value">{{ completionRate() }}%</span>
-          <span class="kpi-label">% Cumplimiento</span>
-        </div>
-        <div class="kpi-progress">
-          <div class="kpi-progress-fill" [style.width.%]="completionRate()"></div>
-        </div>
-      </div>
-      <div class="kpi-card kpi-pending">
-        <div class="kpi-icon">⏳</div>
-        <div class="kpi-content">
-          <span class="kpi-value">{{ pendingTasks() }}</span>
-          <span class="kpi-label">Pendientes</span>
-        </div>
-      </div>
-    </div>
+      <div class="divider-v"></div>
 
-    <!-- ── Charts ────────────────────────────────────────────────────────── -->
-    <div class="charts-grid">
+      <!-- Date Range Picker -->
+      <div class="range-picker-wrapper">
+        <button class="range-display-btn" (click)="toggleCalendar($event)">
+          <span class="cal-icon">📅</span>
+          <span class="range-text">{{ rangeLabel() }}</span>
+          <span class="chevron" [class.open]="calendarOpen()">▾</span>
+        </button>
 
-      <!-- Bar Chart -->
-      <div class="chart-card">
-        <h3 class="chart-title">📈 Productividad por Proceso</h3>
-        @if (barChartData().length === 0) {
-          <div class="chart-empty">
-            <span>📭</span>
-            <p>Sin datos para el período seleccionado</p>
-          </div>
-        } @else {
-          <div class="bar-chart">
-            @for (bar of barChartData(); track bar.label) {
-              <div class="bar-row">
-                <span class="bar-label">{{ bar.label }}</span>
-                <div class="bar-track">
-                  <div class="bar-fill" [style.width.%]="bar.pct"></div>
-                </div>
-                <span class="bar-count">{{ bar.count }}</span>
-              </div>
-            }
-          </div>
-        }
-      </div>
+        @if (calendarOpen()) {
+          <div class="cal-overlay" (click)="calendarOpen.set(false)"></div>
+          <div class="calendar-popover" (click)="stopProp($event)">
+            <div class="cal-nav">
+              <button class="cal-nav-btn" (click)="prevMonth()">‹</button>
+              <span class="cal-month-label">{{ pickerMonthLabel() }}</span>
+              <button class="cal-nav-btn" (click)="nextMonth()">›</button>
+            </div>
 
-      <!-- Pie Chart -->
-      <div class="chart-card">
-        <h3 class="chart-title">🍩 Estado de la Operación</h3>
-        @if (pieSlices().length === 0) {
-          <div class="chart-empty">
-            <span>📭</span>
-            <p>Sin datos para el período seleccionado</p>
-          </div>
-        } @else {
-          <div class="pie-container">
-            <svg viewBox="0 0 180 180" class="pie-svg">
-              @for (slice of pieSlices(); track slice.label) {
-                <path [attr.d]="arcPath(slice.startAngle, slice.endAngle)"
-                      [attr.fill]="slice.color"
-                      class="pie-slice" />
-              }
-              <!-- center text -->
-              <text x="90" y="85" text-anchor="middle" class="pie-center-num">{{ totalTasks() }}</text>
-              <text x="90" y="103" text-anchor="middle" class="pie-center-label">Tareas</text>
-            </svg>
-            <div class="pie-legend">
-              @for (slice of pieSlices(); track slice.label) {
-                <div class="legend-row">
-                  <span class="legend-dot" [style.background]="slice.color"></span>
-                  <span class="legend-text">{{ slice.label }}</span>
-                  <span class="legend-count">{{ slice.count }}</span>
-                </div>
+            <div class="cal-grid-header">
+              @for (d of weekDays; track d) { <span>{{ d }}</span> }
+            </div>
+
+            <div class="cal-grid"
+                 (mouseleave)="hoverDate.set(null)">
+              @for (day of calendarDays(); track ($index)) {
+                <button class="cal-day"
+                        [class.empty]="!day"
+                        [class.start]="isDayStart(day)"
+                        [class.end]="isDayEnd(day)"
+                        [class.in-range]="isDayInRange(day)"
+                        [class.today]="isDayToday(day)"
+                        [disabled]="!day"
+                        (mouseenter)="hoverDate.set(day)"
+                        (click)="selectDay(day, $event)">
+                  {{ day?.getDate() }}
+                </button>
               }
             </div>
           </div>
         }
       </div>
 
-    </div>
+      <div class="divider-v"></div>
 
+      <!-- Process filter -->
+      <div class="select-wrapper">
+        <select class="filter-select"
+                [value]="processFilter()"
+                (change)="processFilter.set($any($event.target).value); triggerLoading()">
+          @for (pt of processTypes; track pt.value) {
+            <option [value]="pt.value">{{ pt.label }}</option>
+          }
+        </select>
+      </div>
+    </div><!-- /filters-bar -->
+
+    <!-- ── Content area switches between global and audit mode ─────────── -->
+    <div class="metrics-content" [class.mode-audit]="isAuditMode()" [class.mode-global]="!isAuditMode()">
+
+      <!-- ── SKELETON LOADER ─────────────────────────────────────────────── -->
+      @if (isLoading()) {
+        <div class="skeleton-grid">
+          @for (i of [1,2,3,4,5]; track i) {
+            <div class="skeleton-card">
+              <div class="sk-line sk-short"></div>
+              <div class="sk-line sk-tall"></div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (!isLoading()) {
+
+        <!-- ══════════════════════════════════════════════════════════════
+             GLOBAL VIEW  (Todos los Analistas)
+        ════════════════════════════════════════════════════════════════ -->
+        @if (!isAuditMode()) {
+
+          <!-- KPI grid — always visible, shows 0 when no data -->
+          <div class="kpi-grid">
+            <div class="kpi-card accent-blue">
+              <span class="kpi-label">Total Tareas</span>
+              <span class="kpi-value">{{ totalTasks() }}</span>
+            </div>
+            <div class="kpi-card accent-green">
+              <span class="kpi-label">Completadas</span>
+              <span class="kpi-value">{{ completedTasks() }}</span>
+            </div>
+            <div class="kpi-card accent-yellow">
+              <span class="kpi-label">Tasa Completado</span>
+              <span class="kpi-value">{{ completionRate() }}%</span>
+            </div>
+            <div class="kpi-card accent-purple">
+              <span class="kpi-label">SLA (sin vencer)</span>
+              <span class="kpi-value">{{ slaRate() }}%</span>
+            </div>
+            <div class="kpi-card accent-red">
+              <span class="kpi-label">Top Proceso</span>
+              <span class="kpi-value kpi-value--sm">{{ topProcess() }}</span>
+            </div>
+          </div>
+
+          <!-- Charts row — always visible -->
+          <div class="charts-row">
+
+            <!-- Bar chart: tasks per process -->
+            <div class="chart-card bar-chart-card">
+              <h3 class="chart-title">Volumen por Proceso</h3>
+              @if (barChartData().length > 0) {
+                <div class="bar-list">
+                  @for (item of barChartData(); track item.label) {
+                    <div class="bar-row">
+                      <span class="bar-label">{{ item.label }}</span>
+                      <div class="bar-track">
+                        <div class="bar-fill" [style.width.%]="item.pct"></div>
+                      </div>
+                      <span class="bar-count">{{ item.count }}</span>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <div class="chart-no-data">📭 Sin registros en este período</div>
+              }
+            </div>
+
+            <!-- Donut chart: status distribution -->
+            <div class="chart-card donut-chart-card">
+              <h3 class="chart-title">Distribución de Estado</h3>
+              @if (pieSlices().length > 0) {
+                <div class="donut-wrapper">
+                  <svg viewBox="0 0 180 180" class="donut-svg">
+                    @for (slice of pieSlices(); track slice.label) {
+                      <path [attr.d]="arcPath(slice.startAngle, slice.endAngle)"
+                            [attr.fill]="slice.color" />
+                    }
+                    <circle cx="90" cy="90" r="35" class="donut-hole" />
+                    <text x="90" y="87" class="donut-center-val">{{ completionRate() }}%</text>
+                    <text x="90" y="103" class="donut-center-lbl">Done</text>
+                  </svg>
+                  <div class="donut-legend">
+                    @for (slice of pieSlices(); track slice.label) {
+                      <div class="legend-item">
+                        <span class="legend-dot" [style.background]="slice.color"></span>
+                        <span class="legend-label">{{ slice.label }}</span>
+                        <span class="legend-val">{{ slice.count }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              } @else {
+                <div class="chart-no-data">📭 Sin registros en este período</div>
+              }
+            </div>
+          </div>
+
+          <!-- Trend line chart -->
+          <div class="chart-card trend-card">
+            <h3 class="chart-title">Tendencia Diaria</h3>
+            @if (trendData().length >= 2) {
+              <div class="trend-wrapper">
+                <svg viewBox="0 0 480 110" class="trend-svg" preserveAspectRatio="none">
+                  <polyline class="trend-line total"  [attr.points]="linePoints(trendData(), 'total')" />
+                  <polyline class="trend-line done"   [attr.points]="linePoints(trendData(), 'completed')" />
+                </svg>
+                <div class="trend-x-labels">
+                  @for (lbl of trendXLabels(); track lbl) {
+                    <span>{{ lbl }}</span>
+                  }
+                </div>
+              </div>
+              <div class="trend-legend">
+                <span class="tl-dot tl-total"></span><span>Total</span>
+                <span class="tl-dot tl-done"></span><span>Completadas</span>
+              </div>
+            } @else {
+              <div class="chart-no-data">📭 Sin registros en este período</div>
+            }
+          </div>
+
+        } @else {
+
+          <!-- ════════════════════════════════════════════════════════════
+               AUDIT VIEW  (Individual analyst)
+          ════════════════════════════════════════════════════════════════ -->
+          @if (selectedAnalyst(); as analyst) {
+
+            <div class="audit-layout">
+
+              <!-- Profile card — always visible -->
+              <div class="audit-profile-card">
+                <div class="analyst-avatar" [style.background]="analyst.color">
+                  {{ analyst.avatar }}
+                </div>
+                <div class="analyst-info">
+                  <h2 class="analyst-name">{{ analyst.displayName }}</h2>
+
+                  <div class="efficiency-stars">
+                    @for (i of [1,2,3,4,5]; track i) {
+                      <span class="star" [class.filled]="i <= stars()">★</span>
+                    }
+                    <span class="eff-pct">{{ efficiencyRate() }}%</span>
+                  </div>
+
+                  <div class="audit-kpi-row">
+                    <div class="akpi">
+                      <span class="akpi-val">{{ totalTasks() }}</span>
+                      <span class="akpi-lbl">Asignadas</span>
+                    </div>
+                    <div class="akpi">
+                      <span class="akpi-val" style="color:#22c55e">{{ completedTasks() }}</span>
+                      <span class="akpi-lbl">Completadas</span>
+                    </div>
+                    <div class="akpi">
+                      <span class="akpi-val" style="color:#f59e0b">{{ pendingTasks() }}</span>
+                      <span class="akpi-lbl">Pendientes</span>
+                    </div>
+                    <div class="akpi">
+                      <span class="akpi-val">{{ completionRate() }}%</span>
+                      <span class="akpi-lbl">Tasa</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button class="tg-btn" (click)="openTelegram()">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M11.944 0A12 12 0 1 0 23.888 12 12.012 12.012 0 0 0 11.944 0zm6.11 8.2l-2.03 9.54c-.15.68-.54.84-1.09.52l-3-2.21-1.45 1.4c-.16.16-.3.3-.61.3l.22-3.07 5.6-5.06c.24-.21-.05-.33-.38-.12l-6.92 4.36-2.98-.93c-.65-.2-.66-.65.14-.96l11.63-4.49c.54-.19 1.01.13.84.72z"/>
+                  </svg>
+                  Contactar
+                </button>
+              </div>
+
+              <!-- Audit charts — always visible -->
+              <div class="audit-charts">
+
+                <div class="chart-card bar-chart-card">
+                  <h3 class="chart-title">Asignadas vs Completadas por Día</h3>
+                  @if (barChartData().length > 0) {
+                    <div class="bar-list audit-bar-list">
+                      @for (item of barChartData(); track item.label) {
+                        <div class="bar-row audit-bar-row">
+                          <span class="bar-label">{{ item.label }}</span>
+                          <div class="bar-track">
+                            <div class="bar-fill bar-assigned" [style.width.%]="item.pct"></div>
+                          </div>
+                          <div class="bar-track bar-track-sm">
+                            <div class="bar-fill bar-completed" [style.width.%]="item.completedPct"></div>
+                          </div>
+                          <span class="bar-count">{{ item.count }}</span>
+                        </div>
+                      }
+                    </div>
+                    <div class="audit-bar-legend">
+                      <span class="ab-dot ab-assigned"></span><span>Asignadas</span>
+                      <span class="ab-dot ab-completed"></span><span>Completadas</span>
+                    </div>
+                  } @else {
+                    <div class="chart-no-data">📭 Sin registros en este período</div>
+                  }
+                </div>
+
+                <div class="chart-card donut-chart-card">
+                  <h3 class="chart-title">Mix de Procesos</h3>
+                  @if (pieSlices().length > 0) {
+                    <div class="donut-wrapper">
+                      <svg viewBox="0 0 180 180" class="donut-svg">
+                        @for (slice of pieSlices(); track slice.label) {
+                          <path [attr.d]="arcPath(slice.startAngle, slice.endAngle)"
+                                [attr.fill]="slice.color" />
+                        }
+                        <circle cx="90" cy="90" r="35" class="donut-hole" />
+                        <text x="90" y="87" class="donut-center-val">{{ totalTasks() }}</text>
+                        <text x="90" y="103" class="donut-center-lbl">Tareas</text>
+                      </svg>
+                      <div class="donut-legend">
+                        @for (slice of pieSlices(); track slice.label) {
+                          <div class="legend-item">
+                            <span class="legend-dot" [style.background]="slice.color"></span>
+                            <span class="legend-label">{{ slice.label }}</span>
+                            <span class="legend-val">{{ slice.count }}</span>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="chart-no-data">📭 Sin registros en este período</div>
+                  }
+                </div>
+
+              </div><!-- /audit-charts -->
+            </div><!-- /audit-layout -->
+          }
+        }
+
+      }<!-- /!isLoading -->
+    </div><!-- /metrics-content -->
   }<!-- /isAdmin -->
 </div>

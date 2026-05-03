@@ -1,4 +1,4 @@
-﻿import { Component, inject, computed } from '@angular/core';
+﻿import { Component, inject, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { EventService } from '../../core/services/event.service';
@@ -11,7 +11,7 @@ import { TipsCounterService } from '../../core/services/tips-counter.service';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   private router = inject(Router);
   private eventService = inject(EventService);
   private tipsCounter = inject(TipsCounterService);
@@ -50,6 +50,10 @@ export class DashboardComponent {
     { icon: '⚙️', label: 'Automatizaciones', route: '/automations',  url: null,                              color: 'rgb(101 118 175)' },
     { icon: '📢', label: 'Crear Aviso',      route: '/avisos',       url: null,                              color: 'rgb(14 80 110)' }
   ];
+
+  ngOnInit(): void {
+    this.tipsCounter.fetchCount().subscribe();
+  }
 
   openTipsFolder() {
     window.open(this.tipsCounter.TIPS_FOLDER_URL, '_blank', 'noopener,noreferrer');

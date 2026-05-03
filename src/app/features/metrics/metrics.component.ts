@@ -1,11 +1,46 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { EventService } from '../../core/services/event.service';
 
-type DateRange = 'today' | 'week' | 'month';
-
 const ADMIN_NAMES = ['johana', 'alejandra', 'maria alejandra'];
+const WEEK_DAYS   = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'];
+
+interface TrendPoint { dateStr: string; label: string; total: number; completed: number; }
+
+export interface Analyst {
+  id: number;
+  displayName: string;
+  telegram: string;
+  avatar: string;
+  color: string;
+}
+
+const ANALYSTS: Analyst[] = [
+  { id: 1,  displayName: 'KateRhine Angarita',    telegram: 'KaterineAngarita',    avatar: 'KA', color: '#667eea' },
+  { id: 2,  displayName: 'Mari Alejandra Murcia', telegram: 'MariAlejandra_Murcia', avatar: 'MA', color: '#f43f5e' },
+  { id: 3,  displayName: 'Cynthia Racas',         telegram: 'cynthiaracas',         avatar: 'CR', color: '#22c55e' },
+  { id: 4,  displayName: 'Miroslawa Estrada',     telegram: 'JMiroslawaEstrada',    avatar: 'ME', color: '#f59e0b' },
+  { id: 5,  displayName: 'Karen Juliéth',         telegram: 'Karenjuliethh',        avatar: 'KJ', color: '#38bdf8' },
+  { id: 6,  displayName: 'Grisell Quiroz',        telegram: 'GrisellQuiroz',        avatar: 'GQ', color: '#a78bfa' },
+  { id: 7,  displayName: 'Joha G. Mora',          telegram: 'JohaGMora',            avatar: 'JM', color: '#fb923c' },
+  { id: 8,  displayName: 'Majo Velásquez',        telegram: 'majovelasquez',        avatar: 'MV', color: '#34d399' },
+  { id: 9,  displayName: 'Erik Castro',           telegram: 'Erikcastro23',         avatar: 'EC', color: '#e879f9' },
+  { id: 10, displayName: 'Valentina Mesa',        telegram: 'ValentinaMesaB',       avatar: 'VM', color: '#fbbf24' },
+  { id: 11, displayName: 'Cristian M. Rojas',     telegram: 'CristianMRojas',       avatar: 'CM', color: '#60a5fa' },
+];
+
+const PROCESS_TYPES = [
+  { value: 'all',                              label: 'Todos los Procesos' },
+  { value: 'Descarga y asignacion de acc id',  label: 'ACC ID' },
+  { value: 'Seguimiento tickets cx',           label: 'Tickets CX' },
+  { value: 'Revision calidad Face',            label: 'Calidad Face' },
+  { value: 'Revision calidad documento',       label: 'Cal. Documento' },
+  { value: 'Revision reglas de riesgo',        label: 'Reglas de Riesgo' },
+  { value: 'Revision label',                   label: 'Label' },
+];
+
+const PROCESS_COLORS = ['#667eea', '#22c55e', '#f59e0b', '#f43f5e', '#38bdf8', '#a78bfa'];
 
 @Component({
   selector: 'app-metrics',
@@ -14,146 +49,327 @@ const ADMIN_NAMES = ['johana', 'alejandra', 'maria alejandra'];
   templateUrl: './metrics.component.html',
   styleUrl: './metrics.component.scss'
 })
-export class MetricsComponent implements OnInit {
+export class MetricsComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private eventService = inject(EventService);
 
-  currentLeader$ = this.authService.currentLeader$;
+  readonly weekDays    = WEEK_DAYS;
+  readonly analysts    = ANALYSTS;
+  readonly processTypes = PROCESS_TYPES;
+
   isAdmin = signal(false);
 
-  // ── Filters ──────────────────────────────────────────────────────────────
-  dateRange = signal<DateRange>('month');
+  // ── Analyst filter ('all' = macro view) ──────────────────────────────────
+  selectedAnalystId = signal<number | 'all'>('all');
+
+  readonly selectedAnalyst = computed((): Analyst | null =>
+    this.selectedAnalystId() === 'all'
+      ? null
+      : ANALYSTS.find(a => a.id === this.selectedAnalystId()) ?? null
+  );
+
+  readonly isAuditMode = computed(() => this.selectedAnalystId() !== 'all');
+
+  // ── Process filter ────────────────────────────────────────────────────────
   processFilter = signal<string>('all');
 
-  readonly processTypes = [
-    { value: 'all',                              label: 'Todos los Procesos' },
-    { value: 'Descarga y asignacion de acc id',  label: 'ACC ID' },
-    { value: 'Seguimiento tickets cx',           label: 'Tickets CX' },
-    { value: 'Revision calidad Face',            label: 'Calidad Face' },
-    { value: 'Revision calidad documento',       label: 'Cal. Documento' },
-    { value: 'Revision reglas de riesgo',        label: 'Reglas de Riesgo' },
-    { value: 'Revision label',                   label: 'Label' },
-  ];
+  // ── Date range picker state ───────────────────────────────────────────────
+  rangeStart   = signal<Date | null>(null);
+  rangeEnd     = signal<Date | null>(null);
+  hoverDate    = signal<Date | null>(null);
+  calendarOpen = signal(false);
+  pickerYear   = signal(new Date().getFullYear());
+  pickerMonth  = signal(new Date().getMonth());
 
-  readonly dateRanges: { value: DateRange; label: string }[] = [
-    { value: 'today', label: 'Hoy' },
-    { value: 'week',  label: 'Esta Semana' },
-    { value: 'month', label: 'Este Mes' },
-  ];
+  // ── Loading skeleton ──────────────────────────────────────────────────────
+  isLoading = signal(false);
+  private loadingTimer: ReturnType<typeof setTimeout> | null = null;
 
-  ngOnInit() {
-    this.authService.currentLeader$.subscribe(leader => {
-      if (leader) {
-        const name = leader.full_name.toLowerCase();
-        this.isAdmin.set(ADMIN_NAMES.some(a => name.includes(a)));
-      }
-    });
+  // ── Computed picker helpers ───────────────────────────────────────────────
+  readonly pickerMonthLabel = computed(() =>
+    new Date(this.pickerYear(), this.pickerMonth(), 1)
+      .toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })
+  );
+
+  readonly rangeLabel = computed(() => {
+    const s = this.rangeStart(), e = this.rangeEnd();
+    const fmt = (d: Date) =>
+      d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+    if (!s) return 'Selecciona un rango';
+    if (!e) return fmt(s) + ' → …';
+    return fmt(s) + '  →  ' + fmt(e);
+  });
+
+  calendarDays = computed((): (Date | null)[] => {
+    const year = this.pickerYear(), month = this.pickerMonth();
+    const firstDay    = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const startPad    = (firstDay + 6) % 7;
+    const cells: (Date | null)[] = [];
+    for (let i = 0; i < startPad; i++) cells.push(null);
+    for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d));
+    return cells;
+  });
+
+  // ── Calendar navigation ───────────────────────────────────────────────────
+  prevMonth(): void {
+    let m = this.pickerMonth() - 1, y = this.pickerYear();
+    if (m < 0) { m = 11; y--; }
+    this.pickerMonth.set(m); this.pickerYear.set(y);
   }
 
-  // ── Date helpers ──────────────────────────────────────────────────────────
-  private getRangeWindow(): { start: Date; end: Date } {
-    const now = new Date();
-    const start = new Date(now);
-    const end   = new Date(now);
+  nextMonth(): void {
+    let m = this.pickerMonth() + 1, y = this.pickerYear();
+    if (m > 11) { m = 0; y++; }
+    this.pickerMonth.set(m); this.pickerYear.set(y);
+  }
 
-    switch (this.dateRange()) {
-      case 'today':
-        start.setHours(0, 0, 0, 0);
-        end.setHours(23, 59, 59, 999);
-        break;
-      case 'week': {
-        const dow = now.getDay(); // 0=Sun
-        start.setDate(now.getDate() - dow);
-        start.setHours(0, 0, 0, 0);
-        end.setDate(start.getDate() + 6);
-        end.setHours(23, 59, 59, 999);
-        break;
-      }
-      default: // month
-        start.setDate(1);
-        start.setHours(0, 0, 0, 0);
-        end.setMonth(now.getMonth() + 1, 0);
-        end.setHours(23, 59, 59, 999);
+  // ── Day selection ─────────────────────────────────────────────────────────
+  selectDay(date: Date | null, event: MouseEvent): void {
+    event.stopPropagation();
+    if (!date) return;
+    const s = this.rangeStart(), e = this.rangeEnd();
+    if (!s || (s && e)) {
+      this.rangeStart.set(new Date(date)); this.rangeEnd.set(null);
+    } else {
+      if (date < s) { this.rangeEnd.set(new Date(s)); this.rangeStart.set(new Date(date)); }
+      else          { this.rangeEnd.set(new Date(date)); }
+      this.calendarOpen.set(false);
+      this.triggerLoading();
     }
-    return { start, end };
   }
 
-  // ── Filtered events ───────────────────────────────────────────────────────
-  filteredEvents = computed(() => {
-    const { start, end } = this.getRangeWindow();
-    const pf = this.processFilter();
+  isDayStart(d: Date | null): boolean  { return !!d && !!this.rangeStart() && this.sameDay(d, this.rangeStart()!); }
+  isDayEnd(d: Date | null): boolean    { return !!d && !!this.rangeEnd()   && this.sameDay(d, this.rangeEnd()!); }
+  isDayToday(d: Date | null): boolean  { return !!d && this.sameDay(d, new Date()); }
+  isDayInRange(d: Date | null): boolean {
+    if (!d) return false;
+    const s = this.rangeStart(), e = this.rangeEnd() ?? this.hoverDate();
+    if (!s || !e) return false;
+    const t = d.getTime();
+    return t > Math.min(s.getTime(), e.getTime()) && t < Math.max(s.getTime(), e.getTime());
+  }
+  private sameDay(a: Date, b: Date): boolean {
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  }
 
+  stopProp(e: MouseEvent): void { e.stopPropagation(); }
+  toggleCalendar(e: MouseEvent): void { e.stopPropagation(); this.calendarOpen.update(v => !v); }
+
+  onAnalystChange(event: Event): void {
+    const val = (event.target as HTMLSelectElement).value;
+    this.selectedAnalystId.set(val === 'all' ? 'all' : Number(val));
+    this.triggerLoading();
+  }
+
+  triggerLoading(): void {
+    if (this.loadingTimer) clearTimeout(this.loadingTimer);
+    this.isLoading.set(true);
+    this.loadingTimer = setTimeout(() => this.isLoading.set(false), 380);
+  }
+
+  // ── Set last-30-days range on init ──────────────────────────────────────
+  private setCurrentMonth(): void {
+    const end   = new Date(); end.setHours(23, 59, 59, 999);
+    const start = new Date(); start.setDate(start.getDate() - 29); start.setHours(0, 0, 0, 0);
+    this.rangeStart.set(start);
+    this.rangeEnd.set(end);
+    this.pickerYear.set(start.getFullYear());
+    this.pickerMonth.set(start.getMonth());
+  }
+
+  // ── Filtered events (by date + process) ──────────────────────────────────
+  private eventsInRange = computed(() => {
+    const s = this.rangeStart(), e = this.rangeEnd();
+    if (!s || !e) return [];
+    const start = new Date(s); start.setHours(0, 0, 0, 0);
+    const end   = new Date(e); end.setHours(23, 59, 59, 999);
+    const pf = this.processFilter();
     return this.eventService.events().filter(ev => {
       const d = new Date(ev.date + 'T00:00:00');
       return d >= start && d <= end && (pf === 'all' || ev.title === pf);
     });
   });
 
-  // ── KPIs ──────────────────────────────────────────────────────────────────
-  totalTasks      = computed(() => this.filteredEvents().length);
-  completedTasks  = computed(() => this.filteredEvents().filter(e => e.status === 'completed').length);
-  pendingTasks    = computed(() => this.filteredEvents().filter(e => e.status === 'pending').length);
-  inProgressTasks = computed(() => this.filteredEvents().filter(e => e.status === 'in-progress').length);
+  // ── KPIs (shared by both modes) ───────────────────────────────────────────
+  totalTasks      = computed(() => this.eventsInRange().length);
+  completedTasks  = computed(() => this.eventsInRange().filter(e => e.status === 'completed').length);
+  pendingTasks    = computed(() => this.eventsInRange().filter(e => e.status === 'pending').length);
+  inProgressTasks = computed(() => this.eventsInRange().filter(e => e.status === 'in-progress').length);
 
   completionRate = computed(() => {
     const t = this.totalTasks();
     return t === 0 ? 0 : Math.round((this.completedTasks() / t) * 100);
   });
 
-  // ── Bar chart ─────────────────────────────────────────────────────────────
-  barChartData = computed(() => {
+  slaRate = computed(() => {
+    const total = this.totalTasks();
+    if (total === 0) return 100;
+    const today   = new Date().toISOString().split('T')[0];
+    const overdue = this.eventsInRange().filter(e => e.status === 'pending' && e.date < today).length;
+    return Math.round(((total - overdue) / total) * 100);
+  });
+
+  topProcess = computed(() => {
     const counts: Record<string, number> = {};
-    for (const ev of this.filteredEvents()) {
+    for (const ev of this.eventsInRange().filter(e => e.status === 'completed')) {
       const label = this.processTypes.find(p => p.value === ev.title)?.label ?? ev.title;
       counts[label] = (counts[label] ?? 0) + 1;
     }
     const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-    const max = entries.length > 0 ? Math.max(...entries.map(e => e[1])) : 1;
-    return entries.map(([label, count]) => ({
-      label,
-      count,
-      pct: Math.round((count / max) * 100),
-    }));
+    return entries.length > 0 ? entries[0][0] : '—';
   });
 
-  // ── Pie chart ─────────────────────────────────────────────────────────────
-  readonly sliceColors = ['#22c55e', '#3b82f6', '#f59e0b'];
+  // ── Audit-mode KPIs (stars) ───────────────────────────────────────────────
+  efficiencyRate = computed(() => this.slaRate());
+  stars = computed(() => Math.round(this.efficiencyRate() / 20));   // 100% → 5★
 
+  // ── Bar chart ─────────────────────────────────────────────────────────────
+  /** Macro mode: counts by process type. Audit mode: assigned vs completed per day */
+  barChartData = computed(() => {
+    if (!this.isAuditMode()) {
+      // Global: tasks per process
+      const counts: Record<string, number> = {};
+      for (const ev of this.eventsInRange()) {
+        const label = this.processTypes.find(p => p.value === ev.title)?.label ?? ev.title;
+        counts[label] = (counts[label] ?? 0) + 1;
+      }
+      const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      const max = Math.max(...entries.map(e => e[1]), 1);
+      return entries.map(([label, count]) => ({
+        label, count, pct: Math.round((count / max) * 100),
+        completedPct: 0, isAudit: false,
+      }));
+    } else {
+      // Audit: assigned vs completed per day (grouped)
+      const events = this.eventsInRange();
+      const byDate: Record<string, { assigned: number; completed: number }> = {};
+      for (const ev of events) {
+        if (!byDate[ev.date]) byDate[ev.date] = { assigned: 0, completed: 0 };
+        byDate[ev.date].assigned++;
+        if (ev.status === 'completed') byDate[ev.date].completed++;
+      }
+      const sorted = Object.entries(byDate).sort(([a], [b]) => a.localeCompare(b));
+      const maxA = Math.max(...sorted.map(([, v]) => v.assigned), 1);
+      return sorted.map(([date, v]) => ({
+        label:       new Date(date + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }),
+        count:       v.assigned,
+        pct:         Math.round((v.assigned  / maxA) * 100),
+        completedPct: Math.round((v.completed / maxA) * 100),
+        isAudit:     true,
+      }));
+    }
+  });
+
+  // ── Pie / Donut chart ─────────────────────────────────────────────────────
   pieSlices = computed(() => {
     const total = this.totalTasks();
     if (total === 0) return [];
-    const raw = [
-      { label: 'Completadas', count: this.completedTasks(),  color: '#22c55e' },
-      { label: 'En Progreso', count: this.inProgressTasks(), color: '#3b82f6' },
-      { label: 'Pendientes',  count: this.pendingTasks(),    color: '#f59e0b' },
-    ].filter(d => d.count > 0);
-
-    let cumulative = 0;
-    return raw.map(s => {
-      const startAngle = cumulative;
-      cumulative += s.count / total;
-      return { ...s, startAngle, endAngle: cumulative };
-    });
+    if (!this.isAuditMode()) {
+      // Global: status distribution
+      const raw = [
+        { label: 'Completadas', count: this.completedTasks(),  color: '#22c55e' },
+        { label: 'En Progreso', count: this.inProgressTasks(), color: '#3b82f6' },
+        { label: 'Pendientes',  count: this.pendingTasks(),    color: '#f59e0b' },
+      ].filter(d => d.count > 0);
+      let c = 0;
+      return raw.map(s => {
+        const startAngle = c; c += s.count / total;
+        return { ...s, startAngle, endAngle: c };
+      });
+    } else {
+      // Audit: process breakdown (purple palette)
+      const counts: Record<string, number> = {};
+      for (const ev of this.eventsInRange()) {
+        const label = this.processTypes.find(p => p.value === ev.title)?.label ?? ev.title;
+        counts[label] = (counts[label] ?? 0) + 1;
+      }
+      const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      let c = 0;
+      return entries.map(([label, count], i) => {
+        const color = PROCESS_COLORS[i % PROCESS_COLORS.length];
+        const startAngle = c; c += count / total;
+        return { label, count, color, startAngle, endAngle: c };
+      });
+    }
   });
 
   arcPath(startPct: number, endPct: number): string {
     const cx = 90, cy = 90, r = 75, ir = 42;
     const toRad = (p: number) => p * 2 * Math.PI - Math.PI / 2;
-    const x1o = cx + r  * Math.cos(toRad(startPct));
-    const y1o = cy + r  * Math.sin(toRad(startPct));
-    const x2o = cx + r  * Math.cos(toRad(endPct));
-    const y2o = cy + r  * Math.sin(toRad(endPct));
-    const x1i = cx + ir * Math.cos(toRad(endPct));
-    const y1i = cy + ir * Math.sin(toRad(endPct));
-    const x2i = cx + ir * Math.cos(toRad(startPct));
-    const y2i = cy + ir * Math.sin(toRad(startPct));
+    const x1o = cx + r  * Math.cos(toRad(startPct)), y1o = cy + r  * Math.sin(toRad(startPct));
+    const x2o = cx + r  * Math.cos(toRad(endPct)),   y2o = cy + r  * Math.sin(toRad(endPct));
+    const x1i = cx + ir * Math.cos(toRad(endPct)),   y1i = cy + ir * Math.sin(toRad(endPct));
+    const x2i = cx + ir * Math.cos(toRad(startPct)), y2i = cy + ir * Math.sin(toRad(startPct));
     const large = (endPct - startPct) > 0.5 ? 1 : 0;
-    return [
-      `M ${x1o} ${y1o}`,
-      `A ${r} ${r} 0 ${large} 1 ${x2o} ${y2o}`,
-      `L ${x1i} ${y1i}`,
-      `A ${ir} ${ir} 0 ${large} 0 ${x2i} ${y2i}`,
-      'Z'
-    ].join(' ');
+    return [`M ${x1o} ${y1o}`, `A ${r} ${r} 0 ${large} 1 ${x2o} ${y2o}`,
+            `L ${x1i} ${y1i}`, `A ${ir} ${ir} 0 ${large} 0 ${x2i} ${y2i}`, 'Z'].join(' ');
+  }
+
+  // ── Trend line chart (macro mode only) ───────────────────────────────────
+  trendData = computed((): TrendPoint[] => {
+    const s = this.rangeStart(), e = this.rangeEnd();
+    if (!s || !e) return [];
+    const diffDays = Math.round((e.getTime() - s.getTime()) / 86_400_000);
+    if (diffDays > 62) return [];
+    const events = this.eventsInRange();
+    const result: TrendPoint[] = [];
+    for (let cur = new Date(s); cur <= e; cur.setDate(cur.getDate() + 1)) {
+      const dateStr = cur.toISOString().split('T')[0];
+      const dayEvs  = events.filter(ev => ev.date === dateStr);
+      result.push({
+        dateStr,
+        label: new Date(cur).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }),
+        total: dayEvs.length,
+        completed: dayEvs.filter(ev => ev.status === 'completed').length,
+      });
+    }
+    return result;
+  });
+
+  trendXLabels = computed(() => {
+    const data = this.trendData();
+    if (!data.length) return [];
+    if (data.length <= 10) return data.map(d => d.label);
+    return [0, 1, 2, 3, 4].map(i =>
+      data[Math.round(i * (data.length - 1) / 4)].label
+    );
+  });
+
+  linePoints(data: TrendPoint[], key: 'total' | 'completed'): string {
+    if (data.length < 2) return '';
+    const maxVal = Math.max(...data.map(d => d.total), 1);
+    const W = 480, H = 110, padV = 12, availH = H - 2 * padV;
+    return data.map((d, i) => {
+      const x = (i / (data.length - 1)) * W;
+      const y = padV + availH - (d[key] / maxVal) * availH;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+  }
+
+  // ── Telegram deep-link with predefined message ────────────────────────────
+  openTelegram(): void {
+    const a = this.selectedAnalyst();
+    if (!a) return;
+    const msg = encodeURIComponent(
+      `Hola ${a.displayName.split(' ')[0]}, revisé tus métricas y quería saber cómo vas con tus pendientes`
+    );
+    window.open(`https://t.me/${a.telegram}?text=${msg}`, '_blank', 'noopener,noreferrer');
+  }
+
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
+  ngOnInit(): void {
+    this.authService.currentLeader$.subscribe(leader => {
+      if (leader) {
+        const name = leader.full_name.toLowerCase();
+        this.isAdmin.set(ADMIN_NAMES.some(a => name.includes(a)));
+      }
+    });
+    this.setCurrentMonth();
+  }
+
+  ngOnDestroy(): void {
+    if (this.loadingTimer) clearTimeout(this.loadingTimer);
   }
 }
+

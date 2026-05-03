@@ -149,6 +149,30 @@
         </a>
 
       </div>
+
+      <!-- Done button -->
+      <div class="done-section">
+        <p class="done-hint">¿Ya terminaste el desbloqueo? Notifica a n8n para registrar la tarea como finalizada.</p>
+
+        <button class="btn-done"
+                [class.loading]="accIdDoneLoading()"
+                [class.success]="accIdDoneSuccess()"
+                [disabled]="accIdDoneLoading()"
+                (click)="markAccIdDone()">
+          @if (accIdDoneLoading()) {
+            <span class="spinner"></span>
+            <span>Enviando...</span>
+          } @else if (accIdDoneSuccess()) {
+            <span>✅ ¡Registrado!</span>
+          } @else {
+            <span>✔ Done</span>
+          }
+        </button>
+
+        @if (accIdDoneError()) {
+          <div class="alert alert-error" style="margin-top:0.75rem">⚠️ {{ accIdDoneError() }}</div>
+        }
+      </div>
     </div>
   }
 </div>

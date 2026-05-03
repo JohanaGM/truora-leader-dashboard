@@ -6,6 +6,9 @@ export const environment = {
   n8nChatWebhookUrlTest: 'https://n8n.zapsign.com.br/webhook-test/chat-ia-tips',
   n8nTelegramWebhookUrl: 'https://n8n.zapsign.com.br/webhook/truface-upload',
   n8nSnowflakeWebhookUrl: 'https://n8n.zapsign.com.br/webhook/snowflake-query',
+  n8nContadorTipsUrl: 'https://n8n.zapsign.com.br/webhook/contador-tips',
+  n8nTareaFinalizadaUrl: 'https://n8n.zapsign.com.br/webhook-test/tarea-finalizada',
+
   supabase: {
     url: 'https://fwgebmdqjlzsvbbtrdkm.supabase.co',
     key: 'sb_publishable_cFZeeY3KJRYjRXA4L61qbg_nDny1VfB'
