@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { AutomationService } from '../../core/services/automation.service';
+import { AuthService } from '../../core/services/auth.service';
 import { environment } from '../../../environments/environment';
 
 type FlowTab = 'telegram' | 'snowflake';
@@ -19,6 +20,7 @@ export class AutomationsComponent {
 
   private automationService = inject(AutomationService);
   private http = inject(HttpClient);
+  private authService = inject(AuthService);
 
   activeTab = signal<FlowTab>('telegram');
 
@@ -44,7 +46,8 @@ export class AutomationsComponent {
     this.accIdDoneError.set(null);
 
     const today = new Date().toISOString().split('T')[0];
-    const payload = { tarea: 'Desbloqueo de ACC ID', estado: 'Finalizado', fecha: today };
+    const usuario = this.authService.getCurrentLeader()?.full_name ?? 'Desconocido';
+    const payload = { usuario, accion: 'Revisión de ACC ID', fecha: today };
 
     this.http.post(environment.n8nTareaFinalizadaUrl, payload).subscribe({
       next: () => {
