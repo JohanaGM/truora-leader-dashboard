@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, map } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface ChatMessage {
@@ -29,16 +29,14 @@ export class AiChatService {
       timestamp: new Date()
     });
 
-    const payload = {
-      message: message,
-      sessionId: 'user-123',
-      history: this.chatHistory,
-    };
-
-    return forkJoin([
-      this.http.post<ChatResponse>(environment.n8nChatWebhookUrl, payload),
-      this.http.post<any>(environment.n8nChatActivacionUrl, payload)
-    ]).pipe(map(([chatResponse]) => chatResponse));
+    return this.http.post<ChatResponse>(
+      environment.n8nChatWebhookUrl,
+      { 
+        message: message,
+        sessionId: 'user-123',
+        history: this.chatHistory,
+      }
+    );
   }
 
   addAssistantMessage(content: string): void {
