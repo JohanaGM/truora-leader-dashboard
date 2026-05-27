@@ -1,8 +1,9 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService, VirtualEvent } from '../../core/services/event.service';
 import { AppEvent, EventPriority, EventStatus, PRIORITY_COLOR } from '../../core/models/event.model';
+import { LeaderScheduleService } from '../../core/services/leader-schedule.service';
 
 interface CalendarDay { date: Date; isCurrentMonth: boolean; }
 
@@ -13,8 +14,22 @@ interface CalendarDay { date: Date; isCurrentMonth: boolean; }
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.scss'
 })
-export class ScheduleComponent {
-  private eventService = inject(EventService);
+export class ScheduleComponent implements OnInit {
+  private eventService    = inject(EventService);
+  private scheduleService = inject(LeaderScheduleService);
+
+  ngOnInit() {
+    this.scheduleService.loadWeekTasks();
+  }
+
+  private get isAssignedLeader(): boolean {
+    return this.scheduleService.weekTasks().length > 0;
+  }
+
+  private filterTrufaceTips(events: VirtualEvent[]): VirtualEvent[] {
+    if (this.isAssignedLeader) return events;
+    return events.filter(e => e.type !== 'truface' && e.type !== 'tips');
+  }
 
   readonly PRIORITY_COLOR = PRIORITY_COLOR;
 
@@ -60,7 +75,7 @@ export class ScheduleComponent {
   }
 
   getEventsForDay(date: Date): VirtualEvent[] {
-    return this.eventService.getAllForDate(date);
+    return this.filterTrufaceTips(this.eventService.getAllForDate(date));
   }
 
   // ---- Modal ----
@@ -146,7 +161,7 @@ export class ScheduleComponent {
 
   todayEvents = computed((): VirtualEvent[] => {
     this.eventService.events();
-    return this.eventService.getAllForDate(new Date());
+    return this.filterTrufaceTips(this.eventService.getAllForDate(new Date()));
   });
 
   upcomingEvents = computed((): VirtualEvent[] => {

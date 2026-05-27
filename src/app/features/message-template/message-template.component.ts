@@ -13,6 +13,7 @@ interface Template {
   label: string;
   icon: string;
   text: string;
+  url?: string;
 }
 
 @Component({
@@ -27,7 +28,6 @@ export class MessageTemplateComponent {
   @Output() mentionAction = new EventEmitter<{ name: string; checked: boolean }>();
 
   users: User[] = [
-    { id: 1, name: '@KaterineAngarita' },
     { id: 4, name: '@MariAlejandra_Murcia' },
     { id: 5, name: '@cynthiaracas' },
     { id: 6, name: '@JMiroslawaEstrada' },
@@ -84,13 +84,14 @@ export class MessageTemplateComponent {
       key: 'Tickets escalados',
       label: 'Update tickets escalados',
       icon: '🔄️',
-      text: ' Falla cursor al diligenciar OCR en el campo MRZ - El estado de la solicitud ha pasado a Tech Product review'
+      text: 'Update Tickets escalados:\n\n1. Manual - Inclusión de opción "No Binario" en campo de género OPT-382\nlink (opcional)\n(Sin acceso al enlace, ya que esta con restricción)\n\n2. Manual Review - Falla Cursor al diligenciar OCR en el campo MRZ - SUP 6746\nlink (opcional)\nSe escalado a Hadar.\n12/05/2026, ultima actualización "Sin avances en la solicitud"'
     },
     {
       key: ' new',
       label: 'Nuevos tickets',
       icon: '🔖',
-      text: ' Buenas tardes Team, se escalo el siguiente ticket a CX SUP - ,  el cual es :'
+      text: 'Buenas tardes team, se escaló ticket para: Inclusión de opción "No Binario" en campo de género SUP-7355',
+      url: 'https://truora.atlassian.net/servicedesk/customer/portals'
     }
   ];
   activeTemplate = '';

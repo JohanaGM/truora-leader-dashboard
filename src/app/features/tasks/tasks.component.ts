@@ -1,8 +1,9 @@
-﻿import { Component, inject, signal, computed } from '@angular/core';
+﻿import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService, VirtualEvent } from '../../core/services/event.service';
 import { AppEvent, EventPriority, EventStatus } from '../../core/models/event.model';
+import { LeaderScheduleService } from '../../core/services/leader-schedule.service';
 
 @Component({
   selector: 'app-tasks',
@@ -11,15 +12,25 @@ import { AppEvent, EventPriority, EventStatus } from '../../core/models/event.mo
   templateUrl: './tasks.component.html',
   styleUrl: './tasks.component.scss'
 })
-export class TasksComponent {
-  private eventService = inject(EventService);
+export class TasksComponent implements OnInit {
+  private eventService    = inject(EventService);
+  private scheduleService = inject(LeaderScheduleService);
 
   filterStatus   = signal<EventStatus | 'all'>('all');
   filterPriority = signal<EventPriority | 'all'>('all');
 
+  ngOnInit() {
+    this.scheduleService.loadWeekTasks();
+  }
+
+  /** Solo muestra Truface/Tips si el líder está asignado en el cronograma esta semana */
   weekEvents = computed((): VirtualEvent[] => {
     this.eventService.events(); // track
-    return this.eventService.getEventsForWeek();
+    const isAssignedLeader = this.scheduleService.weekTasks().length > 0;
+    return this.eventService.getEventsForWeek().filter(ev => {
+      if (!isAssignedLeader && (ev.type === 'truface' || ev.type === 'tips')) return false;
+      return true;
+    });
   });
 
   filteredEvents = computed((): VirtualEvent[] => {

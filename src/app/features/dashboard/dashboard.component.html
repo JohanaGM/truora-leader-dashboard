@@ -21,7 +21,41 @@
         </div>
       </div>
     }
-  </div> 
+  </div>
+
+  <!-- ── Mis tareas del cronograma (solo si hay tareas esta semana) ── -->
+  @if (scheduleService.weekTasks().length > 0) {
+    <div class="card schedule-week-card">
+      <div class="card-header">
+        <h3 class="card-title">📋 Mis Tareas de la Semana</h3>
+        <span class="week-badge">{{ weekLabel }}</span>
+      </div>
+      <div class="card-body">
+        @if (scheduleService.isLoading()) {
+          <p class="schedule-loading">Cargando tareas...</p>
+        } @else {
+          <div class="schedule-task-list">
+            @for (task of scheduleService.weekTasks(); track task.id) {
+              <div class="schedule-task-item"
+                   [style.border-left-color]="scheduleService.taskColor(task.tarea)">
+                <span class="schedule-task-icon">{{ scheduleService.taskIcon(task.tarea) }}</span>
+                <div class="schedule-task-info">
+                  <p class="schedule-task-name">{{ task.tarea }}</p>
+                  <p class="schedule-task-date">
+                    {{ task.fecha | date:'EEEE d MMM':'':'es-ES' }}
+                  </p>
+                </div>
+                <span class="schedule-task-badge"
+                      [style.background]="scheduleService.taskColor(task.tarea)">
+                  Pendiente
+                </span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
 
   <div class="content-grid">
 

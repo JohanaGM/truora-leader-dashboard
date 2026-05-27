@@ -1,8 +1,9 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services';
 import { EventService, VirtualEvent } from '../../core/services/event.service';
+import { LeaderScheduleService } from '../../core/services/leader-schedule.service';
 
 @Component({
   selector: 'app-header',
@@ -11,10 +12,11 @@ import { EventService, VirtualEvent } from '../../core/services/event.service';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
-export class HeaderComponent {
-  authService   = inject(AuthService);
-  eventService  = inject(EventService);
-  private router = inject(Router);
+export class HeaderComponent implements OnInit {
+  authService     = inject(AuthService);
+  eventService    = inject(EventService);
+  scheduleService = inject(LeaderScheduleService);
+  private router  = inject(Router);
 
   currentLeader$ = this.authService.currentLeader$;
   currentDate    = new Date();
@@ -24,24 +26,42 @@ export class HeaderComponent {
 
   /**
    * Pending tasks for the current week (Mon–Sun), sorted oldest → newest.
-   * Reacts in real time when any event's status changes.
+   * Truface/Tips recurring events are hidden when the current user is NOT
+   * the assigned leader for this week (they appear via scheduledTasks instead).
    */
   pendingTasks = computed((): VirtualEvent[] => {
     this.eventService.events(); // track signal for reactivity
-    const todayStr = this.eventService.toDateStr(new Date());
+    const isAssignedLeader = this.scheduledTasks().length > 0;
     return this.eventService
       .getEventsForWeek()
-      .filter(ev => ev.status === 'pending')
+      .filter(ev => {
+        if (ev.status !== 'pending') return false;
+        // Ocultar Truface/Tips del EventService si el líder no está asignado esta semana
+        if (!isAssignedLeader && (ev.type === 'truface' || ev.type === 'tips')) return false;
+        return true;
+      })
       .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
   });
 
-  pendingCount = computed(() => this.pendingTasks().length);
+  /** Tareas del cronograma de la semana actual del líder logueado */
+  scheduledTasks = computed(() => this.scheduleService.weekTasks());
 
-  /** True when at least one pending task is on or before today (overdue within the week). */
+  /** Total badge: tareas de eventos pendientes + tareas de cronograma */
+  pendingCount = computed(() =>
+    this.pendingTasks().length + this.scheduledTasks().length
+  );
+
+  /** True cuando hay tareas urgentes de eventos O hay tareas de cronograma hoy */
   hasUrgent = computed(() => {
     const todayStr = this.eventService.toDateStr(new Date());
-    return this.pendingTasks().some(e => e.date <= todayStr);
+    const urgentEvent = this.pendingTasks().some(e => e.date <= todayStr);
+    const urgentSchedule = this.scheduledTasks().some(t => t.fecha === todayStr);
+    return urgentEvent || urgentSchedule;
   });
+
+  ngOnInit(): void {
+    this.scheduleService.loadWeekTasks();
+  }
 
   toggleNotif() { this.notifOpen.update(v => !v); }
   closeNotif()  { this.notifOpen.set(false); }

@@ -254,62 +254,51 @@
     font-size: 15px;
     color: #757575;
     line-height: 1.6;
-    margin-bottom: 28px;
+    margin-bottom: 16px;
     max-width: 90%;
     margin-left: auto;
     margin-right: auto;
   }
 
+  .welcome-forms-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #424242;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+    text-align: left;
+  }
+
   .welcome-features {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-bottom: 24px;
+    gap: 8px;
+    margin-bottom: 20px;
     text-align: left;
 
     .feature-item {
       display: flex;
-      gap: 12px;
-      padding: 14px;
-      background: #ffffff;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 14px;
+      background: #f9f9f9;
       border-radius: 8px;
-      border: 1px solid #e0e0e0;
-      transition: all 0.2s ease;
+      border: 1px solid #eeeeee;
 
-      &:hover {
-        border-color: #bdbdbd;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      }
-
-      .feature-icon {
+      .feature-bullet {
+        color: #667eea;
+        font-size: 18px;
+        line-height: 1.3;
         flex-shrink: 0;
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        background: #9e9e9e;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
+        font-weight: 700;
       }
 
       .feature-text {
         flex: 1;
-
-        strong {
-          display: block;
-          color: #424242;
-          font-size: 14px;
-          margin-bottom: 4px;
-          font-weight: 600;
-        }
-
-        p {
-          margin: 0;
-          font-size: 13px;
-          color: #757575;
-          line-height: 1.4;
-        }
+        font-size: 13.5px;
+        color: #555;
+        line-height: 1.5;
       }
     }
   }

@@ -247,6 +247,15 @@ body.dark-theme .notif-see-all,
   }
 }
 
+.notif-section-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #a0aec0;
+  padding: 0.5rem 1rem 0.25rem;
+}
+
 .notif-list {
   list-style: none;
   margin: 0;

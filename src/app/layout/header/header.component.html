@@ -36,20 +36,48 @@
                 <p>¡Estás al día!<br>No tienes tareas pendientes.</p>
               </div>
             } @else {
-              <ul class="notif-list">
-                @for (task of pendingTasks(); track task.id) {
-                  <li class="notif-item" [class.overdue]="task.date < (eventService.toDateStr(currentDate))">
-                    <span class="notif-dot" [style.background]="task.color"></span>
-                    <div class="notif-item-body">
-                      <p class="notif-task-title">{{ task.title }}</p>
-                      <p class="notif-task-date">📅 {{ task.date }}</p>
-                    </div>
-                    @if (task.date < (eventService.toDateStr(currentDate))) {
-                      <span class="overdue-badge">Vencida</span>
-                    }
-                  </li>
-                }
-              </ul>
+              <!-- Tareas del cronograma (base de datos líder) -->
+              @if (scheduledTasks().length > 0) {
+                <div class="notif-section-label">📋 Cronograma semanal</div>
+                <ul class="notif-list">
+                  @for (task of scheduledTasks(); track task.id) {
+                    <li class="notif-item notif-item--schedule"
+                        [class.overdue]="task.fecha <= eventService.toDateStr(currentDate)">
+                      <span class="notif-dot"
+                            [style.background]="scheduleService.taskColor(task.tarea)"></span>
+                      <div class="notif-item-body">
+                        <p class="notif-task-title">
+                          {{ scheduleService.taskIcon(task.tarea) }} {{ task.tarea }}
+                        </p>
+                        <p class="notif-task-date">📅 {{ task.fecha }}</p>
+                      </div>
+                      @if (task.fecha <= eventService.toDateStr(currentDate)) {
+                        <span class="overdue-badge">Hoy</span>
+                      }
+                    </li>
+                  }
+                </ul>
+              }
+
+              <!-- Tareas de eventos pendientes -->
+              @if (pendingTasks().length > 0) {
+                <div class="notif-section-label">⏰ Eventos pendientes</div>
+                <ul class="notif-list">
+                  @for (task of pendingTasks(); track task.id) {
+                    <li class="notif-item" [class.overdue]="task.date < (eventService.toDateStr(currentDate))">
+                      <span class="notif-dot" [style.background]="task.color"></span>
+                      <div class="notif-item-body">
+                        <p class="notif-task-title">{{ task.title }}</p>
+                        <p class="notif-task-date">📅 {{ task.date }}</p>
+                      </div>
+                      @if (task.date < (eventService.toDateStr(currentDate))) {
+                        <span class="overdue-badge">Vencida</span>
+                      }
+                    </li>
+                  }
+                </ul>
+              }
+
               <button class="notif-see-all" (click)="goToTasks()">
                 Ver todas las tareas →
               </button>
