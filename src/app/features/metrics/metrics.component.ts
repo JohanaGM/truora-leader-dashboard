@@ -17,17 +17,17 @@ export interface Analyst {
 }
 
 const ANALYSTS: Analyst[] = [
-  { id: 1,  displayName: 'KateRhine Angarita',    telegram: 'KaterineAngarita',    avatar: 'KA', color: '#667eea' },
-  { id: 2,  displayName: 'Mari Alejandra Murcia', telegram: 'MariAlejandra_Murcia', avatar: 'MA', color: '#f43f5e' },
-  { id: 3,  displayName: 'Cynthia Racas',         telegram: 'cynthiaracas',         avatar: 'CR', color: '#22c55e' },
-  { id: 4,  displayName: 'Miroslawa Estrada',     telegram: 'JMiroslawaEstrada',    avatar: 'ME', color: '#f59e0b' },
-  { id: 5,  displayName: 'Karen Juliéth',         telegram: 'Karenjuliethh',        avatar: 'KJ', color: '#38bdf8' },
-  { id: 6,  displayName: 'Grisell Quiroz',        telegram: 'GrisellQuiroz',        avatar: 'GQ', color: '#a78bfa' },
-  { id: 7,  displayName: 'Joha G. Mora',          telegram: 'JohaGMora',            avatar: 'JM', color: '#fb923c' },
-  { id: 8,  displayName: 'Majo Velásquez',        telegram: 'majovelasquez',        avatar: 'MV', color: '#34d399' },
-  { id: 9,  displayName: 'Erik Castro',           telegram: 'Erikcastro23',         avatar: 'EC', color: '#e879f9' },
-  { id: 10, displayName: 'Valentina Mesa',        telegram: 'ValentinaMesaB',       avatar: 'VM', color: '#fbbf24' },
-  { id: 11, displayName: 'Cristian M. Rojas',     telegram: 'CristianMRojas',       avatar: 'CM', color: '#60a5fa' },
+  
+  { id: 1,  displayName: 'Mari Alejandra Murcia', telegram: 'MariAlejandra_Murcia', avatar: 'MA', color: '#f43f5e' },
+  { id: 2,  displayName: 'Cynthia Racas',         telegram: 'cynthiaracas',         avatar: 'CR', color: '#22c55e' },
+  { id: 3,  displayName: 'Miroslawa Estrada',     telegram: 'JMiroslawaEstrada',    avatar: 'ME', color: '#f59e0b' },
+  { id: 4,  displayName: 'Karen Juliéth',         telegram: 'Karenjuliethh',        avatar: 'KJ', color: '#38bdf8' },
+  { id: 5,  displayName: 'Grisell Quiroz',        telegram: 'GrisellQuiroz',        avatar: 'GQ', color: '#a78bfa' },
+  { id: 6,  displayName: 'Joha G. Mora',          telegram: 'JohaGMora',            avatar: 'JM', color: '#fb923c' },
+  { id: 7,  displayName: 'Majo Velásquez',        telegram: 'majovelasquez',        avatar: 'MV', color: '#34d399' },
+  { id: 8,  displayName: 'Erik Castro',           telegram: 'Erikcastro23',         avatar: 'EC', color: '#e879f9' },
+  { id: 9, displayName: 'Valentina Mesa',        telegram: 'ValentinaMesaB',       avatar: 'VM', color: '#fbbf24' },
+  { id: 10, displayName: 'Cristian M. Rojas',     telegram: 'CristianMRojas',       avatar: 'CM', color: '#60a5fa' },
 ];
 
 const PROCESS_TYPES = [

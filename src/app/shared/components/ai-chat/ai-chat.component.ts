@@ -18,7 +18,7 @@ export class AiChatComponent implements AfterViewChecked {
   private authService = inject(AuthService);
   private aiChatService: AiChatService;
 
-  botLogoSrc = 'assets/images/formactman.png';
+  botLogoSrc = 'assets/images/nexusbot.jpg';
   showBotFallback = false;
 
   onBotImgError() {
