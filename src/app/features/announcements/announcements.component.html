@@ -37,56 +37,131 @@
 
     </aside>
 
-    <!-- ===== PANEL DERECHO: Editor ===== -->
-    <main class="editor-panel">
+    <!-- ===== Tarjeta Unificada: Editor ===== -->
+    <div class="editor-card">
 
-      <div class="form-group">
+      <!-- Input de archivo oculto -->
+      <input
+        #fileInput
+        type="file"
+        accept="image/png,image/jpeg,image/jpg"
+        class="file-input-hidden"
+        (change)="onFileSelected($event)"
+      />
+
+      <!-- Etiquetas de columna -->
+      <div class="editor-card__labels">
+        <span class="editor-card__col-label"></span>
+        <span class="editor-card__col-label editor-card__col-label--img">Imagen para Telegram</span>
+      </div>
+
+      <!-- Cuerpo: textarea + separador + zona de carga -->
+      <div class="editor-card__body">
+
         <textarea
           #reminderTextarea
           [value]="reminder()"
           (input)="onTextareaInput($any($event.target).value)"
-          placeholder="Agrega una frase inspiradora, recordatorio importante, noticia de interés o mensajes especiales para tu equipo…"
-          class="reminder-input"
-          rows="12"
+          placeholder="Escribe el mensaje…"
+          class="editor-card__textarea"
           [disabled]="isSending()">
         </textarea>
-      </div>
 
-      @if (detectedDriveUrl()) {
-        <div class="drive-badge">
-          <span>🔗</span>
-          <span>Archivo de Drive detectado</span>
+        <div class="editor-card__sep"></div>
+
+        <!-- Zona de arrastre -->
+        <div
+          class="editor-card__dropzone"
+          [class.editor-card__dropzone--over]="isDragOver()"
+          [class.editor-card__dropzone--filled]="previewUrl()"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+          (click)="!previewUrl() && triggerFilePicker()"
+          [attr.aria-disabled]="isSending()"
+        >
+          @if (previewUrl()) {
+            <div class="dz-preview">
+              <img [src]="previewUrl()" alt="Vista previa" class="dz-preview__thumb" />
+              <div class="dz-preview__info">
+                <span class="dz-preview__name">{{ selectedFile()?.name }}</span>
+                <span class="dz-preview__size">{{ (selectedFile()!.size / 1024 / 1024).toFixed(2) }} MB</span>
+              </div>
+              <button
+                class="dz-preview__remove"
+                type="button"
+                (click)="$event.stopPropagation(); removeFile()"
+                title="Quitar imagen"
+              >✕</button>
+            </div>
+          } @else {
+            <div class="dz-placeholder">
+              <svg class="dz-placeholder__icon" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5"/>
+                <path d="M16.5 7.5L12 3m0 0L7.5 7.5M12 3v13.5"/>
+              </svg>
+              <span class="dz-placeholder__text">Sube o arrastra una imagen aquí.</span>
+              <span class="dz-placeholder__hint">Soporta PNG, JPG, JPEG · máx. 5 MB</span>
+              <span class="dz-placeholder__sparkle" aria-hidden="true">✦</span>
+            </div>
+          }
         </div>
-        <div class="drive-alias-group">
-          <label class="drive-alias-label">Texto del enlace</label>
-          <input
-            type="text"
-            class="drive-alias-input"
-            [value]="driveAlias()"
-            (input)="driveAlias.set($any($event.target).value)"
-            placeholder="Clic para ver archivo"
-          />
+
+      </div><!-- /editor-card__body -->
+
+      <!-- Pie: alertas y Drive badge -->
+      @if (fileError() || detectedDriveUrl() || showSuccess() || errorMessage()) {
+        <div class="editor-card__footer">
+
+          @if (fileError()) {
+            <div class="alert alert-error">{{ fileError() }}</div>
+          }
+
+          @if (detectedDriveUrl()) {
+            <div class="drive-badge">
+              <span>🔗</span>
+              <span>Archivo de Drive detectado</span>
+            </div>
+            <div class="drive-alias-group">
+              <label class="drive-alias-label">Texto del enlace</label>
+              <input
+                type="text"
+                class="drive-alias-input"
+                [value]="driveAlias()"
+                (input)="driveAlias.set($any($event.target).value)"
+                placeholder="Clic para ver archivo"
+              />
+            </div>
+          }
+
+          @if (showSuccess()) {
+            <div class="alert alert-success">✓ Aviso enviado exitosamente a Telegram</div>
+          }
+
+          @if (errorMessage()) {
+            <div class="alert alert-error">{{ errorMessage() }}</div>
+          }
+
         </div>
       }
 
-      @if (showSuccess()) {
-        <div class="alert alert-success">✓ Aviso enviado exitosamente a Telegram</div>
-      }
+    </div><!-- /editor-card -->
 
-      @if (errorMessage()) {
-        <div class="alert alert-error">{{ errorMessage() }}</div>
-      }
-
-      <button class="btn-send" (click)="sendReminder()" [disabled]="!canSend">
+    <!-- Botón fuera de la tarjeta, pegado abajo a la izquierda -->
+    <div class="editor-actions">
+      <button class="btn-send" (click)="enviarATelegram()" [disabled]="!canSend">
         @if (isSending()) {
           <span class="spinner"></span>
           <span>Enviando...</span>
         } @else {
-          <span>📤 Enviar a Telegram</span>
+          <svg class="btn-send__icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+          <span>Enviar a Telegram</span>
         }
       </button>
-
-    </main>
+    </div>
 
   </div>
 </div>

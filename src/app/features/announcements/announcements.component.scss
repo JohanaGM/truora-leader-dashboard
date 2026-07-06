@@ -113,46 +113,257 @@
   }
 }
 
-// ── Right panel (editor) ────────────────────────────────────────────────────
+// ── Hidden file input ────────────────────────────────────────────────────────
 
-.editor-panel {
-  background: #fff;
+.file-input-hidden {
+  display: none !important;
+}
+
+// ── Unified Editor Card ───────────────────────────────────────────────────────
+
+.editor-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 16px;
-  padding: 1.75rem 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.form-group {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-.reminder-input {
-  width: 100%;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 1rem 1.1rem;
-  font-size: 0.95rem;
-  color: #2d3748;
-  background: #f7fafc;
-  resize: vertical;
-  box-sizing: border-box;
+.editor-card__labels {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem 0.5rem;
+  border-bottom: 1px solid #f0f4f8;
+}
+
+.editor-card__col-label {
+  flex: 1 1 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+
+  &--img {
+    flex: 0 0 260px;
+    text-align: center;
+
+    @media (max-width: 860px) {
+      flex: 1 1 auto;
+      text-align: left;
+    }
+  }
+}
+
+.editor-card__body {
+  display: flex;
+  align-items: stretch;
+  flex: 1 1 auto;
+  min-height: 240px;
+
+  @media (max-width: 860px) {
+    flex-direction: column;
+  }
+}
+
+.editor-card__textarea {
+  flex: 1 1 0;
+  min-width: 0;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  padding: 1.25rem 1.5rem;
   font-family: inherit;
-  line-height: 1.6;
-  transition: border-color 0.2s;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: #2d3748;
+  min-height: 220px;
 
-  &:focus {
-    outline: none;
-    border-color: #667eea;
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+  &::placeholder { color: #a0aec0; }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+}
+
+.editor-card__sep {
+  width: 1px;
+  flex-shrink: 0;
+  background: #e8edf3;
+
+  @media (max-width: 860px) {
+    width: 100%;
+    height: 1px;
+  }
+}
+
+// ── Drop zone (right panel inside card) ──────────────────────────────────────
+
+.editor-card__dropzone {
+  flex: 0 0 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  background: #f8fafc;
+  transition: background 0.25s ease;
+
+  &:hover:not([aria-disabled='true']):not(.editor-card__dropzone--filled) {
+    background: #f0f4ff;
+
+    .dz-placeholder__icon { color: #667eea; }
+    .dz-placeholder__text { color: #3c5ec4; }
   }
 
-  &:disabled { opacity: 0.6; cursor: not-allowed; }
+  &--over {
+    background: linear-gradient(160deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+
+    .dz-placeholder__icon { color: #667eea; transform: translateY(-4px); }
+  }
+
+  &--filled {
+    cursor: default;
+    background: #f0f4ff;
+  }
+
+  @media (max-width: 860px) {
+    flex: none;
+    width: 100%;
+    min-height: 150px;
+  }
 }
+
+// ── Drop zone placeholder (empty state) ──────────────────────────────────────
+
+.dz-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 2rem 1.75rem;
+  text-align: center;
+  pointer-events: none;
+  width: 100%;
+
+  &__icon {
+    width: 38px;
+    height: 38px;
+    color: #cbd5e0;
+    transition: color 0.2s ease, transform 0.25s ease;
+  }
+
+  &__text {
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-top: 0.2rem;
+    transition: color 0.2s ease;
+  }
+
+  &__hint {
+    font-size: 0.72rem;
+    color: #a0aec0;
+  }
+
+  &__sparkle {
+    position: absolute;
+    bottom: 12px;
+    right: 16px;
+    font-size: 1.3rem;
+    color: #c7d2fe;
+    opacity: 0.6;
+    line-height: 1;
+    pointer-events: none;
+  }
+}
+
+// ── Drop zone preview (image loaded) ─────────────────────────────────────────
+
+.dz-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 1.25rem;
+  gap: 0.6rem;
+  position: relative;
+
+  &__thumb {
+    width: 100%;
+    max-height: 140px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    width: 100%;
+  }
+
+  &__name {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #4a5568;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  &__size {
+    font-size: 0.68rem;
+    color: #a0aec0;
+  }
+
+  &__remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.38);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    line-height: 1;
+    transition: background 0.15s ease, transform 0.15s ease;
+
+    &:hover { background: #e53e3e; transform: scale(1.15); }
+  }
+}
+
+// ── Card footer (alerts + Drive badge) ───────────────────────────────────────
+
+.editor-card__footer {
+  border-top: 1px solid #e8edf3;
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+// ── Editor actions row (button below card) ────────────────────────────────────
+
+.editor-actions {
+  display: flex;
+  align-items: center;
+  margin-top: 1.25rem;
+}
+
+
 
 // ── Drive badge ──────────────────────────────────────────────────────────────
 
@@ -224,56 +435,66 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.85rem 2.5rem;
+  padding: 0.85rem 2rem;
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: #fff;
   border: none;
   border-radius: 12px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
-  align-self: flex-start;
   transition: all 0.2s ease;
+  letter-spacing: 0.02em;
+
+  &__icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.45);
+    box-shadow: 0 8px 28px rgba(102, 126, 234, 0.45);
   }
 
-  &:disabled { opacity: 0.5; cursor: not-allowed; }
+  &:active:not(:disabled) { transform: translateY(0); }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
 }
 
+// ── Spinner ───────────────────────────────────────────────────────────────────
+
 .spinner {
-  width: 18px;
-  height: 18px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
+  width: 17px;
+  height: 17px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   display: inline-block;
+  flex-shrink: 0;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
 // ── Dark Theme ────────────────────────────────────────────────────────────────
+
 :host-context(body.dark-theme) {
-  .page-title  { color: #f1f5f9; }
+  .page-title    { color: #f1f5f9; }
   .page-subtitle { color: #64748b; }
 
+  // ── Selectors panel ──
   .panel-section {
     background: #1a1f2e;
     border: 1px solid #2d3748;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   }
 
   .panel-section-title { color: #94a3b8; }
   .panel-section-hint  { color: #475569; }
 
-  // Member checkboxes area (rendered by browser default, style the label text)
   label { color: #cbd5e0; }
   input[type="checkbox"] { accent-color: #667eea; }
 
-  // Truora contact chips
   .truora-chip {
     background: linear-gradient(135deg, #1e2433, #252b3b);
     border-color: #2d3748;
@@ -287,44 +508,96 @@
     &__label { color: #64748b; }
   }
 
-  // Editor panel
-  .editor-panel {
-    background: #1a1f2e;
-    border: 1px solid #2d3748;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  // ── Unified editor card ──
+  .editor-card {
+    background: rgba(22, 27, 40, 0.82);
+    border-color: rgba(102, 126, 234, 0.18);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
-  .reminder-input {
-    background: #252b3b;
-    border-color: #2d3748;
+  .editor-card__labels { border-bottom-color: rgba(255, 255, 255, 0.05); }
+  .editor-card__col-label { color: #475569; }
+
+  .editor-card__textarea {
     color: #e2e8f0;
 
-    &::placeholder { color: #4a5568; }
-    &:focus {
-      border-color: #667eea;
-      background: #1e2433;
-      box-shadow: 0 0 0 3px rgba(102,126,234,0.2);
-    }
+    &::placeholder { color: #3a4255; }
+    &:disabled { opacity: 0.45; }
   }
 
+  .editor-card__sep { background: rgba(255, 255, 255, 0.06); }
+
+  .editor-card__footer { border-top-color: rgba(255, 255, 255, 0.06); }
+
+  // ── Drop zone (dark) ──
+  .editor-card__dropzone {
+    background: rgba(255, 255, 255, 0.025);
+
+    &:hover:not([aria-disabled='true']):not(.editor-card__dropzone--filled) {
+      background: rgba(102, 126, 234, 0.07);
+
+      .dz-placeholder__icon { color: #818cf8; }
+      .dz-placeholder__text { color: #a5b4fc; }
+    }
+
+    &--over {
+      background: linear-gradient(160deg,
+        rgba(102, 126, 234, 0.14) 0%,
+        rgba(118,  75, 162, 0.14) 100%);
+
+      .dz-placeholder__icon { color: #818cf8; }
+    }
+
+    &--filled { background: rgba(102, 126, 234, 0.08); }
+  }
+
+  .dz-placeholder {
+    &__icon  { color: #2d3a52; }
+    &__text  { color: #475569; }
+    &__hint  { color: #2d3a52; }
+    &__sparkle { color: #312e81; opacity: 0.5; }
+  }
+
+  .dz-preview {
+    &__name { color: #94a3b8; }
+    &__size { color: #475569; }
+  }
+
+  // ── Drive / alerts ──
   .drive-badge {
-    background: #1e2433;
+    background: rgba(30, 36, 51, 0.9);
     border-color: #2d3748;
     color: #93c5fd;
   }
 
   .drive-alias-group {
     .drive-alias-label { color: #94a3b8; }
+
     .drive-alias-input {
-      background: #252b3b;
+      background: #1e2433;
       border-color: #2d3748;
       color: #e2e8f0;
-      &:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.2); }
+
+      &:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+      }
     }
   }
 
   .alert {
-    &.alert-success { background: rgba(72,187,120,0.12); color: #68d391; border-color: #276749; }
-    &.alert-error   { background: rgba(245,101,101,0.12); color: #fc8181; border-color: #c53030; }
+    &.alert-success {
+      background: rgba(72, 187, 120, 0.1);
+      color: #68d391;
+      border-color: #276749;
+    }
+
+    &.alert-error {
+      background: rgba(245, 101, 101, 0.1);
+      color: #fc8181;
+      border-color: #c53030;
+    }
   }
 }
