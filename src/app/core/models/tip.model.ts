@@ -2,6 +2,9 @@ export interface Tip {
   id: string;
   title: string;
   topic: string;
+  description?: string;
+  category?: string;
+  url?: string;
   imageData: string;
   createdAt: Date;
   sentToTelegram: boolean;

@@ -1,9 +1,6 @@
 @import './assets/styles/variables';
 @import './assets/styles/mixins';
 
-// Google Fonts
-@import url('https://fonts.googleapis.com/css2?family=Bowlby+One&family=Montserrat:wght@400;600;700&display=swap');
-
 // Reset y estilos globales
 * {
   margin: 0;
@@ -21,9 +18,73 @@ body {
   font-family: $font-family-base;
   background: $bg-secondary;
   color: $text-primary;
-  line-height: 1.6;
+  line-height: 1.5;
   overflow-x: hidden;
   transition: background 0.3s ease, color 0.3s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-family-display;
+  font-weight: $font-weight-medium;
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+
+code, kbd, pre, samp {
+  font-family: $font-family-mono;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+.btn-primary,
+.btn-secondary {
+  min-height: 44px;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid transparent;
+  border-radius: $radius-pill;
+  font-weight: $font-weight-semibold;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-color;
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    background: $border-medium;
+    border-color: $border-medium;
+    color: $text-light;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  background: $cta-color;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background: $cta-hover;
+  }
+}
+
+.btn-secondary {
+  background: $white;
+  border-color: $brand-color;
+  color: $brand-color;
+
+  &:hover:not(:disabled) {
+    background: $brand-subtle;
+    border-color: $brand-hover;
+    color: $brand-hover;
+  }
 }
 
 // ── Dark Theme ────────────────────────────────────────────────────────────
@@ -430,12 +491,40 @@ body.dark-theme {
   }
 }
 
-// Tipografía global
+// Tipografía global según la escala oficial de Truora
 h1, h2, h3, h4, h5, h6 {
-  font-weight: $font-weight-bold;
+  font-family: $font-family-display;
+  font-weight: $font-weight-medium;
   line-height: 1.2;
   color: $text-primary;
 }
+
+h1 { font-size: $font-size-3xl; line-height: 1.09; }
+h2 { font-size: $font-size-2xl; line-height: 1.12; }
+h3 { font-size: $font-size-xl; line-height: 1.15; }
+h4, h5, h6 { font-size: $font-size-lg; line-height: 1.22; }
+
+body,
+p,
+label,
+input,
+select,
+textarea,
+button {
+  font-family: $font-family-base;
+}
+
+body { font-size: $font-size-base; font-weight: $font-weight-light; line-height: 1.5; }
+
+// Component roles. These declarations keep feature-local SCSS on the same scale.
+.page-title { font-size: $font-size-3xl !important; font-weight: $font-weight-medium !important; line-height: 1.09 !important; }
+.section-title, .card-title { font-size: $font-size-xl !important; font-weight: $font-weight-medium !important; line-height: 1.15 !important; }
+.page-subtitle, .form-hint, .activity-time, .stat-label { font-size: $font-size-sm !important; font-weight: $font-weight-light !important; line-height: 1.45 !important; }
+.page-subtitle, .section-subtitle { color: #989BB9 !important; }
+body.dark-theme .page-subtitle,
+body.dark-theme .section-subtitle { color: #989BB9 !important; }
+.form-label, .btn-primary, .btn-secondary, button { font-weight: $font-weight-normal; }
+.stat-value { font-size: $font-size-2xl !important; font-weight: $font-weight-medium !important; line-height: 1.12 !important; }
 
 p {
   margin-bottom: $spacing-md;

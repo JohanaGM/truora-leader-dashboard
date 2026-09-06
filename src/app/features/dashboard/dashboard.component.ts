@@ -1,9 +1,11 @@
-﻿import { Component, inject, computed, OnInit } from '@angular/core';
+﻿import { Component, inject, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { EventService } from '../../core/services/event.service';
 import { TipsCounterService } from '../../core/services/tips-counter.service';
 import { LeaderScheduleService } from '../../core/services/leader-schedule.service';
+import { TipService } from '../../core/services/tip.service';
+import { Tip } from '../../core/models';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,7 +18,21 @@ export class DashboardComponent implements OnInit {
   private router = inject(Router);
   private eventService = inject(EventService);
   private tipsCounter = inject(TipsCounterService);
+  private tipService = inject(TipService);
   scheduleService = inject(LeaderScheduleService);
+  tipsDialogOpen = signal(false);
+  tipsSearch = signal('');
+  selectedTip = signal<Tip | null>(null);
+
+  tips = signal<Tip[]>([]);
+  filteredTips = computed(() => {
+    const query = this.tipsSearch().trim().toLowerCase();
+    const tips = this.tips();
+    if (!query) return tips;
+    return tips.filter(tip => [tip.title, tip.topic, tip.description, tip.category]
+      .filter(Boolean)
+      .some(value => value!.toLowerCase().includes(query)));
+  });
 
   // ---- Computed stats (datos reales) ----
   statsActivitiesToday = computed(() => {
@@ -42,10 +58,10 @@ export class DashboardComponent implements OnInit {
   );
 
   stats = computed(() => [
-    { key: 'activities', icon: '📅', label: 'Actividades Hoy',    value: this.statsActivitiesToday(),      color: 'rgb(99 25 50)' },
-    { key: 'completed',  icon: '✅', label: 'Tareas Completadas', value: this.statsTasksCompleted(),       color: 'rgb(7 56 65)' },
-    { key: 'pending',    icon: '⏰', label: 'Tareas Pendientes',  value: this.statsTasksPending(),         color: 'rgb(131 110 27)' },
-    { key: 'tips',       icon: '💡', label: 'Tips Generados',     value: this.tipsCounter.tipsCount(),    color: 'rgb(113 18 137)' },
+    { key: 'activities', icon: '📅', label: 'Actividades Hoy',    value: this.statsActivitiesToday(),      color: '#9BD2F3' },
+    { key: 'completed',  icon: '✅', label: 'Tareas Completadas', value: this.statsTasksCompleted(),       color: '#9BD2F3' },
+    { key: 'pending',    icon: '⏰', label: 'Tareas Pendientes',  value: this.statsTasksPending(),         color: '#9BD2F3' },
+    { key: 'tips',       icon: '💡', label: 'Tips Generados',     value: this.tipsCounter.tipsCount(),    color: '#9BD2F3' },
   ]);
 
   todayActivities = computed(() => {
@@ -68,20 +84,40 @@ export class DashboardComponent implements OnInit {
   }
 
   quickActions = [
-    { icon: '📅', label: 'Cronograma',      route: '/schedule',     url: null,                              color: 'rgb(153 171 158)' },
-    { icon: '✏️', label: 'Crear Tarea',      route: '/tasks',        url: null,                              color: 'rgb(159 143 143)' },
-    { icon: '💡', label: 'Generar Tip',      route: '/tip-generator', url: null,                              color: 'rgb(26 54 73)' },
-    { icon: '⚙️', label: 'Automatizaciones', route: '/automations',  url: null,                              color: 'rgb(101 118 175)' },
-    { icon: '📢', label: 'Crear Aviso',      route: '/avisos',       url: null,                              color: 'rgb(14 80 110)' }
+    { icon: '📅', label: 'Cronograma',      route: '/schedule',     url: null },
+    { icon: '📈', label: 'Métricas',          route: '/metricas',     url: null },
+    { icon: '💡', label: 'Generar Tip',     route: '/tip-generator', url: null },
+    { icon: '⚙️', label: 'Automatizaciones', route: '/automations',  url: null },
+    { icon: '📢', label: 'Crear Aviso',     route: '/avisos',       url: null }
   ];
 
   ngOnInit(): void {
     this.tipsCounter.fetchCount().subscribe();
     this.scheduleService.loadWeekTasks();
+    this.tips.set(this.tipService.getTips());
   }
 
-  openTipsFolder() {
-    window.open(this.tipsCounter.TIPS_FOLDER_URL, '_blank', 'noopener,noreferrer');
+  openTipsSearch(): void {
+    this.tips.set(this.tipService.getTips());
+    this.tipsSearch.set('');
+    this.selectedTip.set(null);
+    this.tipsDialogOpen.set(true);
+  }
+
+  closeTipsSearch(): void {
+    this.tipsDialogOpen.set(false);
+    this.selectedTip.set(null);
+  }
+
+  showTip(tip: Tip): void {
+    this.selectedTip.set(tip);
+  }
+
+  downloadTip(tip: Tip): void {
+    const link = document.createElement('a');
+    link.href = tip.imageData;
+    link.download = `${tip.title.trim().replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'tip'}.png`;
+    link.click();
   }
 
   openUrl(url: string) {

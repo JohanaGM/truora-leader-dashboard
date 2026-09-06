@@ -1,11 +1,16 @@
 import { Routes } from '@angular/router';
 import { DashboardLayoutComponent } from './layout/dashboard-layout/dashboard-layout.component';
-import { authGuard } from './core/guards/auth.guard';
+import { authGuard, twoFactorGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
+  },
+  {
+    path: 'verify-2fa',
+    canActivate: [twoFactorGuard],
+    loadComponent: () => import('./features/auth/verify-2fa/verify-2fa.component').then(m => m.Verify2faComponent)
   },
   {
     path: '',
@@ -27,7 +32,8 @@ export const routes: Routes = [
       },
       {
         path: 'tasks',
-        loadComponent: () => import('./features/tasks/tasks.component').then(m => m.TasksComponent)
+        redirectTo: 'schedule',
+        pathMatch: 'full'
       },
       {
         path: 'tip-generator',

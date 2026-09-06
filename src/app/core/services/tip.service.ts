@@ -56,7 +56,7 @@ export class TipService {
             
             // Texto del título superpuesto en la imagen wraperTitle
             ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 36px Arial';
+            ctx.font = '500 36px "Host Grotesk", sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(request.title.toUpperCase(), 500, 140);
@@ -75,7 +75,7 @@ export class TipService {
             ctx.stroke();
 
             ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 36px Arial';
+            ctx.font = '500 36px "Host Grotesk", sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(request.title.toUpperCase(), 500, 140);
@@ -106,13 +106,13 @@ export class TipService {
 
           // Logo Truora en la esquina inferior izquierda
           ctx.fillStyle = '#FFFFFF';
-          ctx.font = 'bold 32px Arial';
+          ctx.font = '500 32px "Host Grotesk", sans-serif';
           ctx.textAlign = 'left';
           ctx.fillText('Truora', 50, 550);
 
           // Contenido del tip (centro)
           ctx.fillStyle = '#FFFFFF';
-          ctx.font = '26px Arial';
+          ctx.font = '300 26px "Host Grotesk", sans-serif';
           ctx.textAlign = 'left';
           const words = request.topic.split(' ');
           let line = '';
@@ -134,7 +134,7 @@ export class TipService {
 
           // Firma del líder
           ctx.fillStyle = '#E0E0E0';
-          ctx.font = 'italic 20px Arial';
+          ctx.font = '300 italic 20px "Host Grotesk", sans-serif';
           ctx.textAlign = 'left';
           ctx.fillText(`— ${request.leaderName}`, 50, y + 80);
 

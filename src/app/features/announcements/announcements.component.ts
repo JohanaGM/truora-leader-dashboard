@@ -39,7 +39,8 @@ export class AnnouncementsComponent {
 
   /** Contacto global Truora — separado visualmente de los analistas del equipo */
   truoraContacts = [
-    { name: '@hmarquez', label: 'H. Márquez · Truora' }
+    { name: '@hmarquez', label: 'Hugo Márquez · Truora'},
+    { name: '@ValGutierrezz', label: 'Valeria Gutierrez · Truora' }
   ];
 
   get canSend(): boolean {

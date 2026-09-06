@@ -1,3 +1,5 @@
+@import '../../../assets/styles/variables';
+
 // ===== RECOMMENDATIONS BOX =====
 .recommendations-box {
   display: flex;
@@ -80,7 +82,7 @@
   &:hover:not(:disabled) {
     border-color: #667eea;
     background: #eef2ff;
-    color: #4338ca;
+    color: #eef2ff;
   }
 
   &.active {
@@ -360,7 +362,7 @@
 
       >span,
       .btn-text {
-        font-family: "Roboto", system-ui;
+        font-family: 'Host Grotesk', system-ui, sans-serif;
         letter-spacing: 1px;
         z-index: 10;
         transition: 0.25s ease;
@@ -630,7 +632,7 @@
       box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
 
       >span {
-        font-family: "Roboto", system-ui;
+        font-family: 'Host Grotesk', system-ui, sans-serif;
         letter-spacing: 1px;
         z-index: 10;
         transition: 0.25s ease;
@@ -692,7 +694,7 @@
       padding: 1.5rem;
       background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
       border-radius: 12px;
-      border-left: 4px solid #48bb78;
+      border-left: 4px solid #9BD2F3;
       transition: all 0.2s ease;
 
       &:hover {
@@ -702,10 +704,12 @@
       }
 
       .tip-icon {
-        font-size: 1.5rem;
-        color: #48bb78;
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 4px;
         flex-shrink: 0;
-        margin-top: 0.25rem;
+        margin-top: 0;
       }
 
       p {
@@ -745,7 +749,7 @@
     width: 100%;
     height: 100%;
     position: relative;
-    font-family: Arial, sans-serif;
+    font-family: 'Host Grotesk', system-ui, sans-serif;
 
     .leader-name {
       position: absolute;
@@ -860,7 +864,7 @@
         padding-top: 40px;
         height: 100%;
         color: rgb(243, 243, 190);
-        font-family: 'Poppins', 'Montserrat', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'Host Grotesk', system-ui, sans-serif;
         font-size: 34px;
         font-weight: 700;
         line-height: 1.3;
@@ -878,7 +882,7 @@
         width: 100%;
         padding: 0 40px;
         color: rgb(243, 243, 190);
-        font-family: 'Poppins', 'Montserrat', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'Host Grotesk', system-ui, sans-serif;
         font-size: 34px;
         font-weight: 700;
         line-height: 1.3;
@@ -959,6 +963,303 @@
   syntax: "<angle>";
   initial-value: 0deg;
   inherits: false;
+}
+
+// Atelier refinement: breathing room, readable guidance, and solid controls.
+.page-header {
+  margin-bottom: 2.5rem;
+
+  .header-content .page-title {
+    margin-bottom: 1.25rem;
+    font-family: $font-family-display;
+    font-weight: $font-weight-medium;
+  }
+
+  .header-content .page-subtitle {
+    margin: 0;
+    padding-top: 0.25rem;
+    font-family: $font-family-base;
+    font-size: $font-size-base;
+    font-weight: $font-weight-light;
+    line-height: 1.5;
+  }
+}
+
+.recommendations-box {
+  background: $bg-tertiary;
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: $shadow-sm;
+
+  .rec-column { gap: 0.85rem; padding: 0 1rem; }
+  .rec-title {
+    color: $midnight-color;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    margin-bottom: 0.35rem;
+  }
+  .rec-desc {
+    color: $text-secondary;
+    font-size: $font-size-sm;
+    line-height: 1.5;
+  }
+  .rec-divider { background: $border-light; }
+}
+
+.template-buttons {
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.btn-template {
+  min-height: 42px;
+  padding: 0.65rem 1rem;
+  border: 1px solid $border-medium;
+  border-radius: $radius-pill;
+  background: rgba(250, 251, 255, 0.55);
+  color: $text-primary;
+  font-family: $font-family-base;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  &:hover:not(:disabled) {
+    border-color: $brand-color;
+    background: $brand-subtle;
+    color: $brand-color;
+  }
+
+  &.active {
+    background: rgba(250, 251, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    color: $midnight-color;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62), $shadow-sm;
+
+    &::before {
+      content: '';
+      position: absolute;
+      width: 72px;
+      height: 44px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: $brand-color;
+      opacity: 0.58;
+      filter: blur(20px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    &::after {
+      content: none;
+    }
+
+    &:hover:not(:disabled) {
+      background: rgba(250, 251, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.9);
+    }
+  }
+}
+
+.input-section .form-actions {
+  gap: 1rem;
+  margin-top: 0.5rem;
+
+  .font-size-selector,
+  .tip-type-selector {
+    background: $bg-tertiary;
+    border: 1px solid $border-light;
+    border-radius: $radius-md;
+    padding: 0.65rem 1rem;
+  }
+}
+
+.input-section .btn-generate,
+.preview-section .btn-send,
+.input-section .btn-upload-image {
+  background: $cta-color !important;
+  background-image: none !important;
+  border: 1px solid $cta-color !important;
+  border-radius: $radius-pill;
+  color: $white !important;
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  min-height: 44px;
+  padding: 0.75rem 1.25rem;
+  box-shadow: none;
+  animation: none;
+  text-transform: none;
+  -webkit-text-fill-color: $white;
+
+  &:hover:not(:disabled) {
+    all: initial;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.75rem 1.25rem;
+    border: 1px solid $cta-hover !important;
+    border-radius: $radius-pill;
+    background: $cta-hover !important;
+    background-image: none !important;
+    color: $white !important;
+    font-family: $font-family-base;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+    text-transform: none;
+    -webkit-text-fill-color: $white;
+  }
+
+  &::before,
+  &::after { display: none !important; }
+
+  .btn-text {
+    background: none;
+    color: $white;
+    -webkit-text-fill-color: $white;
+    animation: none;
+  }
+}
+
+.input-section .btn-upload-image {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-section .btn-reset {
+  min-height: 44px;
+  border: 1px solid $border-light;
+  border-radius: $radius-pill;
+  background: $bg-tertiary;
+  color: $text-primary;
+  padding: 0.75rem 1.25rem;
+}
+
+// Both template choices keep the same visual treatment; selection remains functional.
+.btn-template.active {
+  background: rgba(250, 251, 255, 0.55) !important;
+  border: 1px solid $border-medium !important;
+  color: $text-primary !important;
+  box-shadow: none !important;
+
+  &::before,
+  &::after {
+    content: none !important;
+    display: none !important;
+  }
+}
+
+// Hover is shared by Text and Image; it is intentionally not a selection state.
+.btn-template:hover:not(:disabled) {
+  background: rgba(236, 233, 253, 0.9) !important;
+  border-color: $brand-color !important;
+  color: $brand-color !important;
+  box-shadow: 0 0 0 2px rgba(60, 26, 234, 0.08), $shadow-sm;
+}
+
+:host-context(body.dark-theme) {
+  .recommendations-box {
+    background: #1a1f2e !important;
+    border-color: #2d3748 !important;
+    .rec-title { color: #f1f5f9 !important; }
+    .rec-desc { color: #b8c0d4 !important; }
+    .rec-divider { background: #3d4a63; }
+  }
+
+  .input-section .form-actions {
+    .font-size-selector,
+    .tip-type-selector {
+      background: #252b3b !important;
+      border-color: #3d4a63 !important;
+      label { color: #d6dbea !important; }
+      select {
+        background: #1a1f2e !important;
+        border-color: #3d4a63 !important;
+        color: #f1f5f9 !important;
+      }
+    }
+
+    .tip-type-selector {
+      background: #252b3b !important;
+      border-color: #3d4a63 !important;
+      label {
+        color: #f1f5f9 !important;
+        text-shadow: 0 1px 2px rgba(1, 2, 46, 0.65);
+      }
+    }
+  }
+
+  .btn-template {
+    background: rgba(250, 251, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.45) !important;
+    border-radius: $radius-pill;
+    color: #f1f5f9 !important;
+    text-shadow: 0 1px 2px rgba(1, 2, 46, 0.8);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), $shadow-sm;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    &:hover:not(:disabled) {
+      background: rgba(250, 251, 255, 0.16) !important;
+      border-color: #9bd2f3 !important;
+      color: #ffffff !important;
+      text-shadow: 0 1px 3px rgba(1, 2, 46, 0.9);
+    }
+
+    &.active {
+      background: rgba(250, 251, 255, 0.08) !important;
+      border: 1px solid rgba(255, 255, 255, 0.45) !important;
+      color: #f1f5f9 !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), $shadow-sm !important;
+      text-shadow: 0 1px 2px rgba(1, 2, 46, 0.8);
+
+      &::before,
+      &::after {
+        content: none !important;
+        display: none !important;
+      }
+    }
+  }
+
+  .input-section .btn-reset {
+    background: #252b3b !important;
+    border-color: #3d4a63 !important;
+    color: #e2e8f0 !important;
+  }
+
+  .tips-history {
+    .tips-list {
+      background: rgba(155, 210, 243, 0.08);
+      border: 1px solid rgba(155, 210, 243, 0.28);
+      border-radius: $radius-md;
+      padding: 1rem;
+    }
+
+    .tip-item {
+      background: rgba(155, 210, 243, 0.12) !important;
+      border-left-color: #9BD2F3 !important;
+
+      &:hover {
+        background: rgba(155, 210, 243, 0.2) !important;
+      }
+
+      p { color: #e2e8f0 !important; }
+      p strong { color: #9BD2F3 !important; }
+    }
+  }
 }
 
 // Responsive

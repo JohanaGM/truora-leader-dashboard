@@ -10,8 +10,8 @@
       <div class="stat-card"
            [style.border-left-color]="stat.color"
            [class.stat-card--clickable]="stat.key === 'tips'"
-           [title]="stat.key === 'tips' ? 'Abrir carpeta de tips en Drive' : ''"
-           (click)="stat.key === 'tips' ? openTipsFolder() : null">
+           [title]="stat.key === 'tips' ? 'Buscar tips generados' : ''"
+           (click)="stat.key === 'tips' ? openTipsSearch() : null">
         <div class="stat-icon">{{ stat.icon }}</div>
         <div class="stat-content">
           <p class="stat-label">{{ stat.label }}</p>
@@ -22,40 +22,6 @@
       </div>
     }
   </div>
-
-  <!-- ── Mis tareas del cronograma (solo si hay tareas esta semana) ── -->
-  @if (scheduleService.weekTasks().length > 0) {
-    <div class="card schedule-week-card">
-      <div class="card-header">
-        <h3 class="card-title">📋 Mis Tareas de la Semana</h3>
-        <span class="week-badge">{{ weekLabel }}</span>
-      </div>
-      <div class="card-body">
-        @if (scheduleService.isLoading()) {
-          <p class="schedule-loading">Cargando tareas...</p>
-        } @else {
-          <div class="schedule-task-list">
-            @for (task of scheduleService.weekTasks(); track task.id) {
-              <div class="schedule-task-item"
-                   [style.border-left-color]="scheduleService.taskColor(task.tarea)">
-                <span class="schedule-task-icon">{{ scheduleService.taskIcon(task.tarea) }}</span>
-                <div class="schedule-task-info">
-                  <p class="schedule-task-name">{{ task.tarea }}</p>
-                  <p class="schedule-task-date">
-                    {{ task.fecha | date:'EEEE d MMM':'':'es-ES' }}
-                  </p>
-                </div>
-                <span class="schedule-task-badge"
-                      [style.background]="scheduleService.taskColor(task.tarea)">
-                  Pendiente
-                </span>
-              </div>
-            }
-          </div>
-        }
-      </div>
-    </div>
-  }
 
   <div class="content-grid">
 
@@ -93,7 +59,8 @@
       <div class="card-body">
         <div class="quick-actions">
           @for (action of quickActions; track action.label) {
-            <button class="action-button" [style.background]="action.color"
+            <button class="action-button"
+              [class.action-button--violet]="$index % 2 === 0"
               (click)="action.url ? openUrl(action.url) : navigateTo(action.route)">
               <span class="action-icon">{{ action.icon }}</span>
               <span class="action-label">{{ action.label }}</span>
@@ -104,3 +71,58 @@
     </div>
   </div>
 </div>
+
+@if (tipsDialogOpen()) {
+  <div class="tips-modal-backdrop" role="presentation" (click)="closeTipsSearch()">
+    <section class="tips-modal" role="dialog" aria-modal="true" aria-labelledby="tips-modal-title" (click)="$event.stopPropagation()">
+      <header class="tips-modal-header">
+        <div>
+          <p class="tips-modal-eyebrow">Biblioteca</p>
+          <h2 id="tips-modal-title">Tips generados</h2>
+        </div>
+        <button class="tips-modal-close" type="button" aria-label="Cerrar buscador" (click)="closeTipsSearch()">×</button>
+      </header>
+
+      @if (!selectedTip()) {
+        <label class="tips-search-label" for="tips-search">Buscar por título, contenido o categoría</label>
+        <input id="tips-search" class="tips-search-input" type="search"
+          placeholder="Busca un tip..." [value]="tipsSearch()"
+          (input)="tipsSearch.set($any($event.target).value)" />
+
+        @if (filteredTips().length > 0) {
+          <div class="tips-result-grid">
+            @for (tip of filteredTips(); track tip.id) {
+              <article class="tip-result-card">
+                @if (tip.imageData) { <img [src]="tip.imageData" [alt]="tip.title" class="tip-result-image" /> }
+                <div class="tip-result-body">
+                  <span class="tip-result-category">{{ tip.category || 'Tip' }}</span>
+                  <h3>{{ tip.title }}</h3>
+                  <p>{{ tip.description || tip.topic }}</p>
+                  <button type="button" class="tip-result-action" (click)="showTip(tip)">Ver completo</button>
+                </div>
+              </article>
+            }
+          </div>
+        } @else {
+          <div class="tips-empty-state">
+            <span aria-hidden="true">⌕</span>
+            <h3>No encontramos tips</h3>
+            <p>Prueba con otro título, contenido o categoría.</p>
+          </div>
+        }
+      } @else {
+        <div class="tip-detail">
+          <button type="button" class="tip-back-button" (click)="selectedTip.set(null)">← Volver a resultados</button>
+          @if (selectedTip()!.imageData) { <img [src]="selectedTip()!.imageData" [alt]="selectedTip()!.title" class="tip-detail-image" /> }
+          <span class="tip-result-category">{{ selectedTip()!.category || 'Tip' }}</span>
+          <h3>{{ selectedTip()!.title }}</h3>
+          <p>{{ selectedTip()!.description || selectedTip()!.topic }}</p>
+          <div class="tip-detail-actions">
+            <button type="button" class="tip-result-action" (click)="downloadTip(selectedTip()!)">Descargar</button>
+            @if (selectedTip()!.url) { <a class="tip-result-action" [href]="selectedTip()!.url" target="_blank" rel="noopener noreferrer">Abrir enlace</a> }
+          </div>
+        </div>
+      }
+    </section>
+  </div>
+}

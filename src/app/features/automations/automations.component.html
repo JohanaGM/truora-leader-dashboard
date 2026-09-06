@@ -1,7 +1,7 @@
 
 <div class="automations-page">
   <div class="welcome-section">
-    <h1 class="page-title">⚙️ Automatizaciones</h1>
+    <h1 class="page-title"> Automatizaciones</h1>
     <p class="page-subtitle">Dispara flujos de automatización conectados a n8n</p>
   </div>
 
@@ -12,14 +12,14 @@
       [class.active]="activeTab() === 'telegram'"
       (click)="setTab('telegram')"
     >
-      📨 Data Truface
+      Data Truface
     </button>
     <button
       class="tab-btn"
       [class.active]="activeTab() === 'snowflake'"
       (click)="setTab('snowflake')"
     >
-      � Desbloqueo de ACC ID
+       Desbloqueo de ACC ID
     </button>
   </div>
 
@@ -29,7 +29,7 @@
   @if (activeTab() === 'telegram') {
     <div class="flow-card">
       <div class="flow-header">
-        <div class="flow-icon">📨</div>
+        <div class="flow-icon"></div>
         <div>
           <h2 class="flow-title">Automatización Truface</h2>
           <p class="flow-desc">
@@ -59,7 +59,7 @@
 
         @if (selectedFile()) {
           <div class="file-preview">
-            <span class="file-icon">📄</span>
+            <span class="file-icon"></span>
             <span class="file-name">{{ selectedFile()!.name }}</span>
             <span class="file-size">{{ (selectedFile()!.size / 1024).toFixed(1) }} KB</span>
           </div>
@@ -73,19 +73,19 @@
       </div>
 
       @if (telegramError()) {
-        <div class="alert alert-error">⚠️ {{ telegramError() }}</div>
+        <div class="alert alert-error"> {{ telegramError() }}</div>
       }
 
       @if (isCompleted()) {
         <div class="completed-block">
-          <p class="completed-hint">✅ El archivo ha sido procesado y cargado correctamente en Sheets.</p>
+          <p class="completed-hint"> El archivo ha sido procesado y cargado correctamente en Sheets.</p>
           <a
             class="btn-completed"
             [href]="DOC_GENERAL_PROMIGAS_URL"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <span>📂 ¡Listo! Ir al Documento General Promigas</span>
+            <span> ¡Listo! Ir al Documento General Promigas</span>
             <span class="btn-completed__arrow">↗</span>
           </a>
         </div>
@@ -99,7 +99,7 @@
             <span class="spinner"></span>
             <span>Procesando...</span>
           } @else {
-            <span>🚀 Iniciar Procesamiento</span>
+            <span> Iniciar Procesamiento</span>
           }
         </button>
       }
@@ -112,7 +112,7 @@
   @if (activeTab() === 'snowflake') {
     <div class="flow-card">
       <div class="flow-header">
-        <div class="flow-icon">�</div>
+        <div class="flow-icon"></div>
         <div>
           <h2 class="flow-title">Desbloqueo de ACC ID</h2>
           <p class="flow-desc">Acceso rápido a las hojas de cálculo y plataformas clave del equipo.</p>
@@ -150,29 +150,6 @@
 
       </div>
 
-      <!-- Done button -->
-      <div class="done-section">
-        <p class="done-hint">¿Ya terminaste el desbloqueo? Notifica a n8n para registrar la tarea como finalizada.</p>
-
-        <button class="btn-done"
-                [class.loading]="accIdDoneLoading()"
-                [class.success]="accIdDoneSuccess()"
-                [disabled]="accIdDoneLoading()"
-                (click)="markAccIdDone()">
-          @if (accIdDoneLoading()) {
-            <span class="spinner"></span>
-            <span>Enviando...</span>
-          } @else if (accIdDoneSuccess()) {
-            <span>✅ ¡Registrado!</span>
-          } @else {
-            <span>✔ Done</span>
-          }
-        </button>
-
-        @if (accIdDoneError()) {
-          <div class="alert alert-error" style="margin-top:0.75rem">⚠️ {{ accIdDoneError() }}</div>
-        }
-      </div>
     </div>
   }
 </div>

@@ -1,11 +1,13 @@
 ﻿<div class="schedule">
   <div class="page-header">
     <div class="header-content">
-      <h1 class="page-title">📅 Cronograma de Actividades</h1>
+      <h1 class="page-title"> Cronograma de Actividades</h1>
+      
       <p class="page-subtitle">Gestiona tus eventos y reuniones</p>
     </div>
-    <button class="btn-primary" (click)="openModal()">
-      ➕ Nuevo Evento
+     <button class="btn-primary new-event-button" (click)="openModal()">
+       <span class="new-event-icon" aria-hidden="true">＋</span>
+       <span>Nuevo evento</span>
     </button>
   </div>
 
@@ -18,12 +20,12 @@
         <button class="cal-nav-btn" (click)="nextMonth()">&#8250;</button>
       </div>
       <div class="cal-legend">
-        <span class="legend-dot" style="background:rgb(147 15 60)"></span> Truface (Lun/Mie/Vie)
-        <span class="legend-dot" style="background:rgb(58 0 119); margin-left:1rem"></span> Generar Tips (Jue)
-        <span class="legend-dot" style="background:#fa0202; margin-left:1rem"></span> Alta
-        <span class="legend-dot" style="background:#f1a50b; margin-left:0.5rem"></span> Media
-        <span class="legend-dot" style="background:#1178da; margin-left:0.5rem"></span> Baja
-        <span class="legend-holiday-dot" style="margin-left:1rem"></span> Festivo
+        <span class="legend-item"><span class="legend-dot legend-truface"></span>Truface</span>
+        <span class="legend-item"><span class="legend-dot legend-tips"></span>Generar tips</span>
+        <span class="legend-item"><span class="legend-dot legend-high"></span>Alta</span>
+        <span class="legend-item"><span class="legend-dot legend-medium"></span>Media</span>
+        <span class="legend-item"><span class="legend-dot legend-low"></span>Baja</span>
+        <span class="legend-item"><span class="legend-holiday-dot"></span>Festivo</span>
       </div>
       <div class="cal-day-names">
         @for (name of dayNames; track name) {
@@ -45,6 +47,9 @@
                 @if (i < 3) {
                   <span class="cal-event-chip"
                         [class.chip-rescheduled]="ev.isRescheduled"
+                    [class.priority-high]="ev.priority === 'high'"
+                    [class.priority-medium]="ev.priority === 'medium'"
+                    [class.priority-low]="ev.priority === 'low'"
                         [style.background-color]="ev.color"
                         [title]="ev.isRescheduled ? 'Reprogramado por festivo (orig: ' + ev.originalDate + ')' : ev.title">
                     @if (ev.isRescheduled) { <span class="chip-arrow">➔</span> }
@@ -58,6 +63,38 @@
       </div>
     </div>
   </div>
+
+  <section class="section weekly-summary" aria-labelledby="weekly-summary-title">
+    <div class="section-heading-row">
+      <div>
+        <h2 id="weekly-summary-title" class="section-title">Resumen de la semana</h2>
+        <p class="section-subtitle">Estado de tus eventos y tareas</p>
+      </div>
+    </div>
+    <div class="status-summary-grid">
+      <article class="status-summary-card pending">
+        <span class="status-summary-dot" aria-hidden="true"></span>
+        <div>
+          <p class="status-summary-label">Pendientes</p>
+          <strong class="status-summary-value">{{ pendingCount() }}</strong>
+        </div>
+      </article>
+      <article class="status-summary-card in-progress">
+        <span class="status-summary-dot" aria-hidden="true"></span>
+        <div>
+          <p class="status-summary-label">En progreso</p>
+          <strong class="status-summary-value">{{ inProgressCount() }}</strong>
+        </div>
+      </article>
+      <article class="status-summary-card completed">
+        <span class="status-summary-dot" aria-hidden="true"></span>
+        <div>
+          <p class="status-summary-label">Completadas</p>
+          <strong class="status-summary-value">{{ completedCount() }}</strong>
+        </div>
+      </article>
+    </div>
+  </section>
 
   <!-- Eventos de Hoy -->
   <div class="section">
@@ -87,6 +124,12 @@
               <p class="activity-description">{{ ev.description }}</p>
             }
             <div class="activity-footer">
+              <span class="status-badge" [class]="ev.status">
+                {{ getStatusLabel(ev.status) }}
+              </span>
+              <span class="priority-badge" [class]="ev.priority">
+                {{ getPriorityLabel(ev.priority) }}
+              </span>
               <select [value]="ev.status"
                       (change)="updateEventStatus(ev, $any($event.target).value)"
                       class="status-select" [class]="ev.status">
@@ -119,7 +162,8 @@
               <div class="item-meta">
                 <span class="item-date">{{ ev.date }}</span>
                 <span class="item-time">{{ ev.startTime }} - {{ ev.endTime }}</span>
-                <span class="item-status" [class]="ev.status">{{ getStatusLabel(ev.status) }}</span>
+                <span class="status-badge" [class]="ev.status">{{ getStatusLabel(ev.status) }}</span>
+                <span class="priority-badge" [class]="ev.priority">{{ getPriorityLabel(ev.priority) }}</span>
               </div>
             </div>
             <div class="activity-actions">
@@ -181,13 +225,13 @@
           <div class="priority-buttons">
             <button type="button" class="priority-btn high"
                     [class.active]="formData().priority === 'high'"
-                    (click)="patchForm({priority: 'high'})">Alta</button>
+                    (click)="patchForm({priority: 'high'})"><span aria-hidden="true">!</span> Alta</button>
             <button type="button" class="priority-btn medium"
                     [class.active]="formData().priority === 'medium'"
-                    (click)="patchForm({priority: 'medium'})">Media</button>
+                    (click)="patchForm({priority: 'medium'})"><span aria-hidden="true">•</span> Media</button>
             <button type="button" class="priority-btn low"
                     [class.active]="formData().priority === 'low'"
-                    (click)="patchForm({priority: 'low'})">Baja</button>
+                    (click)="patchForm({priority: 'low'})"><span aria-hidden="true">↓</span> Baja</button>
           </div>
         </div>
         <div class="form-group">

@@ -78,6 +78,16 @@ export class ScheduleComponent implements OnInit {
     return this.filterTrufaceTips(this.eventService.getAllForDate(date));
   }
 
+  /** Unified weekly status summary formerly shown in the Tasks view. */
+  weekEvents = computed((): VirtualEvent[] => {
+    this.eventService.events();
+    return this.filterTrufaceTips(this.eventService.getEventsForWeek());
+  });
+
+  pendingCount = computed(() => this.weekEvents().filter(e => e.status === 'pending').length);
+  inProgressCount = computed(() => this.weekEvents().filter(e => e.status === 'in-progress').length);
+  completedCount = computed(() => this.weekEvents().filter(e => e.status === 'completed').length);
+
   // ---- Modal ----
   showModal = signal(false);
   editingId  = signal<string | null>(null);

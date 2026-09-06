@@ -1,10 +1,7 @@
 import { Component, inject, signal, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { AutomationService } from '../../core/services/automation.service';
-import { AuthService } from '../../core/services/auth.service';
-import { environment } from '../../../environments/environment';
 
 type FlowTab = 'telegram' | 'snowflake';
 
@@ -19,8 +16,6 @@ export class AutomationsComponent {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   private automationService = inject(AutomationService);
-  private http = inject(HttpClient);
-  private authService = inject(AuthService);
 
   activeTab = signal<FlowTab>('telegram');
 
@@ -33,35 +28,6 @@ export class AutomationsComponent {
   telegramSuccess = signal(false);
   telegramError   = signal<string | null>(null);
   isCompleted     = signal(false);
-
-  // --- Flujo 2: Desbloqueo ACC ID – Done button ---
-  accIdDoneLoading = signal(false);
-  accIdDoneSuccess = signal(false);
-  accIdDoneError   = signal<string | null>(null);
-
-  markAccIdDone(): void {
-    if (this.accIdDoneLoading()) return;
-    this.accIdDoneLoading.set(true);
-    this.accIdDoneSuccess.set(false);
-    this.accIdDoneError.set(null);
-
-    const today = new Date().toISOString().split('T')[0];
-    const usuario = this.authService.getCurrentLeader()?.full_name ?? 'Desconocido';
-    const payload = { usuario, accion: 'Revisión de ACC ID', fecha: today };
-
-    this.http.post(environment.n8nTareaFinalizadaUrl, payload).subscribe({
-      next: () => {
-        this.accIdDoneLoading.set(false);
-        this.accIdDoneSuccess.set(true);
-        setTimeout(() => this.accIdDoneSuccess.set(false), 4000);
-      },
-      error: () => {
-        this.accIdDoneLoading.set(false);
-        this.accIdDoneError.set('Error al notificar. Intenta nuevamente.');
-        setTimeout(() => this.accIdDoneError.set(null), 4000);
-      }
-    });
-  }
 
   setTab(tab: FlowTab) {
     this.activeTab.set(tab);

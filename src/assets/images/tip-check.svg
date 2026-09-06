@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title>Consejo completado</title>
+  <rect width="64" height="64" rx="4" fill="#ECE9FD"/>
+  <path d="M15 34.5 25 44 50 21" fill="none" stroke="#3C1AEA" stroke-width="8" stroke-linecap="square" stroke-linejoin="miter"/>
+</svg>

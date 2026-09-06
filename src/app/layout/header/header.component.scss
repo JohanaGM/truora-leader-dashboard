@@ -37,7 +37,7 @@ body.dark-theme .notif-item,
   .notif-task-date { color: #b3b8d0; }
   .overdue-badge {
     background: #2d1e2a;
-    color: #ff6b9d;
+    color: #01022E;
     border: 1px solid #ff6b9d;
   }
 }
@@ -49,26 +49,12 @@ body.dark-theme .notif-see-all,
   &:hover { background: #181c2a; }
 }
 .header {
-  background: url("../../../assets/images/estrella.png");
+  background: #01022E;
   width: 100%;
   height: 100px;
-  border: 1px solid;
+  border: 0;
   margin: 0px auto;
-  box-shadow: 0px 0px 2px gray;
-  background-size: cover;
-  background-repeat: repeat;
-  background-position: center;
-  animation: backbanner 20s linear infinite;
-}
-
-@keyframes backbanner {
-  0% {
-    background-position: 0px 0px;
-  }
-
-  100% {
-    background-position: 200px 200px;
-  }
+  box-shadow: 0 2px 6px rgba(1, 2, 46, 0.07);
 }
 
 
@@ -84,14 +70,13 @@ body.dark-theme .notif-see-all,
   .greeting {
     display: block;
     width: 850px;
-    font-family: "BebasNeue", sans-serif;
+    font-family: 'Host Grotesk', system-ui, sans-serif;
     color: white;
-    font-size: 30px;
+    font-size: 1.6875rem;
     font-weight: normal;
-    letter-spacing: 2px;
+    letter-spacing: 0;
     text-shadow: 2px 2px 1px black;
     margin: 27px auto;
-    animation: showText 10s linear;
   }
 
   .date {
@@ -116,8 +101,9 @@ body.dark-theme .notif-see-all,
   width: 48px;
   height: 48px;
   border: none;
-  background: #f7fafc;
-  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #d8dae9;
+  border-radius: 999px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -129,7 +115,8 @@ body.dark-theme .notif-see-all,
   }
 
   &:hover {
-    background: #edf2f7;
+    background: #ece9fd;
+    border-color: #3c1aea;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
@@ -144,7 +131,7 @@ body.dark-theme .notif-see-all,
     position: absolute;
     top: 8px;
     right: 8px;
-    background: linear-gradient(135deg, #ff6b9d 0%, #ff8e9e 100%);
+    background: #3C1AEA;
     color: white;
     font-size: 0.7rem;
     font-weight: 700;
@@ -153,10 +140,10 @@ body.dark-theme .notif-see-all,
     min-width: 18px;
     text-align: center;
     box-shadow: 0 2px 8px rgba(255, 107, 157, 0.4);
-    animation: bounce 2s ease-in-out infinite;
+    animation: none;
 
     &.pulse {
-      animation: bounce 2s ease-in-out infinite, pulse-ring 1.5s ease-out infinite;
+      animation: none;
     }
   }
 
@@ -164,17 +151,6 @@ body.dark-theme .notif-see-all,
     background: #edf2f7;
     box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);
   }
-}
-
-@keyframes bounce {
-  0%, 100% { transform: scale(1); }
-  50%       { transform: scale(1.15); }
-}
-
-@keyframes pulse-ring {
-  0%   { box-shadow: 0 0 0 0 rgba(255, 107, 157, 0.5); }
-  70%  { box-shadow: 0 0 0 7px rgba(255, 107, 157, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 107, 157, 0); }
 }
 
 // ── Notification popover ─────────────────────────────────────────────────

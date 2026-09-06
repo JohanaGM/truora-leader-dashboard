@@ -68,7 +68,7 @@ export class HeaderComponent implements OnInit {
 
   goToTasks() {
     this.notifOpen.set(false);
-    this.router.navigate(['/tasks']);
+    this.router.navigate(['/schedule']);
   }
 
   goToSettings() { this.router.navigate(['/configuracion']); }

@@ -1,0 +1,177 @@
+@import '../../../../assets/styles/variables';
+
+.verify-container {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1rem;
+  background: $midnight-color;
+}
+
+.verify-card {
+  width: min(100%, 460px);
+  padding: 2.5rem;
+  background: $white;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: $radius-lg;
+  box-shadow: $shadow-xl;
+  color: $midnight-color;
+}
+
+.verify-header {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  .verify-logo {
+    display: block;
+    width: 150px;
+    height: 72px;
+    object-fit: contain;
+    margin: 0 auto 1.5rem;
+  }
+
+  h1 {
+    margin: 0 0 0.75rem;
+    color: $midnight-color;
+    font-family: $font-family-display;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-medium;
+    line-height: 1.12;
+  }
+
+  p {
+    margin: 0;
+    color: #989BB9;
+    font-family: $font-family-base;
+    font-size: $font-size-base;
+    font-weight: $font-weight-light;
+    line-height: 1.5;
+  }
+}
+
+.verify-form { display: grid; gap: 1.25rem; }
+
+.code-fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  legend {
+    margin-bottom: 0.75rem;
+    color: $midnight-color;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.code-inputs {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.code-input {
+  width: 100%;
+  aspect-ratio: 1;
+  min-width: 0;
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
+  background: $bg-tertiary;
+  color: $midnight-color;
+  font-family: $font-family-base;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-medium;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+
+  &:focus {
+    background: $white;
+    border-color: $brand-color;
+    box-shadow: 0 0 0 3px rgba(60, 26, 234, 0.14);
+  }
+}
+
+.feedback {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  line-height: 1.45;
+
+  &-error { background: #fdeaea; color: #9f262c; border: 1px solid #f3a3a7; }
+  &-success { background: #e6f8ef; color: #0e8957; border: 1px solid #8bd8b5; }
+}
+
+.verify-button {
+  min-height: 48px;
+  border: 1px solid $cta-color;
+  border-radius: $radius-pill;
+  background: $cta-color;
+  color: $white;
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover:not(:disabled) { background: $cta-hover; border-color: $cta-hover; box-shadow: $shadow-md; transform: translateY(-2px); }
+  &:active:not(:disabled) { transform: scale(0.97); }
+  &:focus-visible { outline: 2px solid $brand-color; outline-offset: 3px; }
+  &:disabled { background: $border-medium; border-color: $border-medium; color: $text-light; cursor: not-allowed; }
+}
+
+.resend-area {
+  display: flex;
+  justify-content: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  text-align: center;
+}
+
+.resend-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: $brand-color;
+  font: inherit;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:disabled { color: $text-light; cursor: wait; }
+}
+
+.demo-hint {
+  margin: 1.5rem 0 0;
+  color: $text-light;
+  font-size: $font-size-xs;
+  text-align: center;
+}
+
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 0.4rem;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: $white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 480px) {
+  .verify-card { padding: 2rem 1.25rem; }
+  .code-inputs { gap: 0.4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; }
+}

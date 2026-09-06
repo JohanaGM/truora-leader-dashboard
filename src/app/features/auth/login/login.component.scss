@@ -596,3 +596,162 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+// Atelier login refinement: stable layout, static brand mark, and solid controls.
+.login-container {
+  min-height: 100dvh;
+  padding: 2rem 1rem;
+  background: $midnight-color;
+  isolation: isolate;
+
+  &::before {
+    width: 4px;
+    background: $brand-color;
+  }
+
+  .form-input,
+  input[type='email'],
+  input[type='password'],
+  input[type='text'] {
+    background: $bg-tertiary !important;
+    border: 1px solid $border-light !important;
+    border-radius: $radius-md;
+    color: $midnight-color !important;
+    font-family: $font-family-base;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+
+    &::placeholder { color: $text-light !important; }
+
+    &:focus {
+      background: $white !important;
+      border-color: $brand-color !important;
+      box-shadow: 0 0 0 3px rgba(60, 26, 234, 0.14) !important;
+      transform: none;
+    }
+
+    &:disabled {
+      background: $border-light !important;
+      color: $text-secondary !important;
+      cursor: not-allowed;
+    }
+
+    &.input-error {
+      border-color: $error-color !important;
+      box-shadow: 0 0 0 3px rgba(229, 72, 77, 0.14) !important;
+    }
+  }
+
+  label,
+  .form-label,
+  .checkbox-label { color: $midnight-color !important; }
+
+  .btn-login {
+    background: $cta-color !important;
+    border: 1px solid $cta-color;
+    border-radius: $radius-pill;
+    box-shadow: $shadow-md;
+    color: $white !important;
+    font-family: $font-family-base;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    min-height: 48px;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background: $cta-hover !important;
+      border-color: $cta-hover;
+      box-shadow: $shadow-lg;
+      transform: translateY(-2px);
+    }
+
+    &:active:not(:disabled) { transform: scale(0.97); }
+
+    &:focus-visible {
+      outline: 2px solid $lightblue-color;
+      outline-offset: 3px;
+    }
+
+    &:disabled {
+      background: $border-medium !important;
+      border-color: $border-medium;
+      color: $text-light !important;
+      opacity: 1;
+      box-shadow: none;
+    }
+
+    .btn-icon { animation: none; }
+  }
+}
+
+.login-card {
+  margin: 0;
+  max-width: 460px;
+  padding: 2.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: $radius-lg;
+  box-shadow: $shadow-xl;
+  animation: none;
+}
+
+.login-header {
+  margin-bottom: 2rem;
+
+  .logo-wrapper {
+    min-height: 96px;
+    margin-bottom: 1.25rem;
+  }
+
+  .logo-static {
+    width: 150px;
+    height: 72px;
+    object-fit: contain;
+    filter: none;
+    animation: none;
+    flex: 0 0 auto;
+  }
+
+  .app-title {
+    margin-bottom: 0.75rem;
+    color: $midnight-color;
+    font-family: $font-family-display;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-medium;
+    letter-spacing: 0;
+    background: none;
+    -webkit-text-fill-color: initial;
+  }
+
+  .app-subtitle {
+    color: #989BB9;
+    font-family: $font-family-base;
+    font-size: $font-size-base;
+    font-weight: $font-weight-light;
+    line-height: 1.5;
+  }
+}
+
+.login-form { gap: 1.25rem; }
+
+.form-label {
+  font-family: $font-family-base;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.toggle-password {
+  color: $text-secondary;
+
+  &:hover {
+    background: $brand-subtle !important;
+    color: $brand-color;
+    transform: none !important;
+  }
+}
+
+.forgot-password {
+  color: $brand-color;
+  font-family: $font-family-base;
+  font-weight: $font-weight-medium;
+
+  &:hover { color: $brand-hover; }
+}

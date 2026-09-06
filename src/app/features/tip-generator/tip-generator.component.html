@@ -1,7 +1,7 @@
 <div class="tip-generator">
   <div class="page-header">
     <div class="header-content">
-      <h1 class="page-title">💡 Generador de Tips</h1>
+      <h1 class="page-title"> Generador de Tips</h1>
       <p class="page-subtitle">Crea tips inspiradores para tu equipo</p>
     </div>
   </div>
@@ -9,7 +9,7 @@
   <!-- Sección de Recomendaciones -->
   <div class="recommendations-box">
     <div class="rec-column">
-      <div class="rec-icon">📄</div>
+      <div class="rec-icon"></div>
       <div class="rec-body">
         <p class="rec-title">Plantilla de Texto</p>
         <p class="rec-desc">Utiliza esta plantilla si tu contenido es extenso o requiere una explicación detallada.</p>
@@ -17,7 +17,7 @@
     </div>
     <div class="rec-divider"></div>
     <div class="rec-column">
-      <div class="rec-icon">🖼️</div>
+      <div class="rec-icon"></div>
       <div class="rec-body">
         <p class="rec-title">Plantilla de Imagen</p>
         <p class="rec-desc">Utiliza esta plantilla si buscas un impacto visual fuerte con mensajes breves y directos.</p>
@@ -58,7 +58,7 @@
         </div>
         
         <div class="tip-type-selector">
-          <label>🎨 Tipo de Plantilla</label>
+          <label> Tipo de Plantilla</label>
           <div class="template-buttons">
             <div class="tooltip-wrapper">
               <button type="button"
@@ -66,7 +66,7 @@
                 [class.active]="tipType() === 'text'"
                 (click)="tipType.set('text')"
                 [disabled]="isGenerating() || isSending()">
-                📄 Texto
+                 Texto
               </button>
               <span class="tooltip-bubble">Ideal para tips con más texto</span>
             </div>
@@ -76,7 +76,7 @@
                 [class.active]="tipType() === 'image'"
                 (click)="tipType.set('image')"
                 [disabled]="isGenerating() || isSending()">
-                🖼️ Imagen
+                 Imagen
               </button>
               <span class="tooltip-bubble">Ideal para tips más visuales</span>
             </div>
@@ -93,7 +93,7 @@
           <label class="btn-upload-image">
             <input type="file" accept="image/*" (change)="onImageSelected($event)" 
               [disabled]="isGenerating() || isSending()" hidden #fileInput />
-            📷 Cargar Imagen
+             Cargar Imagen
           </label>
         } @else {
           <div class="image-preview-card">
@@ -107,7 +107,7 @@
         
         @if (imageErrorMessage()) {
           <div class="alert alert-error mt-2">
-            ❌ {{ imageErrorMessage() }}
+             {{ imageErrorMessage() }}
           </div>
         }
       </div>
@@ -118,13 +118,13 @@
           <span class="spinner"></span>
           <span class="btn-text">Generando...</span>
           } @else {
-          <span class="btn-text">✨ Generar Tip</span>
+          <span class="btn-text"> Generar Tip</span>
           }
         </button>
 
         @if (generatedImage()) {
         <button class="btn-reset" (click)="reset()" [disabled]="isSending()">
-          🔄 Nuevo Tip
+           Nuevo Tip
         </button>
         }
       </div>
@@ -137,13 +137,13 @@
 
       @if (errorMessage()) {
       <div class="alert alert-error">
-        ❌ {{ errorMessage() }}
+         {{ errorMessage() }}
       </div>
       }
 
       @if (successMessage()) {
       <div class="alert alert-success">
-        ✅ {{ successMessage() }}
+         {{ successMessage() }}
       </div>
       }
     </div>
@@ -172,7 +172,7 @@
         <span class="spinner"></span>
         <span>Enviando...</span>
         } @else {
-        <span>📤 Enviar a Telegram</span>
+        <span> Enviar a Telegram</span>
         }
       </button>
       }
@@ -212,31 +212,31 @@
 
   <!-- Tips History -->
   <div class="tips-history card">
-    <h3 class="section-title">💡 Consejos para crear tips efectivos</h3>
+    <h3 class="section-title"> Consejos para crear tips efectivos</h3>
 
     <div class="tips-list">
       <div class="tip-item">
-        <span class="tip-icon">✓</span>
+        <img class="tip-icon" src="assets/images/tip-check.svg" alt="" aria-hidden="true" />
         <p><strong>Elige un tema puntual:</strong> Consulta la base de conocimiento y selecciona un tema específico que sea relevante para tu equipo</p>
       </div>
       <div class="tip-item">
-        <span class="tip-icon">✓</span>
+        <img class="tip-icon" src="assets/images/tip-check.svg" alt="" aria-hidden="true" />
         <p><strong>Personaliza la propuesta:</strong> El asistente IA te sugiere contenido, pero tú puedes modificarlo, expandirlo o adaptarlo a tu necesidad</p>
       </div>
       <div class="tip-item">
-        <span class="tip-icon">✓</span>
+        <img class="tip-icon" src="assets/images/tip-check.svg" alt="" aria-hidden="true" />
         <p><strong>Sé claro y conciso:</strong> Usa un lenguaje simple, directo y positivo que tu equipo pueda entender fácilmente</p>
       </div>
       <div class="tip-item">
-        <span class="tip-icon">✓</span>
+        <img class="tip-icon" src="assets/images/tip-check.svg" alt="" aria-hidden="true" />
         <p><strong>Agrega valor práctico:</strong> Incluye ejemplos, casos reales o acciones específicas que el equipo pueda aplicar inmediatamente</p>
       </div>
       <div class="tip-item">
-        <span class="tip-icon">✓</span>
+        <img class="tip-icon" src="assets/images/tip-check.svg" alt="" aria-hidden="true" />
         <p><strong>Imagen opcional (máx 10MB):</strong> Usa imágenes decorativas que refuercen tu mensaje, pero mantén el foco en el contenido textual</p>
       </div>
       <div class="tip-item">
-        <span class="tip-icon">✓</span>
+        <img class="tip-icon" src="assets/images/tip-check.svg" alt="" aria-hidden="true" />
         <p><strong>Espaciado y formato:</strong> Mantén párrafos cortos y bien distribuidos para facilitar la lectura en dispositivos móviles</p>
       </div>
     </div>

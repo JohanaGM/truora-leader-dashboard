@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 72" role="img" aria-labelledby="title">
+  <title>Truora</title>
+  <g fill="none" stroke="#3C1AEA" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 36h18c12 0 20-7 22-18H38c-10 0-18 7-18 18Z" fill="#3C1AEA" stroke="none"/>
+    <path d="M38 36v27c0 4 3 7 7 7s7-3 7-7V36" fill="#3C1AEA" stroke="none"/>
+    <path d="m25 48 8 8 22-20" stroke="#FAFBFF" stroke-width="7"/>
+  </g>
+  <text x="78" y="51" fill="#01022E" font-family="Host Grotesk, Arial, sans-serif" font-size="36" font-weight="500" letter-spacing="-1">Truora</text>
+</svg>

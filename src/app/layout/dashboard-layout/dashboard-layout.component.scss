@@ -1,7 +1,7 @@
 .dashboard-layout {
   display: flex;
   min-height: 100vh;
-  background: #f7fafc;
+  background: #fafbff;
 }
 
 .main-content {
@@ -10,6 +10,7 @@
   display: flex;
   flex-direction: column;
   transition: margin-left 0.3s ease;
+  background: #fafbff;
 }
 
 .content-area {

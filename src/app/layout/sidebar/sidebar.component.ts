@@ -31,12 +31,6 @@ export class SidebarComponent {
       active: false
     },
     {
-      icon: '✅',
-      label: 'Tareas',
-      route: '/tasks',
-      active: false
-    },
-    {
       icon: '💡',
       label: 'Generar Tips',
       route: '/tip-generator',

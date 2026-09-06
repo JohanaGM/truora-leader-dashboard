@@ -1,7 +1,7 @@
 <div class="announcements-page">
   <div class="page-header">
     <div>
-      <h1 class="page-title">📢 Avisos Importantes</h1>
+      <h1 class="page-title"> Avisos Importantes</h1>
       <p class="page-subtitle">Redacta y envía mensajes a tu equipo vía Telegram</p>
     </div>
   </div>
@@ -13,7 +13,7 @@
 
       <!-- Analistas del equipo -->
       <div class="panel-section">
-        <h3 class="panel-section-title">👥 Analistas del equipo</h3>
+        <h3 class="panel-section-title"> Analistas del equipo</h3>
         <app-message-template
           (messageSelected)="onMessageSelected($event)"
           (mentionAction)="onMentionAction($event)">
@@ -22,12 +22,12 @@
 
       <!-- Contactos Truora -->
       <div class="panel-section truora-contacts">
-        <h3 class="panel-section-title">🏢 Menciones Truora</h3>
+        <h3 class="panel-section-title"> Menciones Truora</h3>
         <p class="panel-section-hint">Contactos globales fuera del equipo directo</p>
         <div class="truora-chips">
           @for (contact of truoraContacts; track contact.name) {
             <button class="truora-chip" (click)="insertTruoraContact(contact.name)">
-              <span class="truora-chip__icon">🏢</span>
+              <span class="truora-chip__icon"></span>
               <span class="truora-chip__name">{{ contact.name }}</span>
               <span class="truora-chip__label">{{ contact.label }}</span>
             </button>
