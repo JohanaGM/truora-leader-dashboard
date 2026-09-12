@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, delay, of, throwError } from 'rxjs';
+import { Observable, delay, of, throwError, catchError } from 'rxjs';
 import { Tip, TipGenerationRequest, TipTelegramPayload } from '../models';
 import { environment } from '../../../environments/environment';
 
@@ -169,6 +169,19 @@ export class TipService {
     };
 
     return this.http.post(environment.n8nWebhookUrl, payload);
+  }
+
+  /** Busca tips generados en n8n a partir de un término de búsqueda libre. */
+  buscarTips(termino: string): Observable<any[]> {
+    return this.http.post<any[]>(environment.n8nBuscarTipsUrl, { termino }).pipe(
+      catchError(err => {
+        const prodUrl = 'https://n8n.zapsign.com.br/webhook/buscar_tips';
+        if (environment.n8nBuscarTipsUrl !== prodUrl) {
+          return this.http.post<any[]>(prodUrl, { termino });
+        }
+        return throwError(() => err);
+      })
+    );
   }
 
   private base64ToBlob(base64: string, contentType: string = ''): Blob {

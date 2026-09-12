@@ -24,15 +24,14 @@ export class DashboardComponent implements OnInit {
   tipsSearch = signal('');
   selectedTip = signal<Tip | null>(null);
 
+  // ---- Búsqueda remota de "Tips generados" (POST a webhook n8n) ----
+  isSearchingTips = signal(false);
+  tipsSearchError = signal<string | null>(null);
+  remoteTipsResults = signal<any[] | null>(null);
+  private searchDebounceTimer?: ReturnType<typeof setTimeout>;
+
   tips = signal<Tip[]>([]);
-  filteredTips = computed(() => {
-    const query = this.tipsSearch().trim().toLowerCase();
-    const tips = this.tips();
-    if (!query) return tips;
-    return tips.filter(tip => [tip.title, tip.topic, tip.description, tip.category]
-      .filter(Boolean)
-      .some(value => value!.toLowerCase().includes(query)));
-  });
+  filteredTips = computed(() => this.remoteTipsResults() ?? this.tips());
 
   // ---- Computed stats (datos reales) ----
   statsActivitiesToday = computed(() => {
@@ -100,13 +99,94 @@ export class DashboardComponent implements OnInit {
   openTipsSearch(): void {
     this.tips.set(this.tipService.getTips());
     this.tipsSearch.set('');
+    this.remoteTipsResults.set(null);
+    this.tipsSearchError.set(null);
     this.selectedTip.set(null);
     this.tipsDialogOpen.set(true);
+    this.buscarTipsRemote();
   }
 
   closeTipsSearch(): void {
+    clearTimeout(this.searchDebounceTimer);
     this.tipsDialogOpen.set(false);
     this.selectedTip.set(null);
+  }
+
+  /** Actualiza el término de búsqueda y dispara la búsqueda remota con debounce. */
+  onTipsSearchInput(value: string): void {
+    this.tipsSearch.set(value);
+    this.tipsSearchError.set(null);
+    clearTimeout(this.searchDebounceTimer);
+    this.searchDebounceTimer = setTimeout(() => this.buscarTipsRemote(), 400);
+  }
+
+  /** Ejecuta la búsqueda de "Tips generados" (tips cargados en Drive) contra el webhook de n8n. */
+  buscarTipsRemote(): void {
+    const termino = this.tipsSearch().trim();
+
+    this.isSearchingTips.set(true);
+    this.tipsSearchError.set(null);
+
+    this.tipService.buscarTips(termino).subscribe({
+      next: (results) => {
+        const normalized = this.normalizeTips(results);
+        this.remoteTipsResults.set(normalized);
+        this.isSearchingTips.set(false);
+      },
+      error: () => {
+        // Sin conexión con n8n: se muestra la biblioteca local como respaldo.
+        this.remoteTipsResults.set(this.tips());
+        this.tipsSearchError.set('No fue posible conectar con la biblioteca de Drive. Mostrando tips guardados localmente.');
+        this.isSearchingTips.set(false);
+      }
+    });
+  }
+
+  private normalizeTips(response: any): Tip[] {
+    if (!response) return [];
+
+    let rawList: any[] = [];
+    if (Array.isArray(response)) {
+      rawList = response;
+    } else if (response.tips && Array.isArray(response.tips)) {
+      rawList = response.tips;
+    } else if (response.data && Array.isArray(response.data)) {
+      rawList = response.data;
+    } else if (response.items && Array.isArray(response.items)) {
+      rawList = response.items;
+    } else if (response.files && Array.isArray(response.files)) {
+      rawList = response.files;
+    } else if (typeof response === 'object') {
+      rawList = [response];
+    }
+
+    return rawList.map((item, index) => {
+      const data = item.json || item.data || item;
+      const id = data.id || data.fileId || `tip_${Date.now()}_${index}`;
+      const title = data.title || data.titulo || data.texto || data.name || data.nombre || 'Tip generado';
+      const topic = data.topic || data.tema || data.description || data.descripcion || data.contenido || data.content || '';
+      const description = data.description || data.descripcion || topic;
+      const category = data.category || data.categoria || data.tipo || 'Tip';
+      const url = data.url || data.webViewLink || data.webContentLink || data.link || '';
+      const imageData = data.imageData || data.image || data.imagen || data.thumbnailLink || data.thumbnailUrl || (data.mimeType?.startsWith('image/') ? data.webContentLink : '');
+      const leaderName = data.leaderName || data.lider || data.author || '';
+      const createdAt = data.createdAt || data.createdTime || data.fecha || data.timestamp
+        ? new Date(data.createdAt || data.createdTime || data.fecha || data.timestamp)
+        : new Date();
+
+      return {
+        id,
+        title,
+        topic,
+        description,
+        category,
+        url,
+        imageData,
+        leaderName,
+        createdAt,
+        sentToTelegram: true
+      } as Tip;
+    });
   }
 
   showTip(tip: Tip): void {

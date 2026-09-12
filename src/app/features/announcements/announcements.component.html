@@ -110,29 +110,43 @@
 
       </div><!-- /editor-card__body -->
 
-      <!-- Pie: alertas y Drive badge -->
-      @if (fileError() || detectedDriveUrl() || showSuccess() || errorMessage()) {
+      <!-- Adjuntar enlace / archivo: campos estructurados enviados al webhook -->
+      <div class="link-attach-section">
+        <h3 class="link-attach-section__title">Adjuntar enlace / archivo</h3>
+        <div class="link-attach-section__row">
+          <div class="link-attach-field">
+            <label class="link-attach-field__label" for="linkTexto">Texto del enlace</label>
+            <input
+              id="linkTexto"
+              type="text"
+              class="link-attach-field__input"
+              [value]="linkTexto()"
+              (input)="linkTexto.set($any($event.target).value)"
+              placeholder="Descargar Documento PDF"
+              [disabled]="isSending()"
+            />
+          </div>
+          <div class="link-attach-field">
+            <label class="link-attach-field__label" for="linkUrl">URL del enlace</label>
+            <input
+              id="linkUrl"
+              type="url"
+              class="link-attach-field__input"
+              [value]="linkUrl()"
+              (input)="linkUrl.set($any($event.target).value)"
+              placeholder="https://miservidor.com/archivo.pdf"
+              [disabled]="isSending()"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Pie: alertas -->
+      @if (fileError() || showSuccess() || errorMessage()) {
         <div class="editor-card__footer">
 
           @if (fileError()) {
             <div class="alert alert-error">{{ fileError() }}</div>
-          }
-
-          @if (detectedDriveUrl()) {
-            <div class="drive-badge">
-              <span>🔗</span>
-              <span>Archivo de Drive detectado</span>
-            </div>
-            <div class="drive-alias-group">
-              <label class="drive-alias-label">Texto del enlace</label>
-              <input
-                type="text"
-                class="drive-alias-input"
-                [value]="driveAlias()"
-                (input)="driveAlias.set($any($event.target).value)"
-                placeholder="Clic para ver archivo"
-              />
-            </div>
           }
 
           @if (showSuccess()) {

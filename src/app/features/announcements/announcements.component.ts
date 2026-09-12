@@ -26,16 +26,14 @@ export class AnnouncementsComponent {
   isSending = signal(false);
   showSuccess = signal(false);
   errorMessage = signal<string | null>(null);
-  detectedDriveUrl = signal<string | null>(null);
-  driveAlias = signal('Clic para ver archivo');
+  linkTexto = signal('');
+  linkUrl = signal('');
 
   // ── Image upload state ────────────────────────────────────────────────────
   selectedFile = signal<File | null>(null);
   previewUrl = signal<string | null>(null);
   isDragOver = signal(false);
   fileError = signal<string | null>(null);
-
-  private readonly DRIVE_REGEX = /https?:\/\/drive\.google\.com\/\S+/;
 
   /** Contacto global Truora — separado visualmente de los analistas del equipo */
   truoraContacts = [
@@ -65,14 +63,10 @@ export class AnnouncementsComponent {
   onTextareaInput(value: string) {
     this.reminder.set(value);
     this.messageTemplate?.clearActiveTemplate();
-    const match = value.match(this.DRIVE_REGEX);
-    this.detectedDriveUrl.set(match ? match[0] : null);
   }
 
   onMessageSelected(message: string) {
     this.reminder.set(message);
-    const match = message.match(this.DRIVE_REGEX);
-    this.detectedDriveUrl.set(match ? match[0] : null);
   }
 
   onMentionAction(event: { name: string; checked: boolean }) {
@@ -180,14 +174,9 @@ export class AnnouncementsComponent {
     this.errorMessage.set(null);
     this.showSuccess.set(false);
 
-    let texto = this.reminder();
-    const url = this.detectedDriveUrl();
-    if (url) {
-      const alias = this.driveAlias().trim() || 'Clic para ver archivo';
-      texto = texto.replace(url, '').replace(/[ \t]+$/gm, '').trimEnd();
-      texto = texto + `\n[${alias}](${url})`;
-    }
-
+    const mensaje   = this.reminder();
+    const linkTexto = this.linkTexto().trim();
+    const linkUrl   = this.linkUrl().trim();
     const analistas = this.activeAnalistas;
     const tags      = this.activeTags;
     const file      = this.selectedFile();
@@ -196,7 +185,9 @@ export class AnnouncementsComponent {
       // ── Escenario B: texto + imagen → multipart/form-data ─────────────────
       const formData = new FormData();
       formData.append('file', file, file.name);
-      formData.append('texto', texto);
+      formData.append('mensaje', mensaje);
+      formData.append('link_texto', linkTexto);
+      formData.append('link_url', linkUrl);
       formData.append('analistas', JSON.stringify(analistas));
       formData.append('tags', JSON.stringify(tags));
 
@@ -213,7 +204,7 @@ export class AnnouncementsComponent {
         });
     } else {
       // ── Escenario A: solo texto → JSON ────────────────────────────────────
-      const payload = { texto, analistas, tags };
+      const payload = { mensaje, link_texto: linkTexto, link_url: linkUrl, analistas, tags };
 
       this.http.post(environment.n8nWebhookUrl, payload)
         .subscribe({
@@ -234,8 +225,8 @@ export class AnnouncementsComponent {
     this.isSending.set(false);
     setTimeout(() => {
       this.reminder.set('');
-      this.detectedDriveUrl.set(null);
-      this.driveAlias.set('Clic para ver archivo');
+      this.linkTexto.set('');
+      this.linkUrl.set('');
       this.showSuccess.set(false);
       this.removeFile();
     }, 2000);

@@ -379,44 +379,65 @@
 
 
 
-// ── Drive badge ──────────────────────────────────────────────────────────────
+// ── Adjuntar enlace / archivo (campos estructurados) ─────────────────────────
 
-.drive-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: #eef4ff;
-  border: 1.5px solid #a3bffa;
-  color: #3c5ec4;
-  border-radius: 20px;
-  padding: 0.3rem 0.9rem;
-  font-size: 0.82rem;
-  font-weight: 600;
+.link-attach-section {
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid #e8edf3;
+
+  &__title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #4a5568;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 0.85rem 0;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+    }
+  }
 }
 
-.drive-alias-group {
+.link-attach-field {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
 
-  .drive-alias-label {
+  &__label {
     font-size: 0.8rem;
     font-weight: 600;
     color: #4a5568;
   }
 
-  .drive-alias-input {
-    padding: 0.45rem 0.85rem;
-    border: 1.5px solid #a3bffa;
+  &__input {
+    padding: 0.55rem 0.85rem;
+    border: 1.5px solid #e2e8f0;
     border-radius: 8px;
     font-size: 0.875rem;
+    font-family: inherit;
     color: #2d3748;
     background: #f7fafc;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &::placeholder { color: #a0aec0; }
 
     &:focus {
       outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+      border-color: #3C1AE9;
+      box-shadow: 0 0 0 3px rgba(60, 26, 233, 0.12);
+      background: #ffffff;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
   }
 }
@@ -613,24 +634,27 @@
     &__size { color: #475569; }
   }
 
-  // ── Drive / alerts ──
-  .drive-badge {
-    background: rgba(30, 36, 51, 0.9);
-    border-color: #2d3748;
-    color: #93c5fd;
+  // ── Adjuntar enlace / archivo ──
+  .link-attach-section {
+    border-top-color: rgba(255, 255, 255, 0.06);
+
+    &__title { color: #94a3b8; }
   }
 
-  .drive-alias-group {
-    .drive-alias-label { color: #94a3b8; }
+  .link-attach-field {
+    &__label { color: #94a3b8; }
 
-    .drive-alias-input {
+    &__input {
       background: #1e2433;
       border-color: #2d3748;
       color: #e2e8f0;
 
+      &::placeholder { color: #4a5568; }
+
       &:focus {
         border-color: #667eea;
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        background: #1a1f2e;
       }
     }
   }

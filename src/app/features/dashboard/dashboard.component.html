@@ -87,28 +87,39 @@
         <label class="tips-search-label" for="tips-search">Buscar por título, contenido o categoría</label>
         <input id="tips-search" class="tips-search-input" type="search"
           placeholder="Busca un tip..." [value]="tipsSearch()"
-          (input)="tipsSearch.set($any($event.target).value)" />
+          (input)="onTipsSearchInput($any($event.target).value)" />
 
-        @if (filteredTips().length > 0) {
-          <div class="tips-result-grid">
-            @for (tip of filteredTips(); track tip.id) {
-              <article class="tip-result-card">
-                @if (tip.imageData) { <img [src]="tip.imageData" [alt]="tip.title" class="tip-result-image" /> }
-                <div class="tip-result-body">
-                  <span class="tip-result-category">{{ tip.category || 'Tip' }}</span>
-                  <h3>{{ tip.title }}</h3>
-                  <p>{{ tip.description || tip.topic }}</p>
-                  <button type="button" class="tip-result-action" (click)="showTip(tip)">Ver completo</button>
-                </div>
-              </article>
-            }
+        @if (isSearchingTips()) {
+          <div class="tips-loading-state">
+            <span class="tips-loading-spinner" aria-hidden="true"></span>
+            <span>Buscando tips...</span>
           </div>
         } @else {
-          <div class="tips-empty-state">
-            <span aria-hidden="true">⌕</span>
-            <h3>No encontramos tips</h3>
-            <p>Prueba con otro título, contenido o categoría.</p>
-          </div>
+          @if (tipsSearchError()) {
+            <div class="tips-alert-warning">{{ tipsSearchError() }}</div>
+          }
+
+          @if (filteredTips().length > 0) {
+            <div class="tips-result-grid">
+              @for (tip of filteredTips(); track tip.id) {
+                <article class="tip-result-card">
+                  @if (tip.imageData) { <img [src]="tip.imageData" [alt]="tip.title" class="tip-result-image" /> }
+                  <div class="tip-result-body">
+                    <span class="tip-result-category">{{ tip.category || 'Tip' }}</span>
+                    <h3>{{ tip.title }}</h3>
+                    <p>{{ tip.description || tip.topic }}</p>
+                    <button type="button" class="tip-result-action" (click)="showTip(tip)">Ver completo</button>
+                  </div>
+                </article>
+              }
+            </div>
+          } @else {
+            <div class="tips-empty-state">
+              <span aria-hidden="true">⌕</span>
+              <h3>No encontramos tips</h3>
+              <p>Prueba con otro título, contenido o categoría.</p>
+            </div>
+          }
         }
       } @else {
         <div class="tip-detail">

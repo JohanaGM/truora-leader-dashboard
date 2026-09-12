@@ -957,6 +957,35 @@
   p { margin: 0; font-size: $font-size-sm; }
 }
 
+.tips-alert-warning {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: #fdefe4;
+  border: 1px solid #f5ac75;
+  border-radius: $radius-md;
+  color: #b05011;
+  font-size: $font-size-sm;
+}
+
+.tips-loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 3rem 1rem;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+}
+
+.tips-loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(60, 26, 233, 0.15);
+  border-top-color: $brand-color;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
 .tip-detail {
   max-width: 700px;
   margin: 0 auto;
@@ -994,7 +1023,10 @@
   .tips-search-label,
   .tip-result-body p,
   .tip-detail p,
-  .tips-empty-state { color: #b8c0d4; }
+  .tips-empty-state,
+  .tips-loading-state { color: #b8c0d4; }
+  .tips-loading-spinner { border-color: rgba(255, 255, 255, 0.15); border-top-color: #818CF8; }
+  .tips-alert-warning { background: rgba(238, 121, 47, 0.14); border-color: rgba(245, 172, 117, 0.42); color: #f5ac75; }
   .tips-search-input { background: #252b3b; border-color: #3d4a63; color: #f1f5f9; &:focus { background: #1a1f2e; } }
   .tips-modal-close { background: #252b3b; border-color: #3d4a63; color: #e2e8f0; }
   .tip-result-card { background: #1e2433; border-color: #3d4a63; }
