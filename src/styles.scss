@@ -67,25 +67,25 @@ button, input, select, textarea {
 }
 
 .btn-primary {
-  background: #EE792F;
-  border-color: #EE792F;
+  background: #3C1AE9;
+  border-color: #3C1AE9;
   color: #FFFFFF;
 
   &:hover:not(:disabled) {
-    background: #D96518;
-    border-color: #D96518;
+    background: #3114C4;
+    border-color: #3114C4;
   }
 }
 
 .btn-secondary {
   background: transparent;
-  border-color: #EE792F;
-  color: #EE792F;
+  border-color: #3C1AE9;
+  color: #3C1AE9;
 
   &:hover:not(:disabled) {
-    background: rgba(238, 121, 47, 0.08);
-    border-color: #D96518;
-    color: #D96518;
+    background: rgba(60, 26, 233, 0.08);
+    border-color: #3114C4;
+    color: #3114C4;
   }
 }
 
@@ -183,24 +183,24 @@ body.dark-theme {
   }
 
   .btn-primary {
-    background: #EE792F !important;
-    border-color: #EE792F !important;
+    background: #4F26EC !important;
+    border-color: #4F26EC !important;
     color: #FFFFFF !important;
 
     &:hover:not(:disabled) {
-      background: #D96518 !important;
-      border-color: #D96518 !important;
+      background: #3C1AE9 !important;
+      border-color: #3C1AE9 !important;
     }
   }
 
   .btn-secondary {
     background: transparent !important;
-    color: #F28B47 !important;
-    border: 1px solid #F28B47 !important;
+    color: #818CF8 !important;
+    border: 1px solid #6366F1 !important;
 
     &:hover:not(:disabled) {
       background: rgba(255, 255, 255, 0.1) !important;
-      border-color: #F28B47 !important;
+      border-color: #818CF8 !important;
       color: #FFFFFF !important;
     }
   }

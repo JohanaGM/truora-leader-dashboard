@@ -158,9 +158,10 @@ export class TipService {
     // Quitar el prefijo 'data:image/png;base64,' del base64
     const base64Data = tip.imageData.split(',')[1] || tip.imageData;
 
-    // Enviar datos como JSON con imagen en base64 limpio
+    // Enviar datos como JSON con imagen en base64 limpio + texto del título
     const payload = {
       image: base64Data,
+      texto: tip.title,
       title: tip.title,
       topic: tip.topic,
       leaderName: tip.leaderName,

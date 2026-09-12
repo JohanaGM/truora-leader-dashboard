@@ -19,6 +19,8 @@ export interface TipGenerationRequest {
 
 export interface TipTelegramPayload {
   image: string;
+  texto: string;
+  title: string;
   topic: string;
   leaderName: string;
   timestamp: string;

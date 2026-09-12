@@ -436,31 +436,31 @@
     align-items: center;
     justify-content: center;
     background: transparent;
-    color: #EE792F;
+    color: #3C1AE9;
     padding: 0.75rem 1.25rem;
     border-radius: $radius-pill;
     font-weight: 600;
     font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.2s ease;
-    border: 1px solid #EE792F;
+    border: 1px solid #3C1AE9;
 
     :host-context(body.dark-theme) & {
       background: transparent !important;
-      color: #F28B47 !important;
-      border: 1px solid #F28B47 !important;
+      color: #818CF8 !important;
+      border: 1px solid #6366F1 !important;
     }
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);
-      background: rgba(238, 121, 47, 0.08);
-      border-color: #D96518;
-      color: #D96518;
-      box-shadow: 0 4px 12px rgba(238, 121, 47, 0.15);
+      background: rgba(60, 26, 233, 0.08);
+      border-color: #3114C4;
+      color: #3114C4;
+      box-shadow: 0 4px 12px rgba(60, 26, 233, 0.15);
 
       :host-context(body.dark-theme) & {
         background: rgba(255, 255, 255, 0.1) !important;
-        border-color: #F28B47 !important;
+        border-color: #818CF8 !important;
         color: #FFFFFF !important;
       }
     }
@@ -1090,9 +1090,9 @@
 
 .input-section .btn-generate,
 .preview-section .btn-send {
-  background: #EE792F !important;
+  background: #3C1AE9 !important;
   background-image: none !important;
-  border: 1px solid #EE792F !important;
+  border: 1px solid #3C1AE9 !important;
   border-radius: $radius-pill;
   color: #FFFFFF !important;
   font-family: $font-family-base;
@@ -1113,9 +1113,9 @@
     gap: 0.5rem;
     min-height: 44px;
     padding: 0.75rem 1.25rem;
-    border: 1px solid #D96518 !important;
+    border: 1px solid #3114C4 !important;
     border-radius: $radius-pill;
-    background: #D96518 !important;
+    background: #3114C4 !important;
     background-image: none !important;
     color: #FFFFFF !important;
     font-family: $font-family-base;
@@ -1146,9 +1146,9 @@
   justify-content: center;
   background: transparent !important;
   background-image: none !important;
-  border: 1px solid #EE792F !important;
+  border: 1px solid #3C1AE9 !important;
   border-radius: $radius-pill;
-  color: #EE792F !important;
+  color: #3C1AE9 !important;
   font-family: $font-family-base;
   font-size: $font-size-base;
   font-weight: $font-weight-medium;
@@ -1157,7 +1157,7 @@
   box-shadow: none;
   animation: none;
   text-transform: none;
-  -webkit-text-fill-color: #EE792F !important;
+  -webkit-text-fill-color: #3C1AE9 !important;
 
   &:hover:not(:disabled) {
     all: initial;
@@ -1166,11 +1166,11 @@
     justify-content: center;
     min-height: 44px;
     padding: 0.75rem 1.25rem;
-    border: 1px solid #D96518 !important;
+    border: 1px solid #3114C4 !important;
     border-radius: $radius-pill;
-    background: rgba(238, 121, 47, 0.08) !important;
+    background: rgba(60, 26, 233, 0.08) !important;
     background-image: none !important;
-    color: #D96518 !important;
+    color: #3114C4 !important;
     font-family: $font-family-base;
     font-size: $font-size-base;
     font-weight: $font-weight-medium;
@@ -1178,7 +1178,7 @@
     transform: translateY(-2px);
     box-shadow: $shadow-sm;
     text-transform: none;
-    -webkit-text-fill-color: #D96518 !important;
+    -webkit-text-fill-color: #3114C4 !important;
   }
 
   &::before,
@@ -1288,14 +1288,14 @@
 
   .input-section .btn-generate,
   .preview-section .btn-send {
-    background: #EE792F !important;
-    border-color: #EE792F !important;
+    background: #4F26EC !important;
+    border-color: #4F26EC !important;
     color: #FFFFFF !important;
     -webkit-text-fill-color: #FFFFFF !important;
 
     &:hover:not(:disabled) {
-      background: #D96518 !important;
-      border-color: #D96518 !important;
+      background: #3C1AE9 !important;
+      border-color: #3C1AE9 !important;
       color: #FFFFFF !important;
       -webkit-text-fill-color: #FFFFFF !important;
     }
@@ -1309,13 +1309,13 @@
 
   .input-section .btn-upload-image {
     background: transparent !important;
-    border: 1px solid #F28B47 !important;
-    color: #F28B47 !important;
-    -webkit-text-fill-color: #F28B47 !important;
+    border: 1px solid #6366F1 !important;
+    color: #818CF8 !important;
+    -webkit-text-fill-color: #818CF8 !important;
 
     &:hover:not(:disabled) {
       background: rgba(255, 255, 255, 0.1) !important;
-      border-color: #F28B47 !important;
+      border-color: #818CF8 !important;
       color: #FFFFFF !important;
       -webkit-text-fill-color: #FFFFFF !important;
     }

@@ -604,9 +604,9 @@
     }
 
     .btn-primary {
-      background: #EE792F;
+      background: #3C1AE9;
       color: $white;
-      border: 1px solid #EE792F;
+      border: 1px solid #3C1AE9;
       margin-left: 0;
       padding: 0.75rem 1.25rem;
       border-radius: $radius-pill;
@@ -616,8 +616,8 @@
       transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 
       &:hover:not(:disabled) {
-        background: #D96518;
-        border-color: #D96518;
+        background: #3114C4;
+        border-color: #3114C4;
         transform: translateY(-2px);
       }
 

@@ -36,6 +36,9 @@
     margin: 0 auto 1.5rem;
   }
 
+  // Tarjeta blanca (modo claro) → logo con texto oscuro; tarjeta oscura → logo con caja/texto blanco.
+  .verify-logo-dark { display: none; }
+
   h1 {
     margin: 0 0 0.75rem;
     color: $midnight-color;
@@ -150,6 +153,9 @@
     background: #0f1117;
   }
 
+  .verify-logo-light { display: none; }
+  .verify-logo-dark { display: block; }
+
   .verify-card {
     background: #1a1f2e;
     border-color: #2d3748;
@@ -166,8 +172,8 @@
 
     &:focus {
       background: #1e2433 !important;
-      border-color: #EE792F !important;
-      box-shadow: 0 0 0 3px rgba(238, 121, 47, 0.2);
+      border-color: #667eea !important;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
     }
   }
 
@@ -191,12 +197,12 @@
   }
 
   .resend-button {
-    color: #F28B47;
+    color: #818CF8;
   }
 
   .loading-state {
     color: #94a3b8;
-    .spinner { border-color: rgba(255, 255, 255, 0.15); border-top-color: #F28B47; }
+    .spinner { border-color: rgba(255, 255, 255, 0.15); border-top-color: #818CF8; }
   }
 
   .enroll-step .step-text { color: #94a3b8; }
