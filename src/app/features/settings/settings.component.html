@@ -9,7 +9,6 @@
     <!-- Perfil -->
     <div class="settings-card">
       <div class="card-header">
-        <span class="card-icon"></span>
         <h2 class="card-title">Perfil</h2>
       </div>
       <div class="form-group">
@@ -39,7 +38,6 @@
     <!-- Notificaciones -->
     <div class="settings-card">
       <div class="card-header">
-        <span class="card-icon">🔔</span>
         <h2 class="card-title">Preferencias de Notificación</h2>
       </div>
       <div class="toggle-item">
@@ -71,7 +69,6 @@
     <!-- Tema -->
     <div class="settings-card">
       <div class="card-header">
-        <span class="card-icon">🎨</span>
         <h2 class="card-title">Personalización</h2>
       </div>
       <p class="form-label" style="margin-bottom:1rem">Tema de la aplicación</p>
@@ -89,5 +86,142 @@
       </div>
     </div>
 
+    <!-- Seguridad y 2FA -->
+    <div class="settings-card mfa-card">
+      <div class="card-header">
+        <h2 class="card-title">Seguridad (2FA / MFA)</h2>
+      </div>
+      
+      <p class="form-hint" style="margin-bottom: 1rem;">
+        Protege tu cuenta de líder solicitando un código TOTP de 6 dígitos desde tu aplicación autenticadora (Google Authenticator, Authy, etc.) al iniciar sesión.
+      </p>
+
+      @if (isLoadingMFA() && !showEnrollModal()) {
+        <div class="mfa-loading-state">
+          <span class="spinner"></span>
+          <span>Cargando estado de seguridad...</span>
+        </div>
+      } @else if (mfaStatus()?.hasMFA) {
+        <div class="mfa-active-box">
+          <div class="mfa-status-badge active">
+            <span class="status-dot"></span>
+            <span>2FA Activo y Protegido</span>
+          </div>
+          <p class="mfa-active-text">
+            Tu inicio de sesión está protegido con un factor de autenticación TOTP verificado.
+          </p>
+          <button class="btn-secondary btn-disable-mfa" (click)="disable2FA()" [disabled]="isLoadingMFA()">
+            Desactivar 2FA
+          </button>
+        </div>
+      } @else {
+        <div class="mfa-inactive-box">
+          <div class="mfa-status-badge inactive">
+            <span class="status-dot"></span>
+            <span>2FA No Configurado</span>
+          </div>
+          <p class="mfa-inactive-text">
+            Se recomienda activar la autenticación de dos pasos para mayor seguridad.
+          </p>
+          <button class="btn-primary" (click)="startEnrollment()" [disabled]="isLoadingMFA()">
+            @if (isLoadingMFA()) {
+              <span class="spinner"></span>
+              <span>Generando código QR...</span>
+            } @else {
+              <span>Activar Autenticación de Dos Pasos</span>
+            }
+          </button>
+        </div>
+      }
+
+      @if (mfaSuccess() && !showEnrollModal()) {
+        <div class="alert-success mt-3">{{ mfaSuccess() }}</div>
+      }
+      @if (mfaError() && !showEnrollModal()) {
+        <div class="alert-error mt-3">{{ mfaError() }}</div>
+      }
+    </div>
+
   </div>
 </div>
+
+<!-- Modal Enrolamiento 2FA (TOTP) -->
+@if (showEnrollModal() && enrollmentData()) {
+  <div class="modal-backdrop" (click)="cancelEnrollment()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Configurar Autenticación de Dos Pasos (2FA)</h3>
+        <button class="btn-close" (click)="cancelEnrollment()" aria-label="Cerrar modal">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="enroll-step">
+          <div class="step-badge">Paso 1</div>
+          <p class="step-text">
+            Escanea el código QR con tu aplicación autenticadora (Google Authenticator, Authy, 1Password, etc.):
+          </p>
+        </div>
+
+        <div class="qr-container">
+          @if (qrCodeUrl()) {
+            <img [src]="qrCodeUrl()" alt="Código QR de activación 2FA" class="qr-image" />
+          }
+        </div>
+
+        <div class="secret-box">
+          <span class="secret-label">¿No puedes escanear el código? Ingresa esta clave manualmente:</span>
+          <div class="secret-row">
+            <code class="secret-code">{{ enrollmentData()?.secret }}</code>
+            <button class="btn-copy" (click)="copySecret()" type="button">
+              {{ copiedSecret() ? '✓ Copiado' : 'Copiar' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="enroll-step" style="margin-top: 1.5rem;">
+          <div class="step-badge">Paso 2</div>
+          <p class="step-text">
+            Ingresa el código de 6 dígitos que muestra tu aplicación autenticadora:
+          </p>
+        </div>
+
+        <div class="code-input-wrapper">
+          <input
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="6"
+            class="mfa-code-input"
+            placeholder="000000"
+            [(ngModel)]="verificationCode"
+            (keyup.enter)="confirmEnrollment()"
+            [disabled]="isVerifyingMFA()"
+            autofocus
+          />
+        </div>
+
+        @if (mfaError()) {
+          <div class="alert-error">{{ mfaError() }}</div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cancelEnrollment()" [disabled]="isVerifyingMFA()">
+          Cancelar
+        </button>
+        <button
+          class="btn-primary"
+          (click)="confirmEnrollment()"
+          [disabled]="verificationCode().trim().length !== 6 || isVerifyingMFA()"
+        >
+          @if (isVerifyingMFA()) {
+            <span class="spinner"></span>
+            <span>Verificando...</span>
+          } @else {
+            <span>Verificar y Activar</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

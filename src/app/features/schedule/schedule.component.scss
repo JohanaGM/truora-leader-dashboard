@@ -246,16 +246,16 @@
   }
 
   .btn-primary {
-    background: $cta-color;
-    color: $white;
-    border: 1px solid transparent;
+    background: #EE792F;
+    color: #FFFFFF;
+    border: 1px solid #EE792F;
     padding: 0.75rem 1.25rem;
     margin-left: 0;
     border-radius: $radius-pill;
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     white-space: nowrap;
 
     &.new-event-button {
@@ -263,7 +263,8 @@
     }
 
     &:hover:not(:disabled) {
-      background: $cta-hover;
+      background: #D96518;
+      border-color: #D96518;
       transform: translateY(-2px);
       box-shadow: $shadow-md;
     }
@@ -804,9 +805,9 @@
 }
 
 .btn-secondary {
-  background: #e2e8f0;
-  color: #2d3748;
-  border: none;
+  background: transparent;
+  color: #EE792F;
+  border: 1px solid #EE792F;
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
   font-weight: 600;
@@ -814,7 +815,9 @@
   transition: all 0.2s ease;
 
   &:hover {
-    background: #cbd5e0;
+    background: rgba(238, 121, 47, 0.08);
+    border-color: #D96518;
+    color: #D96518;
   }
 }
 
@@ -840,8 +843,16 @@
 
 // ── Dark Theme – Modal ────────────────────────────────────────────────────
 :host-context(body.dark-theme) {
-  .page-header .new-event-button {
+  .page-header .new-event-button,
+  .modal-footer .btn-primary {
+    background: #EE792F !important;
+    border-color: #EE792F !important;
     color: #ffffff !important;
+
+    &:hover:not(:disabled) {
+      background: #D96518 !important;
+      border-color: #D96518 !important;
+    }
 
     span {
       color: #ffffff !important;
@@ -1054,9 +1065,15 @@
   }
 
   .btn-secondary {
-    background: #252b3b;
-    color: #cbd5e0;
-    &:hover { background: #2d3748; }
+    background: transparent !important;
+    color: #F28B47 !important;
+    border: 1px solid #F28B47 !important;
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.1) !important;
+      border-color: #F28B47 !important;
+      color: #FFFFFF !important;
+    }
   }
 }
 

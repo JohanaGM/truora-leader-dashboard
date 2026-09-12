@@ -1,3 +1,5 @@
+@import '../../../assets/styles/variables';
+
 .settings-page {
   max-width: 900px;
   margin: 0 auto;
@@ -29,6 +31,7 @@
   border-radius: 16px;
   padding: 1.75rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 1px solid #e2e8f0;
 }
 
 .card-header {
@@ -36,7 +39,6 @@
   align-items: center;
   gap: 0.6rem;
   margin-bottom: 1.5rem;
-  .card-icon { font-size: 1.4rem; }
   .card-title {
     font-size: 1.1rem;
     font-weight: 700;
@@ -65,12 +67,12 @@
   font-size: 0.95rem;
   font-family: inherit;
   color: #2d3748;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
   &:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: $brand-color;
+    box-shadow: 0 0 0 3px rgba(60, 26, 233, 0.1);
   }
   &.disabled, &:disabled {
     background: #f7fafc;
@@ -84,19 +86,79 @@
   color: #a0aec0;
   margin-top: 0.3rem;
   display: block;
+  line-height: 1.4;
 }
 
-.btn-save {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-  border: none;
-  padding: 0.6rem 1.4rem;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 0.9rem;
+.btn-save,
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.75rem 1.25rem;
+  background: #EE792F;
+  color: #FFFFFF;
+  border: 1px solid #EE792F;
+  border-radius: $radius-pill;
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.2s;
-  &:hover { opacity: 0.9; transform: translateY(-1px); }
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: #D96518;
+    border-color: #D96518;
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #EE792F;
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    background: $border-medium;
+    border-color: $border-medium;
+    color: $text-secondary;
+    cursor: not-allowed;
+  }
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.75rem 1.25rem;
+  background: transparent;
+  color: #EE792F;
+  border: 1px solid #EE792F;
+  border-radius: $radius-pill;
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(238, 121, 47, 0.08);
+    border-color: #D96518;
+    color: #D96518;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 .alert-success {
@@ -109,7 +171,21 @@
   color: #276749;
 }
 
-// Toggle switch
+.alert-error {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.9rem;
+  background: #fff5f5;
+  border: 1px solid #feb2b2;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #c53030;
+}
+
+.mt-3 {
+  margin-top: 0.75rem;
+}
+
+// Toggle switch (Atelier solid color style)
 .toggle-item {
   display: flex;
   justify-content: space-between;
@@ -136,8 +212,8 @@
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 44px;
-  height: 24px;
+  width: 46px;
+  height: 26px;
   flex-shrink: 0;
 
   input { opacity: 0; width: 0; height: 0; }
@@ -146,24 +222,31 @@
     position: absolute;
     inset: 0;
     background: #cbd5e0;
-    border-radius: 24px;
+    border-radius: 26px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+
     &::before {
       content: '';
       position: absolute;
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       left: 3px;
       top: 3px;
-      background: #fff;
+      background: #ffffff;
       border-radius: 50%;
-      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 
+  input:focus-visible + .slider {
+    outline: 2px solid $brand-color;
+    outline-offset: 2px;
+  }
+
   input:checked + .slider {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: $brand-color;
     &::before { transform: translateX(20px); }
   }
 }
@@ -177,19 +260,456 @@
 .theme-btn {
   flex: 1;
   padding: 0.65rem 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 10px;
-  background: #f7fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: $radius-pill;
+  background: #fafbff;
   color: #4a5568;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.18s ease;
-  &:hover { border-color: #667eea; background: #eef2ff; color: #4338ca; }
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $brand-color;
+    background: rgba(60, 26, 233, 0.08);
+    color: $brand-color;
+  }
+
   &.active {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border-color: transparent;
-    color: #fff;
-    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.35);
+    background: $brand-color;
+    border-color: $brand-color;
+    color: #ffffff;
+    box-shadow: $shadow-sm;
+  }
+}
+
+// ── MFA / 2FA Card ────────────────────────────────────────────────────────
+.mfa-card {
+  .mfa-loading-state {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 0;
+    color: $text-secondary;
+    font-size: 0.9rem;
+  }
+
+  .mfa-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: $radius-pill;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    &.active {
+      background: #e6f8ef;
+      color: #0e8957;
+      .status-dot { background: #15a66a; }
+    }
+
+    &.inactive {
+      background: #f7fafc;
+      color: #718096;
+      border: 1px solid #e2e8f0;
+      .status-dot { background: #a0aec0; }
+    }
+  }
+
+  .mfa-active-text,
+  .mfa-inactive-text {
+    font-size: 0.88rem;
+    color: #4a5568;
+    line-height: 1.5;
+    margin-bottom: 1.25rem;
+  }
+
+  .btn-disable-mfa {
+    font-size: 0.88rem;
+    padding: 0.5rem 1rem;
+    min-height: 38px;
+  }
+}
+
+// ── Spinner ───────────────────────────────────────────────────────────────
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── 2FA Enrollment Modal ──────────────────────────────────────────────────
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(1, 2, 46, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+
+  h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #2d3748;
+  }
+
+  .btn-close {
+    background: transparent;
+    border: none;
+    font-size: 1.1rem;
+    color: #718096;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover { background: #f7fafc; color: #2d3748; }
+  }
+}
+
+.modal-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.enroll-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+
+  .step-badge {
+    background: $brand-color;
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  .step-text {
+    margin: 0;
+    font-size: 0.88rem;
+    color: #4a5568;
+    line-height: 1.45;
+  }
+}
+
+.qr-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 190px;
+  padding: 1rem;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+
+  .qr-image {
+    width: 190px;
+    height: 190px;
+    display: block;
+  }
+}
+
+.secret-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+
+  .secret-label {
+    display: block;
+    font-size: 0.74rem;
+    color: #718096;
+    margin-bottom: 0.4rem;
+  }
+
+  .secret-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .secret-code {
+    font-family: $font-family-mono;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: $brand-color;
+    word-break: break-all;
+  }
+
+  .btn-copy {
+    background: #ffffff;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #4a5568;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+
+    &:hover {
+      border-color: $brand-color;
+      color: $brand-color;
+    }
+  }
+}
+
+.code-input-wrapper {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+
+  .mfa-code-input {
+    width: 100%;
+    text-align: center;
+    font-family: $font-family-mono;
+    font-size: 1.5rem;
+    letter-spacing: 0.35em;
+    font-weight: 700;
+    padding: 0.65rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+
+    &:focus {
+      border-color: #EE792F;
+      box-shadow: 0 0 0 3px rgba(238, 121, 47, 0.15);
+    }
+  }
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+// ── Dark Theme ────────────────────────────────────────────────────────────
+:host-context(body.dark-theme) {
+  .page-title { color: #f1f5f9; }
+  .page-subtitle { color: #64748b; }
+
+  .settings-card {
+    background: #1a1f2e;
+    border-color: #2d3748;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  .card-title { color: #f1f5f9; }
+  .form-label, .toggle-label { color: #cbd5e0; }
+  .form-hint, .toggle-desc { color: #94a3b8; }
+
+  .form-input {
+    background: #252b3b;
+    border-color: #2d3748;
+    color: #e2e8f0;
+
+    &:focus {
+      border-color: #EE792F;
+      box-shadow: 0 0 0 3px rgba(238, 121, 47, 0.2);
+    }
+
+    &.disabled, &:disabled {
+      background: #1e2433;
+      color: #64748b;
+    }
+  }
+
+  .btn-save,
+  .btn-primary {
+    background: #EE792F !important;
+    border-color: #EE792F !important;
+    color: #ffffff !important;
+
+    &:hover:not(:disabled) {
+      background: #D96518 !important;
+      border-color: #D96518 !important;
+    }
+  }
+
+  .btn-secondary {
+    background: transparent !important;
+    border-color: #F28B47 !important;
+    color: #F28B47 !important;
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.1) !important;
+      border-color: #F28B47 !important;
+      color: #ffffff !important;
+    }
+  }
+
+  .alert-success {
+    background: rgba(72, 187, 120, 0.1);
+    color: #68d391;
+    border-color: #276749;
+  }
+
+  .alert-error {
+    background: rgba(245, 101, 101, 0.1);
+    color: #fc8181;
+    border-color: #c53030;
+  }
+
+  .toggle-item {
+    border-bottom-color: #2d3748;
+  }
+
+  .toggle-switch {
+    .slider {
+      background: #2d3748;
+    }
+
+    input:focus-visible + .slider {
+      outline-color: #818CF8;
+    }
+
+    input:checked + .slider {
+      background: #4F26EC;
+    }
+  }
+
+  .theme-btn {
+    background: #252b3b;
+    border-color: #2d3748;
+    color: #cbd5e0;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #818CF8;
+      color: #ffffff;
+    }
+
+    &.active {
+      background: #4F26EC;
+      border-color: #4F26EC;
+      color: #ffffff;
+    }
+  }
+
+  .mfa-card {
+    .mfa-active-text,
+    .mfa-inactive-text { color: #cbd5e0; }
+
+    .mfa-status-badge {
+      &.active {
+        background: rgba(21, 166, 106, 0.18);
+        color: #7ee2b1;
+        .status-dot { background: #7ee2b1; }
+      }
+
+      &.inactive {
+        background: #252b3b;
+        border-color: #2d3748;
+        color: #94a3b8;
+        .status-dot { background: #64748b; }
+      }
+    }
+  }
+
+  .modal-content {
+    background: #1a1f2e;
+    color: #e2e8f0;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  }
+
+  .modal-header {
+    border-bottom-color: #2d3748;
+    h3 { color: #f1f5f9; }
+    .btn-close {
+      color: #94a3b8;
+      &:hover { background: #252b3b; color: #f1f5f9; }
+    }
+  }
+
+  .enroll-step .step-text { color: #cbd5e0; }
+
+  .qr-container {
+    background: #ffffff; // Keep QR code background white for high contrast scanner reading
+    border-color: #2d3748;
+  }
+
+  .secret-box {
+    background: #252b3b;
+    border-color: #2d3748;
+    .secret-label { color: #94a3b8; }
+    .secret-code { color: #9BD2F3; }
+    .btn-copy {
+      background: #1e2433;
+      border-color: #3d4a63;
+      color: #cbd5e0;
+      &:hover { border-color: #9BD2F3; color: #9BD2F3; }
+    }
+  }
+
+  .code-input-wrapper .mfa-code-input {
+    background: #252b3b;
+    border-color: #2d3748;
+    color: #f1f5f9;
+    &:focus {
+      background: #1e2433;
+      border-color: #EE792F;
+      box-shadow: 0 0 0 3px rgba(238, 121, 47, 0.25);
+    }
+  }
+
+  .modal-footer {
+    border-top-color: #2d3748;
   }
 }

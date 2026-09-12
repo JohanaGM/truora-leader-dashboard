@@ -310,9 +310,9 @@
   gap: 0.5rem;
   min-height: 44px;
   padding: 0.75rem 1.25rem;
-  background: $cta-color;
+  background: #EE792F;
   color: $white;
-  border: 1px solid $cta-color;
+  border: 1px solid #EE792F;
   border-radius: $radius-pill;
   font-size: $font-size-base;
   font-weight: $font-weight-medium;
@@ -323,8 +323,8 @@
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
-    background: $cta-hover;
-    border-color: $cta-hover;
+    background: #D96518;
+    border-color: #D96518;
     box-shadow: $shadow-md;
   }
 
@@ -333,7 +333,7 @@
   }
 
   &:focus-visible {
-    outline: 2px solid $brand-color;
+    outline: 2px solid #EE792F;
     outline-offset: 2px;
   }
 
@@ -371,6 +371,20 @@
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+// ---- Dark Theme ----
+:host-context(body.dark-theme) {
+  .btn-primary {
+    background: #EE792F !important;
+    border-color: #EE792F !important;
+    color: #FFFFFF !important;
+
+    &:hover:not(:disabled) {
+      background: #D96518 !important;
+      border-color: #D96518 !important;
+    }
+  }
 }
 
 // ---- Responsive ----

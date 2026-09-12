@@ -104,7 +104,7 @@
     &::placeholder { color: #a0aec0 !important; }
     &:focus {
       background: #ffffff !important;
-      border-color: #667eea !important;
+      border-color: #EE792F !important;
     }
   }
 
@@ -114,7 +114,8 @@
 
   // Cancelar dark-theme en el botón de login
   .btn-login {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    background: #EE792F !important;
+    border: 1px solid #EE792F !important;
     color: #ffffff !important;
   }
 
@@ -466,37 +467,24 @@
   font-weight: $font-weight-bold;
   font-family: $font-family-base;
   color: $white;
-  background: linear-gradient(135deg, $primary-gradient-start 0%, $primary-gradient-end 100%);
-  border: none;
+  background: #EE792F !important;
+  border: 1px solid #EE792F !important;
   border-radius: $radius-md;
   cursor: pointer;
-  box-shadow: 
-    $shadow-md,
-    0 4px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: $shadow-md;
   transition: all $transition-base;
   position: relative;
   overflow: hidden;
 
   &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transition: left 0.5s ease;
+    display: none;
   }
 
   &:hover:not(:disabled) {
+    background: #D96518 !important;
+    border-color: #D96518 !important;
     transform: translateY(-2px);
-    box-shadow: 
-      $shadow-lg,
-      0 8px 30px rgba(102, 126, 234, 0.5);
-
-    &::before {
-      left: 100%;
-    }
+    box-shadow: $shadow-lg;
   }
 
   &:active:not(:disabled) {
@@ -646,8 +634,8 @@
   .checkbox-label { color: $midnight-color !important; }
 
   .btn-login {
-    background: $cta-color !important;
-    border: 1px solid $cta-color;
+    background: #EE792F !important;
+    border: 1px solid #EE792F !important;
     border-radius: $radius-pill;
     box-shadow: $shadow-md;
     color: $white !important;
@@ -658,8 +646,8 @@
     transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 
     &:hover:not(:disabled) {
-      background: $cta-hover !important;
-      border-color: $cta-hover;
+      background: #D96518 !important;
+      border-color: #D96518 !important;
       box-shadow: $shadow-lg;
       transform: translateY(-2px);
     }

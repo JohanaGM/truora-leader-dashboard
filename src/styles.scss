@@ -67,23 +67,25 @@ button, input, select, textarea {
 }
 
 .btn-primary {
-  background: $cta-color;
-  color: $white;
+  background: #EE792F;
+  border-color: #EE792F;
+  color: #FFFFFF;
 
   &:hover:not(:disabled) {
-    background: $cta-hover;
+    background: #D96518;
+    border-color: #D96518;
   }
 }
 
 .btn-secondary {
-  background: $white;
-  border-color: $brand-color;
-  color: $brand-color;
+  background: transparent;
+  border-color: #EE792F;
+  color: #EE792F;
 
   &:hover:not(:disabled) {
-    background: $brand-subtle;
-    border-color: $brand-hover;
-    color: $brand-hover;
+    background: rgba(238, 121, 47, 0.08);
+    border-color: #D96518;
+    color: #D96518;
   }
 }
 
@@ -180,10 +182,27 @@ body.dark-theme {
     &:hover { background: #2d3748 !important; }
   }
 
+  .btn-primary {
+    background: #EE792F !important;
+    border-color: #EE792F !important;
+    color: #FFFFFF !important;
+
+    &:hover:not(:disabled) {
+      background: #D96518 !important;
+      border-color: #D96518 !important;
+    }
+  }
+
   .btn-secondary {
-    background: #252b3b !important;
-    color: #a0aec0 !important;
-    border-color: #2d3748 !important;
+    background: transparent !important;
+    color: #F28B47 !important;
+    border: 1px solid #F28B47 !important;
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.1) !important;
+      border-color: #F28B47 !important;
+      color: #FFFFFF !important;
+    }
   }
 
   // Recommendations box (tip-generator)

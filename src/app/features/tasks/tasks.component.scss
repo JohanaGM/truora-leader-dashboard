@@ -26,28 +26,23 @@
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #EE792F;
     color: #ffffff;
-    border: 4px solid transparent;
-    background-image: 
-      linear-gradient(135deg, #667eea 0%, #764ba2 100%),
-      linear-gradient(90deg, #667eea, #764ba2, #ff6b9d, #667eea);
-    background-origin: border-box;
-    background-clip: padding-box, border-box;
-    background-size: 100%, 400% 100%;
+    border: 1px solid #EE792F;
     margin-left: 0;
-    padding: 0.5rem 1rem;
-    border-radius: 12px;
+    padding: 0.75rem 1.25rem;
+    border-radius: $radius-pill;
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     white-space: nowrap;
-    animation: borderShift 4s linear infinite;
 
-    &:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+    &:hover:not(:disabled) {
+      background: #D96518;
+      border-color: #D96518;
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
     }
   }
 }
@@ -488,9 +483,9 @@
 }
 
 .btn-secondary {
-  background: #e2e8f0;
-  color: #2d3748;
-  border: none;
+  background: transparent;
+  color: #EE792F;
+  border: 1px solid #EE792F;
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
   font-weight: 600;
@@ -498,7 +493,9 @@
   transition: all 0.2s ease;
 
   &:hover {
-    background: #cbd5e0;
+    background: rgba(238, 121, 47, 0.08);
+    border-color: #D96518;
+    color: #D96518;
   }
 }
 
@@ -625,9 +622,26 @@
     &.high   { border-color: #f44336; color: #fca5a5; &:hover, &.active { background: #f44336 !important; color: #fff; } }
   }
 
+  .btn-primary {
+    background: #EE792F !important;
+    border-color: #EE792F !important;
+    color: #FFFFFF !important;
+
+    &:hover:not(:disabled) {
+      background: #D96518 !important;
+      border-color: #D96518 !important;
+    }
+  }
+
   .btn-secondary {
-    background: #252b3b;
-    color: #cbd5e0;
-    &:hover { background: #2d3748; }
+    background: transparent !important;
+    color: #F28B47 !important;
+    border: 1px solid #F28B47 !important;
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.1) !important;
+      border-color: #F28B47 !important;
+      color: #FFFFFF !important;
+    }
   }
 }

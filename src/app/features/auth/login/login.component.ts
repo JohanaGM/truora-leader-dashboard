@@ -50,6 +50,8 @@ export class LoginComponent {
     this.isLoading.set(false);
 
     if (result.success) {
+      // El 2FA siempre es obligatorio: la propia pantalla decide si toca
+      // enrolar un nuevo factor o verificar uno ya existente.
       this.router.navigate(['/verify-2fa']);
     } else {
       this.errorMessage.set(result.error || 'Error al iniciar sesión');

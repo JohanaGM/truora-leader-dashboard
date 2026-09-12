@@ -16,6 +16,22 @@ export interface Leader {
   last_login?: string;
 }
 
+export interface TOTPEnrollment {
+  factorId: string;
+  qrCode: string;
+  secret: string;
+  uri?: string;
+}
+
+export interface MFAStatus {
+  hasMFA: boolean;
+  verifiedFactor: any | null;
+  factors: any[];
+  currentLevel?: string;
+  nextLevel?: string;
+  error?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -24,6 +40,7 @@ export class AuthService {
   private readonly twoFactorVerifiedKey = 'truora_2fa_verified';
   private readonly twoFactorUserKey = 'truora_2fa_user';
   private readonly twoFactorChallengeKey = 'truora_2fa_challenge';
+  private readonly twoFactorFactorIdKey = 'truora_2fa_factor_id';
   private supabase: SupabaseClient;
   private router = inject(Router);
   
@@ -89,7 +106,12 @@ export class AuthService {
   }
 
   // Login con email y password
-  async login(email: string, password: string): Promise<{ success: boolean; error?: string }> {
+  async login(email: string, password: string): Promise<{
+    success: boolean;
+    requiresMFA?: boolean;
+    factorId?: string;
+    error?: string;
+  }> {
     try {
       const { data, error } = await this.supabase.auth.signInWithPassword({
         email,
@@ -124,13 +146,27 @@ export class AuthService {
           .update({ last_login: new Date().toISOString() })
           .eq('id', leader.id);
 
+        // Verificar si el usuario tiene un factor TOTP activo (AAL2)
+        const mfaStatus = await this.checkMFAStatus();
+
+        // El 2FA es obligatorio: siempre queda "pendiente" hasta completar el
+        // reto (si ya tiene factor verificado) o el enrolamiento (si no tiene).
         sessionStorage.setItem(this.twoFactorPendingKey, 'true');
         sessionStorage.setItem(this.twoFactorUserKey, data.user.id);
         sessionStorage.removeItem(this.twoFactorVerifiedKey);
         sessionStorage.removeItem(this.twoFactorChallengeKey);
-        await this.resendTwoFactorCode();
 
-        return { success: true };
+        if (mfaStatus.hasMFA && mfaStatus.verifiedFactor) {
+          sessionStorage.setItem(this.twoFactorFactorIdKey, mfaStatus.verifiedFactor.id);
+        } else {
+          sessionStorage.removeItem(this.twoFactorFactorIdKey);
+        }
+
+        return {
+          success: true,
+          requiresMFA: true,
+          factorId: mfaStatus.verifiedFactor?.id
+        };
       }
 
       return { success: false, error: 'No se pudo iniciar sesión' };
@@ -138,6 +174,216 @@ export class AuthService {
       return { 
         success: false, 
         error: this.getErrorMessage(error.message) 
+      };
+    }
+  }
+
+  // ==========================================
+  // MFA / 2FA TOTP Methods (Supabase Auth)
+  // ==========================================
+
+  /**
+   * 1. Inicia el enrolamiento de un factor TOTP
+   * Retorna el factorId, código QR (SVG/URI) y clave secreta
+   */
+  async enrollTOTP(): Promise<{
+    success: boolean;
+    data?: TOTPEnrollment;
+    error?: string;
+  }> {
+    try {
+      const user = this.getCurrentUser();
+      const email = user?.email || 'usuario@truora.com';
+
+      const { data, error } = await this.supabase.auth.mfa.enroll({
+        factorType: 'totp',
+        issuer: 'Truora Leader Dashboard',
+        friendlyName: email
+      });
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        data: {
+          factorId: data.id,
+          qrCode: data.totp.qr_code,
+          secret: data.totp.secret,
+          uri: data.totp.uri
+        }
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || 'No fue posible iniciar el registro de 2FA.'
+      };
+    }
+  }
+
+  /**
+   * 2. Verifica el factor recién enrolado para activarlo definitivamente
+   */
+  async verifyEnrolledFactor(factorId: string, code: string): Promise<{ success: boolean; error?: string }> {
+    if (!/^\d{6}$/.test(code)) {
+      return { success: false, error: 'Ingresa un código de 6 dígitos numéricos.' };
+    }
+
+    try {
+      const { data: challengeData, error: challengeError } = await this.supabase.auth.mfa.challenge({
+        factorId
+      });
+
+      if (challengeError) throw challengeError;
+
+      const { data: verifyData, error: verifyError } = await this.supabase.auth.mfa.verify({
+        factorId,
+        challengeId: challengeData.id,
+        code
+      });
+
+      if (verifyError) throw verifyError;
+
+      sessionStorage.setItem(this.twoFactorVerifiedKey, 'true');
+      sessionStorage.setItem(this.twoFactorUserKey, this.getCurrentUser()?.id ?? '');
+      sessionStorage.removeItem(this.twoFactorPendingKey);
+
+      return { success: true };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || 'Código inválido o expirado. Intenta de nuevo.'
+      };
+    }
+  }
+
+  /**
+   * 3. Consulta el estado y factores MFA activos del usuario
+   */
+  async checkMFAStatus(): Promise<MFAStatus> {
+    try {
+      const { data: factors, error } = await this.supabase.auth.mfa.listFactors();
+      if (error) throw error;
+
+      const totpFactors = factors.totp || [];
+      const verifiedFactor = totpFactors.find((f: any) => f.status === 'verified') || null;
+
+      let currentLevel: string | undefined;
+      let nextLevel: string | undefined;
+
+      try {
+        const { data: aalData } = await this.supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+        if (aalData) {
+          currentLevel = aalData.currentLevel ?? undefined;
+          nextLevel = aalData.nextLevel ?? undefined;
+        }
+      } catch {
+        // Ignorable si no está soportado en la sesión actual
+      }
+
+      return {
+        hasMFA: !!verifiedFactor,
+        verifiedFactor,
+        factors: factors.all || totpFactors,
+        currentLevel,
+        nextLevel
+      };
+    } catch (error: any) {
+      return {
+        hasMFA: false,
+        verifiedFactor: null,
+        factors: [],
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * 4. Realiza el challenge y verificación durante el login para elevar la sesión a aal2
+   */
+  async challengeAndVerify(factorId?: string, code?: string): Promise<{ success: boolean; error?: string }> {
+    const verificationCode = (code ?? '').trim();
+    if (!/^\d{6}$/.test(verificationCode)) {
+      return { success: false, error: 'Ingresa un código de 6 dígitos numéricos.' };
+    }
+
+    try {
+      let targetFactorId = factorId || sessionStorage.getItem(this.twoFactorFactorIdKey);
+
+      if (!targetFactorId) {
+        const mfaStatus = await this.checkMFAStatus();
+        if (mfaStatus.verifiedFactor) {
+          targetFactorId = mfaStatus.verifiedFactor.id;
+        }
+      }
+
+      if (!targetFactorId) {
+        // Modo fallback para desarrollo si no hay factor activo
+        if (!environment.production && verificationCode === '123456') {
+          sessionStorage.setItem(this.twoFactorVerifiedKey, 'true');
+          sessionStorage.setItem(this.twoFactorUserKey, this.getCurrentUser()?.id ?? '');
+          sessionStorage.removeItem(this.twoFactorPendingKey);
+          return { success: true };
+        }
+        return { success: false, error: 'No se encontró un factor 2FA configurado para este usuario.' };
+      }
+
+      const { data: challengeData, error: challengeError } = await this.supabase.auth.mfa.challenge({
+        factorId: targetFactorId
+      });
+
+      if (challengeError) throw challengeError;
+
+      const { data: verifyData, error: verifyError } = await this.supabase.auth.mfa.verify({
+        factorId: targetFactorId,
+        challengeId: challengeData.id,
+        code: verificationCode
+      });
+
+      if (verifyError) {
+        // Modo fallback para testing si código de prueba
+        if (!environment.production && verificationCode === '123456') {
+          sessionStorage.setItem(this.twoFactorVerifiedKey, 'true');
+          sessionStorage.setItem(this.twoFactorUserKey, this.getCurrentUser()?.id ?? '');
+          sessionStorage.removeItem(this.twoFactorPendingKey);
+          return { success: true };
+        }
+        return { success: false, error: 'Código de autenticación inválido o expirado.' };
+      }
+
+      sessionStorage.setItem(this.twoFactorVerifiedKey, 'true');
+      sessionStorage.setItem(this.twoFactorUserKey, this.getCurrentUser()?.id ?? '');
+      sessionStorage.removeItem(this.twoFactorPendingKey);
+      sessionStorage.removeItem(this.twoFactorChallengeKey);
+
+      return { success: true };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || 'Error al verificar el código 2FA. Intenta nuevamente.'
+      };
+    }
+  }
+
+  /**
+   * 5. Desactiva / elimina un factor TOTP (Unenroll)
+   */
+  async unenrollTOTP(factorId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const { error } = await this.supabase.auth.mfa.unenroll({
+        factorId
+      });
+
+      if (error) throw error;
+
+      sessionStorage.removeItem(this.twoFactorPendingKey);
+      sessionStorage.removeItem(this.twoFactorFactorIdKey);
+      sessionStorage.setItem(this.twoFactorVerifiedKey, 'true');
+
+      return { success: true };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || 'No fue posible desactivar 2FA.'
       };
     }
   }
@@ -186,38 +432,7 @@ export class AuthService {
   }
 
   async verifyTwoFactorCode(code: string): Promise<{ success: boolean; error?: string }> {
-    if (!/^\d{6}$/.test(code)) {
-      return { success: false, error: 'Ingresa un código de 6 dígitos.' };
-    }
-
-    try {
-      const { data: factors, error: factorsError } = await this.supabase.auth.mfa.listFactors();
-      if (factorsError) throw factorsError;
-
-      const factor = factors.totp.find(item => item.status === 'verified');
-      const challengeId = sessionStorage.getItem(this.twoFactorChallengeKey);
-
-      if (factor && challengeId) {
-        const { error } = await this.supabase.auth.mfa.verify({
-          factorId: factor.id,
-          challengeId,
-          code
-        });
-        if (error) return { success: false, error: 'El código es inválido o expiró.' };
-      } else if (!environment.production && code !== '123456') {
-        return { success: false, error: 'El código es inválido. Usa el código de prueba 123456.' };
-      } else if (environment.production) {
-        return { success: false, error: 'No hay un factor 2FA configurado para esta cuenta.' };
-      }
-
-      sessionStorage.setItem(this.twoFactorVerifiedKey, 'true');
-      sessionStorage.setItem(this.twoFactorUserKey, this.getCurrentUser()?.id ?? '');
-      sessionStorage.removeItem(this.twoFactorPendingKey);
-      sessionStorage.removeItem(this.twoFactorChallengeKey);
-      return { success: true };
-    } catch {
-      return { success: false, error: 'No fue posible verificar el código. Intenta nuevamente.' };
-    }
+    return this.challengeAndVerify(undefined, code);
   }
 
   async resendTwoFactorCode(): Promise<{ success: boolean; error?: string }> {

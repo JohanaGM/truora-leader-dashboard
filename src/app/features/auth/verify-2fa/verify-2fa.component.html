@@ -1,60 +1,108 @@
 <main class="verify-container">
   <section class="verify-card" aria-labelledby="verify-title">
     <div class="verify-header">
-      <img src="assets/images/logo truora blanco.png" alt="Truora" class="verify-logo" width="150" height="72" />
-      <h1 id="verify-title">Verifica tu identidad</h1>
-      <p>Ingresa el código de 6 dígitos para continuar.</p>
-    </div>
-
-    <form (ngSubmit)="verifyCode()" class="verify-form">
-      <fieldset class="code-fieldset">
-        <legend>Código de verificación</legend>
-        <div class="code-inputs" (paste)="onPaste($event)">
-          @for (digit of digits(); track $index) {
-            <input
-              #codeInput
-              class="code-input"
-              type="text"
-              inputmode="numeric"
-              maxlength="1"
-              autocomplete="one-time-code"
-              [value]="digit"
-              [attr.aria-label]="'Dígito ' + ($index + 1)"
-              (input)="onDigitInput($index, $event)"
-              (keydown)="onKeydown($index, $event)"
-            />
-          }
-        </div>
-      </fieldset>
-
-      @if (errorMessage()) {
-        <p class="feedback feedback-error" role="alert">{{ errorMessage() }}</p>
-      }
-      @if (successMessage()) {
-        <p class="feedback feedback-success" role="status">{{ successMessage() }}</p>
-      }
-
-      <button type="submit" class="verify-button" [disabled]="!canVerify">
-        @if (isLoading()) {
-          <span class="spinner" aria-hidden="true"></span>
-          <span>Verificando...</span>
-        } @else {
-          <span>Verificar código</span>
-        }
-      </button>
-    </form>
-
-    <div class="resend-area">
-      <span>¿No recibiste un código?</span>
-      @if (resendCountdown() > 0) {
-        <span>Reenviar en {{ resendCountdown() }} s</span>
+      <img src="assets/images/logo truora oscuro.png" alt="Truora" class="verify-logo" width="150" height="72" />
+      @if (mode() === 'enroll') {
+        <h1 id="verify-title">Activa la autenticación de dos pasos</h1>
+        <p>Es obligatorio para continuar. Escanea el código QR con tu app autenticadora.</p>
       } @else {
-        <button type="button" class="resend-button" (click)="resendCode()" [disabled]="isResending()">
-          {{ isResending() ? 'Enviando...' : 'Reenviar código' }}
-        </button>
+        <h1 id="verify-title">Verifica tu identidad</h1>
+        <p>Ingresa el código de 6 dígitos para continuar.</p>
       }
     </div>
 
-    <p class="demo-hint">En entorno de prueba usa el código 123456.</p>
+    @if (mode() === 'loading') {
+      <div class="loading-state">
+        <span class="spinner" aria-hidden="true"></span>
+        <span>Cargando...</span>
+      </div>
+    }
+
+    @if (mode() === 'enroll') {
+      <div class="enroll-step">
+        <div class="step-badge">Paso 1</div>
+        <p class="step-text">Escanea este código QR con Google Authenticator, Authy, 1Password, etc.:</p>
+      </div>
+
+      <div class="qr-container">
+        @if (qrCodeUrl()) {
+          <img [src]="qrCodeUrl()" alt="Código QR de activación 2FA" class="qr-image" />
+        } @else {
+          <span class="spinner" aria-hidden="true"></span>
+        }
+      </div>
+
+      @if (enrollmentData()?.secret) {
+        <div class="secret-box">
+          <span class="secret-label">¿No puedes escanear el código? Ingresa esta clave manualmente:</span>
+          <div class="secret-row">
+            <code class="secret-code">{{ enrollmentData()?.secret }}</code>
+            <button class="btn-copy" type="button" (click)="copySecret()">
+              {{ copiedSecret() ? '✓ Copiado' : 'Copiar' }}
+            </button>
+          </div>
+        </div>
+      }
+
+      <div class="enroll-step">
+        <div class="step-badge">Paso 2</div>
+        <p class="step-text">Ingresa el código de 6 dígitos que muestra tu aplicación autenticadora:</p>
+      </div>
+    }
+
+    @if (mode() !== 'loading') {
+      <form (ngSubmit)="verifyCode()" class="verify-form">
+        <fieldset class="code-fieldset">
+          <legend>Código de verificación</legend>
+          <div class="code-inputs" (paste)="onPaste($event)">
+            @for (digit of digits(); track $index) {
+              <input
+                #codeInput
+                class="code-input"
+                type="text"
+                inputmode="numeric"
+                maxlength="1"
+                autocomplete="one-time-code"
+                [value]="digit"
+                [attr.aria-label]="'Dígito ' + ($index + 1)"
+                (input)="onDigitInput($index, $event)"
+                (keydown)="onKeydown($index, $event)"
+              />
+            }
+          </div>
+        </fieldset>
+
+        @if (errorMessage()) {
+          <p class="feedback feedback-error" role="alert">{{ errorMessage() }}</p>
+        }
+        @if (successMessage()) {
+          <p class="feedback feedback-success" role="status">{{ successMessage() }}</p>
+        }
+
+        <button type="submit" class="verify-button" [disabled]="!canVerify">
+          @if (isLoading()) {
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Verificando...</span>
+          } @else if (mode() === 'enroll') {
+            <span>Verificar y Activar</span>
+          } @else {
+            <span>Verificar código</span>
+          }
+        </button>
+      </form>
+    }
+
+    @if (mode() === 'challenge') {
+      <div class="resend-area">
+        <span>¿No recibiste un código?</span>
+        @if (resendCountdown() > 0) {
+          <span>Reenviar en {{ resendCountdown() }} s</span>
+        } @else {
+          <button type="button" class="resend-button" (click)="resendCode()" [disabled]="isResending()">
+            {{ isResending() ? 'Enviando...' : 'Reenviar código' }}
+          </button>
+        }
+      </div>
+    }
   </section>
 </main>

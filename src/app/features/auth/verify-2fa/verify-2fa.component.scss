@@ -16,6 +16,12 @@
   border-radius: $radius-lg;
   box-shadow: $shadow-xl;
   color: $midnight-color;
+
+  h1,
+  legend { color: $midnight-color !important; }
+
+  .verify-header p,
+  .resend-area span { color: $text-secondary !important; }
 }
 
 .verify-header {
@@ -85,10 +91,13 @@
   text-align: center;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  background: $bg-tertiary !important;
+  border-color: $border-light !important;
+  color: $midnight-color !important;
 
   &:focus {
-    background: $white;
-    border-color: $brand-color;
+    background: $white !important;
+    border-color: $brand-color !important;
     box-shadow: 0 0 0 3px rgba(60, 26, 234, 0.14);
   }
 }
@@ -100,26 +109,120 @@
   font-size: $font-size-sm;
   line-height: 1.45;
 
-  &-error { background: #fdeaea; color: #9f262c; border: 1px solid #f3a3a7; }
-  &-success { background: #e6f8ef; color: #0e8957; border: 1px solid #8bd8b5; }
+  &-error { background: #fdeaea; color: #9f262c !important; border: 1px solid #f3a3a7; }
+  &-success { background: #e6f8ef; color: #0e8957 !important; border: 1px solid #8bd8b5; }
 }
 
 .verify-button {
   min-height: 48px;
-  border: 1px solid $cta-color;
+  border: 1px solid #EE792F !important;
   border-radius: $radius-pill;
-  background: $cta-color;
-  color: $white;
+  background: #EE792F !important;
+  color: #FFFFFF !important;
   font-family: $font-family-base;
   font-size: $font-size-base;
   font-weight: $font-weight-medium;
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 
-  &:hover:not(:disabled) { background: $cta-hover; border-color: $cta-hover; box-shadow: $shadow-md; transform: translateY(-2px); }
+  &:hover:not(:disabled) {
+    background: #D96518 !important;
+    border-color: #D96518 !important;
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
   &:active:not(:disabled) { transform: scale(0.97); }
-  &:focus-visible { outline: 2px solid $brand-color; outline-offset: 3px; }
-  &:disabled { background: $border-medium; border-color: $border-medium; color: $text-light; cursor: not-allowed; }
+  &:focus-visible { outline: 2px solid #EE792F; outline-offset: 3px; }
+  span { color: #FFFFFF !important; }
+  &:disabled {
+    background: #D8DAE9 !important;
+    border-color: #D8DAE9 !important;
+    color: #9598B3 !important;
+    cursor: not-allowed;
+
+    span { color: #9598B3 !important; }
+  }
+}
+
+// ── Dark Theme Support ───────────────────────────────────────────────────
+:host-context(body.dark-theme) {
+  .verify-container {
+    background: #0f1117;
+  }
+
+  .verify-card {
+    background: #1a1f2e;
+    border-color: #2d3748;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+
+    h1, legend { color: #f1f5f9 !important; }
+    .verify-header p, .resend-area span { color: #94a3b8 !important; }
+  }
+
+  .code-input {
+    background: #252b3b !important;
+    border-color: #2d3748 !important;
+    color: #f1f5f9 !important;
+
+    &:focus {
+      background: #1e2433 !important;
+      border-color: #EE792F !important;
+      box-shadow: 0 0 0 3px rgba(238, 121, 47, 0.2);
+    }
+  }
+
+  .verify-button {
+    background: #EE792F !important;
+    border-color: #EE792F !important;
+    color: #FFFFFF !important;
+
+    &:hover:not(:disabled) {
+      background: #D96518 !important;
+      border-color: #D96518 !important;
+    }
+
+    &:disabled {
+      background: #2d3748 !important;
+      border-color: #2d3748 !important;
+      color: #64748b !important;
+
+      span { color: #64748b !important; }
+    }
+  }
+
+  .resend-button {
+    color: #F28B47;
+  }
+
+  .loading-state {
+    color: #94a3b8;
+    .spinner { border-color: rgba(255, 255, 255, 0.15); border-top-color: #F28B47; }
+  }
+
+  .enroll-step .step-text { color: #94a3b8; }
+  .enroll-step .step-badge { background: #4F26EC; }
+
+  .qr-container {
+    background: #ffffff; // se mantiene blanco para que el lector QR conserve contraste
+    border-color: #2d3748;
+
+    .spinner { border-color: rgba(1, 2, 46, 0.15); border-top-color: #3C1AE9; }
+  }
+
+  .secret-box {
+    background: #252b3b;
+    border-color: #2d3748;
+
+    .secret-label { color: #94a3b8; }
+    .secret-code { color: #9BD2F3; }
+
+    .btn-copy {
+      background: #1e2433;
+      border-color: #3d4a63;
+      color: #cbd5e0;
+      &:hover { border-color: #9BD2F3; color: #9BD2F3; }
+    }
+  }
 }
 
 .resend-area {
@@ -146,13 +249,6 @@
   &:disabled { color: $text-light; cursor: wait; }
 }
 
-.demo-hint {
-  margin: 1.5rem 0 0;
-  color: $text-light;
-  font-size: $font-size-xs;
-  text-align: center;
-}
-
 .spinner {
   display: inline-block;
   width: 18px;
@@ -166,6 +262,122 @@
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+// ── Loading state ─────────────────────────────────────────────────────────
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 2rem 0;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+
+  .spinner {
+    border-color: rgba(1, 2, 46, 0.15);
+    border-top-color: $brand-color;
+  }
+}
+
+// ── Enrollment (mandatory 2FA setup) ─────────────────────────────────────
+.enroll-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+
+  .step-badge {
+    background: $brand-color;
+    color: $white;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+    white-space: nowrap;
+  }
+
+  .step-text {
+    margin: 0;
+    font-size: 0.88rem;
+    color: $text-secondary;
+    line-height: 1.45;
+  }
+}
+
+.qr-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 190px;
+  padding: 1rem;
+  background: $bg-tertiary;
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
+  margin-bottom: 1rem;
+
+  .qr-image {
+    width: 190px;
+    height: 190px;
+    display: block;
+  }
+
+  .spinner {
+    border-color: rgba(1, 2, 46, 0.15);
+    border-top-color: $brand-color;
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.secret-box {
+  background: $bg-tertiary;
+  border: 1px solid $border-light;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+
+  .secret-label {
+    display: block;
+    font-size: 0.74rem;
+    color: $text-secondary;
+    margin-bottom: 0.4rem;
+  }
+
+  .secret-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .secret-code {
+    font-family: $font-family-mono;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: $brand-color;
+    word-break: break-all;
+  }
+
+  .btn-copy {
+    background: $white;
+    border: 1px solid $border-medium;
+    border-radius: 6px;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $text-secondary;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+
+    &:hover {
+      border-color: $brand-color;
+      color: $brand-color;
+    }
+  }
+}
 
 @media (max-width: 480px) {
   .verify-card { padding: 2rem 1.25rem; }
