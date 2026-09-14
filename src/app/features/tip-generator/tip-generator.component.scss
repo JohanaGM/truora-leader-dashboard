@@ -1175,12 +1175,12 @@
   padding: 0.75rem 1.25rem;
 }
 
-// Both template choices keep the same visual treatment; selection remains functional.
+// Keep the selected template visibly distinct from the unselected option.
 .btn-template.active {
-  background: rgba(250, 251, 255, 0.55) !important;
-  border: 1px solid $border-medium !important;
-  color: $text-primary !important;
-  box-shadow: none !important;
+  background: #3C1AE9 !important;
+  border: 1px solid #3C1AE9 !important;
+  color: #FFFFFF !important;
+  box-shadow: $shadow-sm !important;
 
   &::before,
   &::after {
@@ -1189,12 +1189,18 @@
   }
 }
 
-// Hover is shared by Text and Image; it is intentionally not a selection state.
-.btn-template:hover:not(:disabled) {
+// Hover only affects unselected options.
+.btn-template:hover:not(:disabled):not(.active) {
   background: rgba(236, 233, 253, 0.9) !important;
   border-color: $brand-color !important;
   color: $brand-color !important;
   box-shadow: 0 0 0 2px rgba(60, 26, 234, 0.08), $shadow-sm;
+}
+
+.btn-template.active:hover:not(:disabled) {
+  background: #3114C4 !important;
+  border-color: #3114C4 !important;
+  color: #FFFFFF !important;
 }
 
 :host-context(body.dark-theme) {
