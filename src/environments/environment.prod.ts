@@ -8,7 +8,7 @@ export const environment = {
   n8nTareaFinalizadaUrl: 'https://n8n.zapsign.com.br/webhook/tarea-finalizada',
   n8nBuscarTipsUrl: 'https://n8n.zapsign.com.br/webhook/buscar_tips',
   supabase: {
-    url: 'https://fwgebmdqjlzsvbbtrdkm.supabase.co',
-    key: 'sb_publishable_cFZeeY3KJRYjRXA4L61qbg_nDny1VfB'
+    url: 'https://zoyfudgcghnlipujxhgr.supabase.co',
+    key: 'sb_publishable_4mvbxmVc62d7TGg2XUwocw_8kIxFfXt'
   }
 };
