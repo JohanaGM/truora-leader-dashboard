@@ -26,6 +26,7 @@ export interface TOTPEnrollment {
 export interface MFAStatus {
   hasMFA: boolean;
   verifiedFactor: any | null;
+  unverifiedFactor: any | null;
   factors: any[];
   currentLevel?: string;
   nextLevel?: string;
@@ -195,6 +196,19 @@ export class AuthService {
       const user = this.getCurrentUser();
       const email = user?.email || 'usuario@truora.com';
 
+      // Supabase keeps an unfinished enrollment as an unverified factor.
+      // Remove abandoned TOTP factors before creating a fresh QR code.
+      const { data: factors, error: factorsError } = await this.supabase.auth.mfa.listFactors();
+      if (factorsError) throw factorsError;
+
+      const pendingFactors = (factors.totp || []).filter((factor: any) => factor.status !== 'verified');
+      for (const factor of pendingFactors) {
+        const { error: unenrollError } = await this.supabase.auth.mfa.unenroll({
+          factorId: factor.id
+        });
+        if (unenrollError) throw unenrollError;
+      }
+
       const { data, error } = await this.supabase.auth.mfa.enroll({
         factorType: 'totp',
         issuer: 'Truora Leader Dashboard',
@@ -283,6 +297,7 @@ export class AuthService {
       return {
         hasMFA: !!verifiedFactor,
         verifiedFactor,
+        unverifiedFactor: totpFactors.find((f: any) => f.status !== 'verified') || null,
         factors: factors.all || totpFactors,
         currentLevel,
         nextLevel
@@ -291,6 +306,7 @@ export class AuthService {
       return {
         hasMFA: false,
         verifiedFactor: null,
+        unverifiedFactor: null,
         factors: [],
         error: error.message
       };

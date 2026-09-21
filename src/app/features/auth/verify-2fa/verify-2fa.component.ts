@@ -60,6 +60,8 @@ export class Verify2faComponent implements OnInit, OnDestroy {
   private async startEnrollment(): Promise<void> {
     this.mode.set('enroll');
     this.errorMessage.set(null);
+    this.qrCodeUrl.set(null);
+    this.enrollmentData.set(null);
     this.isLoading.set(true);
 
     const result = await this.authService.enrollTOTP();
