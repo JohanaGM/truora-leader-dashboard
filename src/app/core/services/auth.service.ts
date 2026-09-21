@@ -27,6 +27,7 @@ export interface MFAStatus {
   hasMFA: boolean;
   verifiedFactor: any | null;
   unverifiedFactor: any | null;
+  totpFactors: any[];
   factors: any[];
   currentLevel?: string;
   nextLevel?: string;
@@ -215,7 +216,19 @@ export class AuthService {
         friendlyName: email
       });
 
-      if (error) throw error;
+      if (error) {
+        // A factor may have been created between listFactors() and enroll().
+        // Re-read MFA state so the UI can challenge an existing factor instead
+        // of repeatedly trying to create the same friendly name.
+        const currentStatus = await this.checkMFAStatus();
+        if (currentStatus.verifiedFactor) {
+          return {
+            success: false,
+            error: 'Este usuario ya tiene 2FA activo. Ingresa el código de tu aplicación autenticadora.'
+          };
+        }
+        throw error;
+      }
 
       return {
         success: true,
@@ -298,6 +311,7 @@ export class AuthService {
         hasMFA: !!verifiedFactor,
         verifiedFactor,
         unverifiedFactor: totpFactors.find((f: any) => f.status !== 'verified') || null,
+        totpFactors,
         factors: factors.all || totpFactors,
         currentLevel,
         nextLevel
@@ -307,6 +321,7 @@ export class AuthService {
         hasMFA: false,
         verifiedFactor: null,
         unverifiedFactor: null,
+        totpFactors: [],
         factors: [],
         error: error.message
       };

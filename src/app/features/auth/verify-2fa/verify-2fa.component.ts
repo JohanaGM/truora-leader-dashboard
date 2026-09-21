@@ -73,6 +73,8 @@ export class Verify2faComponent implements OnInit, OnDestroy {
         this.qrCodeUrl.set(this.sanitizer.bypassSecurityTrustUrl(result.data.qrCode));
       }
     } else {
+      this.mode.set('challenge');
+      this.startCountdown();
       this.errorMessage.set(result.error ?? 'No se pudo generar el código QR. Intenta de nuevo.');
     }
   }
