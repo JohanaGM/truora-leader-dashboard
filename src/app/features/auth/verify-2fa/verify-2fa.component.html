@@ -3,8 +3,13 @@
     <div class="verify-header">
       <img src="assets/images/logo truora blanco.png" alt="Truora" class="verify-logo verify-logo-light" width="150" height="72" />
       <img src="assets/images/logo truora oscuro.png" alt="Truora" class="verify-logo verify-logo-dark" width="150" height="72" />
-      <h1 id="verify-title">Verifica tu identidad</h1>
-      <p>Ingresa el código de 6 dígitos para continuar.</p>
+      @if (mode() === 'enroll') {
+        <h1 id="verify-title">Activa la autenticación de dos pasos</h1>
+        <p>Escanea el código QR y luego ingresa el código de 6 dígitos.</p>
+      } @else {
+        <h1 id="verify-title">Verifica tu identidad</h1>
+        <p>Ingresa el código de 6 dígitos para continuar.</p>
+      }
     </div>
 
     @if (mode() === 'loading') {
@@ -14,7 +19,39 @@
       </div>
     }
 
-    @if (mode() !== 'loading') {
+    @if (mode() === 'enroll') {
+      <div class="enroll-step">
+        <div class="step-badge">Paso 1</div>
+        <p class="step-text">Escanea este código QR con tu aplicación autenticadora:</p>
+      </div>
+
+      <div class="qr-container">
+        @if (qrCodeUrl()) {
+          <img [src]="qrCodeUrl()" alt="Código QR de activación 2FA" class="qr-image" />
+        } @else {
+          <span class="spinner" aria-hidden="true"></span>
+        }
+      </div>
+
+      @if (enrollmentData()?.secret) {
+        <div class="secret-box">
+          <span class="secret-label">También puedes ingresar la clave manualmente:</span>
+          <div class="secret-row">
+            <code class="secret-code">{{ enrollmentData()?.secret }}</code>
+            <button class="btn-copy" type="button" (click)="copySecret()">
+              {{ copiedSecret() ? 'Copiado' : 'Copiar' }}
+            </button>
+          </div>
+        </div>
+      }
+
+      <div class="enroll-step">
+        <div class="step-badge">Paso 2</div>
+        <p class="step-text">Ingresa el código de 6 dígitos que genera tu aplicación:</p>
+      </div>
+    }
+
+    @if (mode() === 'enroll' || mode() === 'challenge') {
       <form (ngSubmit)="verifyCode()" class="verify-form">
         <fieldset class="code-fieldset">
           <legend>Código de verificación</legend>
@@ -47,6 +84,8 @@
           @if (isLoading()) {
             <span class="spinner" aria-hidden="true"></span>
             <span>Verificando...</span>
+          } @else if (mode() === 'enroll') {
+            <span>Verificar y activar</span>
           } @else {
             <span>Verificar código</span>
           }

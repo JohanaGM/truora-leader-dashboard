@@ -2,9 +2,10 @@ import { Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren, inje
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { AuthService, TOTPEnrollment } from '../../../core/services/auth.service';
 
-type Verify2faMode = 'loading' | 'challenge';
+type Verify2faMode = 'loading' | 'enroll' | 'challenge';
 
 @Component({
   selector: 'app-verify-2fa',
@@ -16,12 +17,14 @@ type Verify2faMode = 'loading' | 'challenge';
 export class Verify2faComponent implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly sanitizer = inject(DomSanitizer);
   @ViewChildren('codeInput') codeInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
-  // El login solo verifica un factor TOTP existente. El enrolamiento se gestiona
-  // por separado y no se inicia automáticamente en esta vista.
   mode = signal<Verify2faMode>('loading');
   factorId: string | null = null;
+  enrollmentData = signal<TOTPEnrollment | null>(null);
+  qrCodeUrl = signal<SafeUrl | null>(null);
+  copiedSecret = signal(false);
 
   digits = signal<string[]>(['', '', '', '', '', '']);
   isLoading = signal(false);
@@ -52,11 +55,38 @@ export class Verify2faComponent implements OnInit, OnDestroy {
       this.factorId = result.factorId;
       this.mode.set('challenge');
       this.startCountdown();
+    } else if (!result.error) {
+      await this.startEnrollment();
     } else {
+      this.mode.set('challenge');
       this.errorMessage.set(
         result.error ?? 'No se encontró un factor MFA activo para este usuario.'
       );
     }
+  }
+
+  private async startEnrollment(): Promise<void> {
+    this.mode.set('enroll');
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    const result = await this.authService.enrollTOTP();
+    this.isLoading.set(false);
+
+    if (result.success && result.data) {
+      this.enrollmentData.set(result.data);
+      this.qrCodeUrl.set(this.sanitizer.bypassSecurityTrustUrl(result.data.qrCode));
+    } else {
+      this.errorMessage.set(result.error ?? 'No se pudo generar el código QR.');
+    }
+  }
+
+  copySecret(): void {
+    const secret = this.enrollmentData()?.secret;
+    if (!secret) return;
+    navigator.clipboard.writeText(secret);
+    this.copiedSecret.set(true);
+    setTimeout(() => this.copiedSecret.set(false), 2000);
   }
 
   onDigitInput(index: number, event: Event): void {
@@ -90,6 +120,11 @@ export class Verify2faComponent implements OnInit, OnDestroy {
   async verifyCode(): Promise<void> {
     if (!this.canVerify) return;
 
+    if (this.mode() === 'enroll') {
+      await this.confirmEnrollment();
+      return;
+    }
+
     if (!this.factorId) {
       this.errorMessage.set('No se encontró un factor MFA activo para este usuario.');
       return;
@@ -102,6 +137,25 @@ export class Verify2faComponent implements OnInit, OnDestroy {
 
     if (result.success) {
       this.successMessage.set('Código verificado. Redirigiendo...');
+      setTimeout(() => this.router.navigate(['/dashboard']), 350);
+    } else {
+      this.errorMessage.set(result.error ?? 'Código inválido o expirado.');
+      this.digits.set(['', '', '', '', '', '']);
+      this.focusInput(0);
+    }
+  }
+
+  private async confirmEnrollment(): Promise<void> {
+    const factor = this.enrollmentData();
+    if (!factor) return;
+
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+    const result = await this.authService.verifyEnrolledFactor(factor.factorId, this.code);
+    this.isLoading.set(false);
+
+    if (result.success) {
+      this.successMessage.set('2FA activado. Redirigiendo...');
       setTimeout(() => this.router.navigate(['/dashboard']), 350);
     } else {
       this.errorMessage.set(result.error ?? 'Código inválido o expirado.');
