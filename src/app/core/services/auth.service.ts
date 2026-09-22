@@ -328,6 +328,12 @@ export class AuthService {
     }
   }
 
+  async getVerifiedTOTPFactorId(): Promise<{ factorId: string | null; error?: string }> {
+    const status = await this.checkMFAStatus();
+    if (status.error) return { factorId: null, error: status.error };
+    return { factorId: status.verifiedFactor?.id ?? null };
+  }
+
   /**
    * 4. Realiza el challenge y verificación durante el login para elevar la sesión a aal2
    */
@@ -457,6 +463,13 @@ export class AuthService {
 
   async verifyTwoFactorCode(code: string): Promise<{ success: boolean; error?: string }> {
     return this.challengeAndVerify(undefined, code);
+  }
+
+  async verifyTwoFactorCodeForFactor(
+    factorId: string,
+    code: string
+  ): Promise<{ success: boolean; error?: string }> {
+    return this.challengeAndVerify(factorId, code);
   }
 
   async resendTwoFactorCode(): Promise<{ success: boolean; error?: string }> {
