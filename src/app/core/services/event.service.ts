@@ -1,11 +1,11 @@
 ﻿import { Injectable, signal, computed } from '@angular/core';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../../../environments/environment';
+import { SupabaseClient } from '@supabase/supabase-js';
 import {
   AppEvent, EventStatus, EventPriority,
   PRIORITY_COLOR, RECURRING_COLOR
 } from '../models/event.model';
 import { HolidayService } from './holiday.service';
+import { SupabaseService } from './supabase.service';
 
 export interface VirtualEvent {
   id: string;
@@ -28,15 +28,13 @@ export interface VirtualEvent {
 @Injectable({ providedIn: 'root' })
 export class EventService {
   private readonly STORAGE_KEY = 'truora_events_v2';
-  private supabase: SupabaseClient = createClient(
-    environment.supabase.url,
-    environment.supabase.key
-  );
+  private supabase: SupabaseClient;
 
   private eventsSignal = signal<AppEvent[]>(this.loadCache());
   readonly events = this.eventsSignal.asReadonly();
 
   private holidayService = new HolidayService();
+  private supabaseService = inject(SupabaseService);
 
   /** Cache: "YYYY-M" → Truface schedule map */
   private trufaceCache = new Map<string, Map<string, { isRescheduled: boolean; originalDate?: string }>>();
@@ -50,6 +48,7 @@ export class EventService {
   }
 
   constructor() {
+    this.supabase = this.supabaseService.client;
     this.syncFromSupabase();
   }
 

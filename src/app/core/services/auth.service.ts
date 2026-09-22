@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { createClient, SupabaseClient, User as SupabaseUser, Session } from '@supabase/supabase-js';
+import { SupabaseClient, User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { User } from '../models';
+import { SupabaseService } from './supabase.service';
 
 export interface Leader {
   id: string;
@@ -44,6 +45,7 @@ export class AuthService {
   private readonly twoFactorChallengeKey = 'truora_2fa_challenge';
   private readonly twoFactorFactorIdKey = 'truora_2fa_factor_id';
   private supabase: SupabaseClient;
+  private supabaseService = inject(SupabaseService);
   private router = inject(Router);
   
   // Observables para el estado de autenticación
@@ -54,10 +56,7 @@ export class AuthService {
   currentLeader$ = this.currentLeaderSubject.asObservable();
 
   constructor() {
-    this.supabase = createClient(
-      environment.supabase.url,
-      environment.supabase.key
-    );
+    this.supabase = this.supabaseService.client;
     
     // Escuchar cambios de autenticación
     this.supabase.auth.onAuthStateChange((event, session) => {
@@ -329,9 +328,21 @@ export class AuthService {
   }
 
   async getVerifiedTOTPFactorId(): Promise<{ factorId: string | null; error?: string }> {
-    const status = await this.checkMFAStatus();
-    if (status.error) return { factorId: null, error: status.error };
-    return { factorId: status.verifiedFactor?.id ?? null };
+    try {
+      const { data: factors, error } = await this.supabase.auth.mfa.listFactors();
+      if (error) throw error;
+
+      const verifiedFactor = (factors.totp || []).find(
+        (factor: any) => factor.status === 'verified'
+      );
+
+      return { factorId: verifiedFactor?.id ?? null };
+    } catch (error: any) {
+      return {
+        factorId: null,
+        error: error.message || 'No se pudieron consultar los factores MFA.'
+      };
+    }
   }
 
   /**
