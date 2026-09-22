@@ -28,6 +28,7 @@ export class AnnouncementsComponent {
   errorMessage = signal<string | null>(null);
   linkTexto = signal('');
   linkUrl = signal('');
+  scheduledAt = signal('');
 
   // ── Image upload state ────────────────────────────────────────────────────
   selectedFile = signal<File | null>(null);
@@ -42,7 +43,30 @@ export class AnnouncementsComponent {
   ];
 
   get canSend(): boolean {
-    return (this.reminder().trim().length > 0 || this.selectedFile() !== null) && !this.isSending();
+    return (this.reminder().trim().length > 0 || this.selectedFile() !== null)
+      && this.isScheduledAtValid
+      && !this.isSending();
+  }
+
+  get minScheduledAt(): string {
+    const now = new Date();
+    const offset = now.getTimezoneOffset() * 60000;
+    return new Date(now.getTime() - offset).toISOString().slice(0, 16);
+  }
+
+  get isScheduledAtValid(): boolean {
+    const value = this.scheduledAt().trim();
+    return !value || new Date(value).getTime() > Date.now();
+  }
+
+  onScheduledAtChange(value: string): void {
+    this.scheduledAt.set(value);
+    this.errorMessage.set(null);
+  }
+
+  private get sendAtIso(): string {
+    const value = this.scheduledAt().trim();
+    return value ? new Date(value).toISOString() : new Date().toISOString();
   }
 
   // ── Derived state from MessageTemplateComponent ───────────────────────────
@@ -174,9 +198,16 @@ export class AnnouncementsComponent {
     this.errorMessage.set(null);
     this.showSuccess.set(false);
 
+    if (!this.isScheduledAtValid) {
+      this.errorMessage.set('La fecha programada debe ser posterior a la fecha y hora actuales.');
+      this.isSending.set(false);
+      return;
+    }
+
     const mensaje   = this.reminder();
     const linkTexto = this.linkTexto().trim();
     const linkUrl   = this.linkUrl().trim();
+    const sendAt    = this.sendAtIso;
     const analistas = this.activeAnalistas;
     const tags      = this.activeTags;
     const file      = this.selectedFile();
@@ -188,6 +219,8 @@ export class AnnouncementsComponent {
       formData.append('mensaje', mensaje);
       formData.append('link_texto', linkTexto);
       formData.append('link_url', linkUrl);
+      formData.append('imagen_url', '');
+      formData.append('send_at', sendAt);
       formData.append('analistas', JSON.stringify(analistas));
       formData.append('tags', JSON.stringify(tags));
 
@@ -204,7 +237,18 @@ export class AnnouncementsComponent {
         });
     } else {
       // ── Escenario A: solo texto → JSON ────────────────────────────────────
-      const payload = { mensaje, link_texto: linkTexto, link_url: linkUrl, analistas, tags };
+      const payload = {
+        mensaje,
+        imagen_url: '',
+        enlace_texto: linkTexto,
+        enlace_url: linkUrl,
+        send_at: sendAt,
+        // Preserve the existing n8n fields while the workflow migrates names.
+        link_texto: linkTexto,
+        link_url: linkUrl,
+        analistas,
+        tags
+      };
 
       this.http.post(environment.n8nWebhookUrl, payload)
         .subscribe({
@@ -227,6 +271,7 @@ export class AnnouncementsComponent {
       this.reminder.set('');
       this.linkTexto.set('');
       this.linkUrl.set('');
+      this.scheduledAt.set('');
       this.showSuccess.set(false);
       this.removeFile();
     }, 2000);

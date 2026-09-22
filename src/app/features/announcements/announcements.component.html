@@ -141,6 +141,23 @@
         </div>
       </div>
 
+      <div class="schedule-section">
+        <label class="link-attach-field__label" for="scheduledAt">Programar envío</label>
+        <input
+          id="scheduledAt"
+          type="datetime-local"
+          class="link-attach-field__input"
+          [value]="scheduledAt()"
+          [min]="minScheduledAt"
+          (input)="onScheduledAtChange($any($event.target).value)"
+          [disabled]="isSending()"
+        />
+        <span class="form-hint">Déjalo vacío para enviar inmediatamente.</span>
+        @if (scheduledAt() && !isScheduledAtValid) {
+          <div class="alert alert-error">La fecha debe ser posterior a la fecha y hora actuales.</div>
+        }
+      </div>
+
       <!-- Pie: alertas -->
       @if (fileError() || showSuccess() || errorMessage()) {
         <div class="editor-card__footer">

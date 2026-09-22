@@ -442,6 +442,60 @@
   }
 }
 
+// ── Scheduled delivery ──────────────────────────────────────────────────────
+
+.schedule-section {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.35fr) minmax(220px, 0.65fr) 1fr;
+  align-items: center;
+  gap: 0.65rem 1rem;
+  margin: 0 1.5rem 1.25rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid #e6e9f2;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #fbfcff 0%, #f7f8ff 100%);
+
+  .link-attach-field__label {
+    margin: 0;
+    color: #4a5568;
+    white-space: nowrap;
+  }
+
+  .link-attach-field__input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    background: #ffffff;
+  }
+
+  .form-hint {
+    margin: 0;
+    color: #718096;
+    font-size: 0.76rem;
+    line-height: 1.4;
+  }
+
+  .alert {
+    grid-column: 2 / -1;
+    margin: 0;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.78rem;
+  }
+
+  @media (max-width: 760px) {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    margin: 0 1rem 1rem;
+    padding: 0.9rem;
+
+    .link-attach-field__label,
+    .form-hint,
+    .alert {
+      grid-column: 1;
+    }
+  }
+}
+
 // ── Alerts ───────────────────────────────────────────────────────────────────
 
 .alert {
@@ -657,6 +711,28 @@
         background: #1a1f2e;
       }
     }
+  }
+
+  .schedule-section {
+    border-color: #2d3748;
+    background: linear-gradient(135deg, rgba(30, 36, 51, 0.95) 0%, rgba(26, 31, 46, 0.95) 100%);
+
+    .link-attach-field__label { color: #cbd5e0; }
+
+    .link-attach-field__input {
+      background: #1e2433;
+      border-color: #2d3748;
+      color: #e2e8f0;
+      color-scheme: dark;
+
+      &:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        background: #1a1f2e;
+      }
+    }
+
+    .form-hint { color: #94a3b8; }
   }
 
   .alert {
