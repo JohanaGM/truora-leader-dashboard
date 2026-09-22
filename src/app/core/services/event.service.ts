@@ -1,4 +1,4 @@
-﻿import { Injectable, signal, computed } from '@angular/core';
+﻿import { Injectable, inject, signal, computed } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
 import {
   AppEvent, EventStatus, EventPriority,

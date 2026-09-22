@@ -62,7 +62,11 @@ export class AuthService {
     this.supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
         this.currentUserSubject.next(session.user);
-        this.loadLeaderData(session.user.id, session.user.email ?? undefined);
+        // Do not call Supabase asynchronously inside this callback. Supabase
+        // holds its auth-token lock while notifying listeners.
+        setTimeout(() => {
+          void this.loadLeaderData(session.user.id, session.user.email ?? undefined);
+        }, 0);
       } else {
         this.currentUserSubject.next(null);
         this.currentLeaderSubject.next(null);
