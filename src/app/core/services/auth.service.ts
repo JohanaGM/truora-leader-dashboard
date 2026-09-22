@@ -338,14 +338,13 @@ export class AuthService {
     }
 
     try {
-      let targetFactorId = factorId || sessionStorage.getItem(this.twoFactorFactorIdKey);
+      const { data: factors, error: factorsError } = await this.supabase.auth.mfa.listFactors();
+      if (factorsError) throw factorsError;
 
-      if (!targetFactorId) {
-        const mfaStatus = await this.checkMFAStatus();
-        if (mfaStatus.verifiedFactor) {
-          targetFactorId = mfaStatus.verifiedFactor.id;
-        }
-      }
+      const verifiedFactor = (factors.totp || []).find(
+        (factor: any) => factor.status === 'verified'
+      );
+      const targetFactorId = factorId || verifiedFactor?.id || sessionStorage.getItem(this.twoFactorFactorIdKey);
 
       if (!targetFactorId) {
         // Modo fallback para desarrollo si no hay factor activo
@@ -358,15 +357,8 @@ export class AuthService {
         return { success: false, error: 'No se encontró un factor 2FA configurado para este usuario.' };
       }
 
-      const { data: challengeData, error: challengeError } = await this.supabase.auth.mfa.challenge({
-        factorId: targetFactorId
-      });
-
-      if (challengeError) throw challengeError;
-
-      const { data: verifyData, error: verifyError } = await this.supabase.auth.mfa.verify({
+      const { error: verifyError } = await this.supabase.auth.mfa.challengeAndVerify({
         factorId: targetFactorId,
-        challengeId: challengeData.id,
         code: verificationCode
       });
 
@@ -384,6 +376,7 @@ export class AuthService {
       sessionStorage.setItem(this.twoFactorVerifiedKey, 'true');
       sessionStorage.setItem(this.twoFactorUserKey, this.getCurrentUser()?.id ?? '');
       sessionStorage.removeItem(this.twoFactorPendingKey);
+      sessionStorage.removeItem(this.twoFactorFactorIdKey);
       sessionStorage.removeItem(this.twoFactorChallengeKey);
 
       return { success: true };
