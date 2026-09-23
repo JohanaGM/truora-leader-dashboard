@@ -42,9 +42,13 @@
                 <p class="activity-title">{{ activity.title }}</p>
                 <span class="activity-time">{{ activity.time }}</span>
               </div>
-              <span class="activity-status" [class]="activity.status">
-                {{ activity.status === 'completed' ? '✓' : '○' }}
-              </span>
+              <select [value]="activity.status"
+                      (change)="updateTodayStatus(activity.id, $any($event.target).value)"
+                      class="status-select" [class]="activity.status">
+                <option value="pending">Pendiente</option>
+                <option value="in-progress">En Progreso</option>
+                <option value="completed">Completado</option>
+              </select>
             </div>
           }
         </div>

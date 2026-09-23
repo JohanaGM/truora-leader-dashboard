@@ -1,7 +1,8 @@
 ﻿import { Component, inject, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { EventService } from '../../core/services/event.service';
+import { EventService, VirtualEvent } from '../../core/services/event.service';
+import { EventStatus } from '../../core/models/event.model';
 import { TipsCounterService } from '../../core/services/tips-counter.service';
 import { LeaderScheduleService } from '../../core/services/leader-schedule.service';
 import { TipService } from '../../core/services/tip.service';
@@ -33,27 +34,47 @@ export class DashboardComponent implements OnInit {
   tips = signal<Tip[]>([]);
   filteredTips = computed(() => this.remoteTipsResults() ?? this.tips());
 
+  private isAssignedLeader(): boolean {
+    return this.scheduleService.weekTasks().length > 0;
+  }
+
+  private eventsForDate(date: Date): VirtualEvent[] {
+    if (this.isAssignedLeader()) {
+      return [
+        ...this.eventService.getScheduledForDate(this.scheduleService.weekTasks(), date),
+        ...this.eventService.getManualForDate(date),
+      ];
+    }
+    return this.eventService.getAllForDate(date)
+      .filter(event => event.type !== 'truface' && event.type !== 'tips');
+  }
+
+  eventsForWeek = computed((): VirtualEvent[] => {
+    this.eventService.events();
+    if (!this.isAssignedLeader()) {
+      return this.eventService.getEventsForWeek()
+        .filter(event => event.type !== 'truface' && event.type !== 'tips');
+    }
+    const { start, end } = this.eventService.getWeekBounds();
+    const events: VirtualEvent[] = [];
+    for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+      events.push(...this.eventsForDate(new Date(date)));
+    }
+    return events;
+  });
+
   // ---- Computed stats (datos reales) ----
   statsActivitiesToday = computed(() => {
     this.eventService.events();
-    const isAssignedLeader = this.scheduleService.weekTasks().length > 0;
-    return this.eventService.getAllForDate(new Date()).filter(e =>
-      isAssignedLeader || (e.type !== 'truface' && e.type !== 'tips')
-    ).length;
+    return this.eventsForDate(new Date()).length;
   });
 
   statsTasksCompleted = computed(() =>
-    this.eventService.getEventsForWeek().filter(e =>
-      e.status === 'completed' &&
-      (this.scheduleService.weekTasks().length > 0 || (e.type !== 'truface' && e.type !== 'tips'))
-    ).length
+    this.eventsForWeek().filter(e => e.status === 'completed').length
   );
 
   statsTasksPending = computed(() =>
-    this.eventService.getEventsForWeek().filter(e =>
-      e.status === 'pending' &&
-      (this.scheduleService.weekTasks().length > 0 || (e.type !== 'truface' && e.type !== 'tips'))
-    ).length
+    this.eventsForWeek().filter(e => e.status === 'pending').length
   );
 
   stats = computed(() => [
@@ -63,13 +84,22 @@ export class DashboardComponent implements OnInit {
     { key: 'tips',       icon: '💡', label: 'Tips Generados',     value: this.tipsCounter.tipsCount(),    color: '#9BD2F3' },
   ]);
 
+  todayEvents = computed(() => this.eventsForDate(new Date()));
+
   todayActivities = computed(() => {
     this.eventService.events();
-    const isAssignedLeader = this.scheduleService.weekTasks().length > 0;
-    return this.eventService.getAllForDate(new Date())
-      .filter(e => isAssignedLeader || (e.type !== 'truface' && e.type !== 'tips'))
-      .map(e => ({ title: e.title, time: e.startTime, status: e.status, color: e.color }));
+    return this.todayEvents().map(e => ({ id: e.id, title: e.title, time: e.startTime, status: e.status, color: e.color }));
   });
+
+  updateTodayStatus(eventId: string, status: EventStatus): void {
+    const event = this.todayEvents().find(item => item.id === eventId);
+    if (!event) return;
+    if (event.isRecurring) {
+      this.eventService.updateRecurringStatus(event.type as 'truface' | 'tips', event.date, status);
+    } else {
+      this.eventService.updateEvent(event.id, { status });
+    }
+  }
 
   // ---- Rango semana actual (para el card de cronograma) ----
   get weekLabel(): string {

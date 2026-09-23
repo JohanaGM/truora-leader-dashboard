@@ -305,6 +305,34 @@
   gap: 1rem;
 }
 
+.weekly-task-list {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.weekly-task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-left: 4px solid;
+  border-radius: $radius-md;
+  background: $bg-primary;
+  box-shadow: $shadow-sm;
+
+  strong,
+  span { display: block; }
+  strong { color: $text-primary; font-size: $font-size-sm; }
+  span { margin-top: 0.2rem; color: $text-secondary; font-size: $font-size-xs; }
+
+  @media (max-width: 560px) {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
 .status-summary-card {
   display: flex;
   align-items: center;

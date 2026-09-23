@@ -75,13 +75,25 @@ export class ScheduleComponent implements OnInit {
   }
 
   getEventsForDay(date: Date): VirtualEvent[] {
+    if (this.isAssignedLeader) {
+      return [
+        ...this.eventService.getScheduledForDate(this.scheduleService.weekTasks(), date),
+        ...this.eventService.getManualForDate(date),
+      ];
+    }
     return this.filterTrufaceTips(this.eventService.getAllForDate(date));
   }
 
   /** Unified weekly status summary formerly shown in the Tasks view. */
   weekEvents = computed((): VirtualEvent[] => {
     this.eventService.events();
-    return this.filterTrufaceTips(this.eventService.getEventsForWeek());
+    if (!this.isAssignedLeader) return this.filterTrufaceTips(this.eventService.getEventsForWeek());
+    const { start, end } = this.eventService.getWeekBounds();
+    const events: VirtualEvent[] = [];
+    for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+      events.push(...this.getEventsForDay(new Date(date)));
+    }
+    return events.sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
   });
 
   pendingCount = computed(() => this.weekEvents().filter(e => e.status === 'pending').length);
@@ -171,7 +183,7 @@ export class ScheduleComponent implements OnInit {
 
   todayEvents = computed((): VirtualEvent[] => {
     this.eventService.events();
-    return this.filterTrufaceTips(this.eventService.getAllForDate(new Date()));
+    return this.getEventsForDay(new Date());
   });
 
   upcomingEvents = computed((): VirtualEvent[] => {

@@ -2,6 +2,10 @@ export type EventType = 'truface' | 'tips' | 'manual';
 export type EventStatus = 'pending' | 'in-progress' | 'completed';
 export type EventPriority = 'low' | 'medium' | 'high';
 
+// Domain vocabulary used by the weekly leader schedule.
+export type TaskStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+export type TaskEventType = 'TRUFACE' | 'GENERATE_TIP';
+
 export interface AppEvent {
   id: string;
   title: string;
@@ -22,6 +26,6 @@ export const PRIORITY_COLOR: Record<EventPriority, string> = {
 };
 
 export const RECURRING_COLOR: Record<'truface' | 'tips', string> = {
-  truface: 'rgb(147, 15, 60)',
-  tips:    'rgb(58, 0, 119)',
+  truface: '#4f26ec',
+  tips:    '#f3a261',
 };

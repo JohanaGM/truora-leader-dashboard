@@ -94,6 +94,25 @@
         </div>
       </article>
     </div>
+    @if (weekEvents().length > 0) {
+      <div class="weekly-task-list">
+        @for (ev of weekEvents(); track ev.id) {
+          <div class="weekly-task-item" [style.border-left-color]="ev.color">
+            <div>
+              <strong>{{ ev.title }}</strong>
+              <span>{{ ev.date }} · {{ ev.startTime }}</span>
+            </div>
+            <select [value]="ev.status"
+                    (change)="updateEventStatus(ev, $any($event.target).value)"
+                    class="status-select" [class]="ev.status">
+              <option value="pending">Pendiente</option>
+              <option value="in-progress">En Progreso</option>
+              <option value="completed">Completado</option>
+            </select>
+          </div>
+        }
+      </div>
+    }
   </section>
 
   <!-- Eventos de Hoy -->

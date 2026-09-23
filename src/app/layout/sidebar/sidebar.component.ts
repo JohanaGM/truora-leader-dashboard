@@ -50,7 +50,7 @@ export class SidebarComponent {
     },
     {
       icon: '📈',
-      label: 'Métricas',
+      label: 'Auditoría Telegram',
       route: '/metricas',
       active: false
     }

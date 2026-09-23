@@ -4,3 +4,4 @@ export * from './tip.model';
 export * from './user.model';
 export * from './event.model';
 export * from './leader-schedule.model';
+export * from './telegram-log.model';

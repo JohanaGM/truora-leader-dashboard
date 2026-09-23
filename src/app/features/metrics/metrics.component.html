@@ -1,332 +1,70 @@
-<div class="metrics-page" (click)="calendarOpen.set(false)">
-
-  <!-- ── Admin Gate ──────────────────────────────────────────────────────── -->
-  @if (!isAdmin()) {
-    <div class="access-denied">
-      <div class="denied-icon">🔒</div>
-      <h2>Acceso Restringido</h2>
-      <p>Esta sección es exclusiva para el liderazgo (Johana Galindo y María Alejandra).</p>
+<main class="telegram-history-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Auditoría operativa</p>
+      <h1 class="page-title">Historial de Telegram</h1>
+      <p class="page-subtitle">Consulta el contenido exacto de cada aviso y tip enviado.</p>
     </div>
-  } @else {
+  </header>
 
-    <!-- ── Page Header ───────────────────────────────────────────────────── -->
-    <div class="page-header">
+  <section class="filters-panel" aria-labelledby="filters-title">
+    <div class="filters-heading">
       <div>
-        <h1 class="page-title">Control de Métricas</h1>
-        <p class="page-subtitle">Visión global y auditoría individual por período</p>
+        <h2 id="filters-title">Filtrar envíos</h2>
+        <p>Combina usuario, fecha y origen para encontrar un mensaje.</p>
       </div>
-      <span class="admin-badge">👤 Liderazgo</span>
+      <button type="button" class="clear-button" (click)="clearFilters()">Limpiar filtros</button>
     </div>
-
-    <!-- ── Filters Bar ───────────────────────────────────────────────────── -->
-    <div class="filters-bar" (click)="stopProp($event)">
-
-      <!-- Analyst selector -->
-      <div class="select-wrapper">
-        <select class="filter-select analyst-select"
-                (change)="onAnalystChange($event)">
-          <option value="all">👥 Todos los Analistas</option>
-          @for (analyst of analysts; track analyst.id) {
-            <option [value]="analyst.id">{{ analyst.displayName }}</option>
-          }
+    <div class="filters-grid">
+      <label class="filter-field">
+        <span>Usuario</span>
+        <select [value]="selectedUser()" (change)="setUser($any($event.target).value)">
+          <option value="all">Todos los usuarios</option>
+          @for (user of users(); track user.email) { <option [value]="user.email">{{ user.name }} · {{ user.email }}</option> }
         </select>
-      </div>
-
-      <div class="divider-v"></div>
-
-      <!-- Date Range Picker -->
-      <div class="range-picker-wrapper">
-        <button class="range-display-btn" (click)="toggleCalendar($event)">
-          <span class="cal-icon">📅</span>
-          <span class="range-text">{{ rangeLabel() }}</span>
-          <span class="chevron" [class.open]="calendarOpen()">▾</span>
-        </button>
-
-        @if (calendarOpen()) {
-          <div class="cal-overlay" (click)="calendarOpen.set(false)"></div>
-          <div class="calendar-popover" (click)="stopProp($event)">
-            <div class="cal-nav">
-              <button class="cal-nav-btn" (click)="prevMonth()">‹</button>
-              <span class="cal-month-label">{{ pickerMonthLabel() }}</span>
-              <button class="cal-nav-btn" (click)="nextMonth()">›</button>
-            </div>
-
-            <div class="cal-grid-header">
-              @for (d of weekDays; track d) { <span>{{ d }}</span> }
-            </div>
-
-            <div class="cal-grid"
-                 (mouseleave)="hoverDate.set(null)">
-              @for (day of calendarDays(); track ($index)) {
-                <button class="cal-day"
-                        [class.empty]="!day"
-                        [class.start]="isDayStart(day)"
-                        [class.end]="isDayEnd(day)"
-                        [class.in-range]="isDayInRange(day)"
-                        [class.today]="isDayToday(day)"
-                        [disabled]="!day"
-                        (mouseenter)="hoverDate.set(day)"
-                        (click)="selectDay(day, $event)">
-                  {{ day?.getDate() }}
-                </button>
-              }
-            </div>
-          </div>
-        }
-      </div>
-
-      <div class="divider-v"></div>
-
-      <!-- Process filter -->
-      <div class="select-wrapper">
-        <select class="filter-select"
-                [value]="processFilter()"
-                (change)="processFilter.set($any($event.target).value); triggerLoading()">
-          @for (pt of processTypes; track pt.value) {
-            <option [value]="pt.value">{{ pt.label }}</option>
-          }
+      </label>
+      <label class="filter-field"><span>Fecha</span><input type="date" [value]="selectedDate()" (change)="setDate($any($event.target).value)" /></label>
+      <label class="filter-field">
+        <span>Origen</span>
+        <select [value]="selectedOrigin()" (change)="setOrigin($any($event.target).value)">
+          <option value="all">Todos</option><option value="announcement">Avisos</option><option value="tip">Generar Tips</option>
         </select>
-      </div>
-    </div><!-- /filters-bar -->
+      </label>
+    </div>
+  </section>
 
-    <!-- ── Content area switches between global and audit mode ─────────── -->
-    <div class="metrics-content" [class.mode-audit]="isAuditMode()" [class.mode-global]="!isAuditMode()">
+  <section class="results-heading" aria-live="polite"><p>{{ summary() }}</p></section>
 
-      <!-- ── SKELETON LOADER ─────────────────────────────────────────────── -->
-      @if (isLoading()) {
-        <div class="skeleton-grid">
-          @for (i of [1,2,3,4,5]; track i) {
-            <div class="skeleton-card">
-              <div class="sk-line sk-short"></div>
-              <div class="sk-line sk-tall"></div>
-            </div>
-          }
-        </div>
-      }
-
-      @if (!isLoading()) {
-
-        <!-- ══════════════════════════════════════════════════════════════
-             GLOBAL VIEW  (Todos los Analistas)
-        ════════════════════════════════════════════════════════════════ -->
-        @if (!isAuditMode()) {
-
-          <!-- KPI grid — always visible, shows 0 when no data -->
-          <div class="kpi-grid">
-            <div class="kpi-card accent-blue">
-              <span class="kpi-label">Total Tareas</span>
-              <span class="kpi-value">{{ totalTasks() }}</span>
-            </div>
-            <div class="kpi-card accent-green">
-              <span class="kpi-label">Completadas</span>
-              <span class="kpi-value">{{ completedTasks() }}</span>
-            </div>
-            <div class="kpi-card accent-yellow">
-              <span class="kpi-label">Tasa Completado</span>
-              <span class="kpi-value">{{ completionRate() }}%</span>
-            </div>
-            <div class="kpi-card accent-purple">
-              <span class="kpi-label">SLA (sin vencer)</span>
-              <span class="kpi-value">{{ slaRate() }}%</span>
-            </div>
-            <div class="kpi-card accent-red">
-              <span class="kpi-label">Top Proceso</span>
-              <span class="kpi-value kpi-value--sm">{{ topProcess() }}</span>
-            </div>
-          </div>
-
-          <!-- Charts row — always visible -->
-          <div class="charts-row">
-
-            <!-- Bar chart: tasks per process -->
-            <div class="chart-card bar-chart-card">
-              <h3 class="chart-title">Volumen por Proceso</h3>
-              @if (barChartData().length > 0) {
-                <div class="bar-list">
-                  @for (item of barChartData(); track item.label) {
-                    <div class="bar-row">
-                      <span class="bar-label">{{ item.label }}</span>
-                      <div class="bar-track">
-                        <div class="bar-fill" [style.width.%]="item.pct"></div>
-                      </div>
-                      <span class="bar-count">{{ item.count }}</span>
-                    </div>
-                  }
-                </div>
-              } @else {
-                <div class="chart-no-data">📭 Sin registros en este período</div>
-              }
-            </div>
-
-            <!-- Donut chart: status distribution -->
-            <div class="chart-card donut-chart-card">
-              <h3 class="chart-title">Distribución de Estado</h3>
-              @if (pieSlices().length > 0) {
-                <div class="donut-wrapper">
-                  <svg viewBox="0 0 180 180" class="donut-svg">
-                    @for (slice of pieSlices(); track slice.label) {
-                      <path [attr.d]="arcPath(slice.startAngle, slice.endAngle)"
-                            [attr.fill]="slice.color" />
-                    }
-                    <circle cx="90" cy="90" r="35" class="donut-hole" />
-                    <text x="90" y="87" class="donut-center-val">{{ completionRate() }}%</text>
-                    <text x="90" y="103" class="donut-center-lbl">Done</text>
-                  </svg>
-                  <div class="donut-legend">
-                    @for (slice of pieSlices(); track slice.label) {
-                      <div class="legend-item">
-                        <span class="legend-dot" [style.background]="slice.color"></span>
-                        <span class="legend-label">{{ slice.label }}</span>
-                        <span class="legend-val">{{ slice.count }}</span>
-                      </div>
-                    }
-                  </div>
-                </div>
-              } @else {
-                <div class="chart-no-data">📭 Sin registros en este período</div>
-              }
-            </div>
-          </div>
-
-          <!-- Trend line chart -->
-          <div class="chart-card trend-card">
-            <h3 class="chart-title">Tendencia Diaria</h3>
-            @if (trendData().length >= 2) {
-              <div class="trend-wrapper">
-                <svg viewBox="0 0 480 110" class="trend-svg" preserveAspectRatio="none">
-                  <polyline class="trend-line total"  [attr.points]="linePoints(trendData(), 'total')" />
-                  <polyline class="trend-line done"   [attr.points]="linePoints(trendData(), 'completed')" />
-                </svg>
-                <div class="trend-x-labels">
-                  @for (lbl of trendXLabels(); track lbl) {
-                    <span>{{ lbl }}</span>
-                  }
-                </div>
+  <section class="history-feed" aria-label="Historial de mensajes">
+    @if (filteredLogs().length === 0) {
+      <div class="empty-state"><span class="empty-state__icon">⌕</span><h2>No hay mensajes para estos filtros</h2><p>Prueba con otra fecha, usuario u origen.</p></div>
+    } @else {
+      @for (log of filteredLogs(); track log.id) {
+        <article class="message-card">
+          <header class="message-card__header">
+            <div class="message-meta"><time [attr.datetime]="log.sentAt">{{ log.sentAt | date:'medium':'':'es-CO' }}</time><span class="origin-badge" [class.origin-badge--tip]="log.origin === 'tip'">{{ originLabel(log.origin) }}</span></div>
+            <span class="status-badge" [class.status-badge--error]="log.status === 'error'"><span class="status-icon">{{ log.status === 'success' ? '✓' : '!' }}</span>{{ statusLabel(log.status) }}</span>
+          </header>
+          <div class="message-card__body" [class.message-card__body--tip]="log.origin === 'tip'">
+            @if (log.origin === 'tip') {
+              <div class="tip-audit-copy">
+                <span class="tip-audit-label">Tip enviado</span>
+                <h2>{{ log.tipTitle || 'Tip de Telegram' }}</h2>
+                <p>{{ log.message }}</p>
+                @if (log.libraryUrl) {
+                  <a class="tip-library-link" [href]="log.libraryUrl">Ver en la biblioteca de tips</a>
+                }
               </div>
-              <div class="trend-legend">
-                <span class="tl-dot tl-total"></span><span>Total</span>
-                <span class="tl-dot tl-done"></span><span>Completadas</span>
-              </div>
+              @if (log.imageUrl) {
+                <img class="tip-audit-image" [src]="log.imageUrl" [alt]="log.tipTitle || 'Imagen del tip enviado'" />
+              }
             } @else {
-              <div class="chart-no-data">📭 Sin registros en este período</div>
+              <p>{{ log.message }}</p>
             }
           </div>
-
-        } @else {
-
-          <!-- ════════════════════════════════════════════════════════════
-               AUDIT VIEW  (Individual analyst)
-          ════════════════════════════════════════════════════════════════ -->
-          @if (selectedAnalyst(); as analyst) {
-
-            <div class="audit-layout">
-
-              <!-- Profile card — always visible -->
-              <div class="audit-profile-card">
-                <div class="analyst-avatar" [style.background]="analyst.color">
-                  {{ analyst.avatar }}
-                </div>
-                <div class="analyst-info">
-                  <h2 class="analyst-name">{{ analyst.displayName }}</h2>
-
-                  <div class="efficiency-stars">
-                    @for (i of [1,2,3,4,5]; track i) {
-                      <span class="star" [class.filled]="i <= stars()">★</span>
-                    }
-                    <span class="eff-pct">{{ efficiencyRate() }}%</span>
-                  </div>
-
-                  <div class="audit-kpi-row">
-                    <div class="akpi">
-                      <span class="akpi-val">{{ totalTasks() }}</span>
-                      <span class="akpi-lbl">Asignadas</span>
-                    </div>
-                    <div class="akpi">
-                      <span class="akpi-val" style="color:#22c55e">{{ completedTasks() }}</span>
-                      <span class="akpi-lbl">Completadas</span>
-                    </div>
-                    <div class="akpi">
-                      <span class="akpi-val" style="color:#f59e0b">{{ pendingTasks() }}</span>
-                      <span class="akpi-lbl">Pendientes</span>
-                    </div>
-                    <div class="akpi">
-                      <span class="akpi-val">{{ completionRate() }}%</span>
-                      <span class="akpi-lbl">Tasa</span>
-                    </div>
-                  </div>
-                </div>
-
-                <button class="tg-btn" (click)="openTelegram()">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M11.944 0A12 12 0 1 0 23.888 12 12.012 12.012 0 0 0 11.944 0zm6.11 8.2l-2.03 9.54c-.15.68-.54.84-1.09.52l-3-2.21-1.45 1.4c-.16.16-.3.3-.61.3l.22-3.07 5.6-5.06c.24-.21-.05-.33-.38-.12l-6.92 4.36-2.98-.93c-.65-.2-.66-.65.14-.96l11.63-4.49c.54-.19 1.01.13.84.72z"/>
-                  </svg>
-                  Contactar
-                </button>
-              </div>
-
-              <!-- Audit charts — always visible -->
-              <div class="audit-charts">
-
-                <div class="chart-card bar-chart-card">
-                  <h3 class="chart-title">Asignadas vs Completadas por Día</h3>
-                  @if (barChartData().length > 0) {
-                    <div class="bar-list audit-bar-list">
-                      @for (item of barChartData(); track item.label) {
-                        <div class="bar-row audit-bar-row">
-                          <span class="bar-label">{{ item.label }}</span>
-                          <div class="bar-track">
-                            <div class="bar-fill bar-assigned" [style.width.%]="item.pct"></div>
-                          </div>
-                          <div class="bar-track bar-track-sm">
-                            <div class="bar-fill bar-completed" [style.width.%]="item.completedPct"></div>
-                          </div>
-                          <span class="bar-count">{{ item.count }}</span>
-                        </div>
-                      }
-                    </div>
-                    <div class="audit-bar-legend">
-                      <span class="ab-dot ab-assigned"></span><span>Asignadas</span>
-                      <span class="ab-dot ab-completed"></span><span>Completadas</span>
-                    </div>
-                  } @else {
-                    <div class="chart-no-data">📭 Sin registros en este período</div>
-                  }
-                </div>
-
-                <div class="chart-card donut-chart-card">
-                  <h3 class="chart-title">Mix de Procesos</h3>
-                  @if (pieSlices().length > 0) {
-                    <div class="donut-wrapper">
-                      <svg viewBox="0 0 180 180" class="donut-svg">
-                        @for (slice of pieSlices(); track slice.label) {
-                          <path [attr.d]="arcPath(slice.startAngle, slice.endAngle)"
-                                [attr.fill]="slice.color" />
-                        }
-                        <circle cx="90" cy="90" r="35" class="donut-hole" />
-                        <text x="90" y="87" class="donut-center-val">{{ totalTasks() }}</text>
-                        <text x="90" y="103" class="donut-center-lbl">Tareas</text>
-                      </svg>
-                      <div class="donut-legend">
-                        @for (slice of pieSlices(); track slice.label) {
-                          <div class="legend-item">
-                            <span class="legend-dot" [style.background]="slice.color"></span>
-                            <span class="legend-label">{{ slice.label }}</span>
-                            <span class="legend-val">{{ slice.count }}</span>
-                          </div>
-                        }
-                      </div>
-                    </div>
-                  } @else {
-                    <div class="chart-no-data">📭 Sin registros en este período</div>
-                  }
-                </div>
-
-              </div><!-- /audit-charts -->
-            </div><!-- /audit-layout -->
-          }
-        }
-
-      }<!-- /!isLoading -->
-    </div><!-- /metrics-content -->
-  }<!-- /isAdmin -->
-</div>
+          <footer class="message-card__footer"><span class="recipient-label">Destinatario</span><strong>{{ log.chatId }}</strong><span class="sender">Enviado por {{ log.senderName }}</span></footer>
+        </article>
+      }
+    }
+  </section>
+</main>

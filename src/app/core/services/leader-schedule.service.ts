@@ -39,7 +39,7 @@ export class LeaderScheduleService {
 
   /** Color de acento según el tipo de tarea */
   taskColor(tarea: string): string {
-    return tarea === 'Generar Tip' ? '#764ba2' : '#1a3a5f';
+    return tarea === 'Generar Tip' || tarea === 'Generar TL' ? '#f3a261' : '#4f26ec';
   }
 
   // ── Carga desde assets ─────────────────────────────────────────────────

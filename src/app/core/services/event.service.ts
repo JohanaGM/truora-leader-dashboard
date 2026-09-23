@@ -4,6 +4,7 @@ import {
   AppEvent, EventStatus, EventPriority,
   PRIORITY_COLOR, RECURRING_COLOR
 } from '../models/event.model';
+import { LeaderScheduleTask } from '../models/leader-schedule.model';
 import { HolidayService } from './holiday.service';
 import { SupabaseService } from './supabase.service';
 
@@ -246,6 +247,30 @@ export class EventService {
 
   getAllForDate(date: Date): VirtualEvent[] {
     return [...this.getRecurringForDate(date), ...this.getManualForDate(date)];
+  }
+
+  /** Convert weekly schedule rows into the same reactive event shape used by the UI. */
+  getScheduledForDate(tasks: LeaderScheduleTask[], date: Date): VirtualEvent[] {
+    const dateStr = this.toDateStr(date);
+    return tasks
+      .filter(task => task.fecha === dateStr)
+      .map(task => {
+        const type = task.tarea === 'Generar Tip' || task.tarea === 'Generar TL' ? 'tips' : 'truface';
+        const override = this.eventsSignal().find(event => event.id === `${type}_${dateStr}`);
+        const startTime = type === 'tips' ? '14:00' : '08:00';
+        return {
+          id: `${type}_${dateStr}`,
+          title: task.tarea,
+          date: dateStr,
+          startTime,
+          endTime: startTime,
+          type,
+          status: override?.status ?? task.status ?? 'pending',
+          priority: 'medium',
+          color: RECURRING_COLOR[type],
+          isRecurring: true,
+        } as VirtualEvent;
+      });
   }
 
   // ── Week helpers ──────────────────────────────────────────────────────────
