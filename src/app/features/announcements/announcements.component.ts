@@ -1,12 +1,16 @@
-import { Component, inject, signal, ViewChild, ElementRef } from '@angular/core';
+import { Component, computed, inject, signal, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { MessageTemplateComponent } from '../message-template/message-template.component';
 
-const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/jpg'];
-const MAX_FILE_SIZE_MB = 5;
+const IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/jpg'];
+const VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/webm'];
+const IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg'];
+const VIDEO_EXTENSIONS = ['mp4', 'mov', 'webm'];
+const MAX_IMAGE_SIZE_MB = 5;
+const MAX_VIDEO_SIZE_MB = 20;
 
 @Component({
   selector: 'app-announcements',
@@ -30,11 +34,15 @@ export class AnnouncementsComponent {
   linkUrl = signal('');
   scheduledAt = signal('');
 
-  // ── Image upload state ────────────────────────────────────────────────────
+  // ── Media upload state ────────────────────────────────────────────────────
   selectedFile = signal<File | null>(null);
   previewUrl = signal<string | null>(null);
   isDragOver = signal(false);
   fileError = signal<string | null>(null);
+  isVideo = computed(() => {
+    const file = this.selectedFile();
+    return !!file && this.getMediaKind(file) === 'video';
+  });
 
   /** Contacto global Truora — separado visualmente de los analistas del equipo */
   truoraContacts = [
@@ -155,17 +163,30 @@ export class AnnouncementsComponent {
     input.value = '';
   }
 
+  // Some browsers report an empty MIME type for .mov files, so the extension is a fallback.
+  private getMediaKind(file: File): 'image' | 'video' | null {
+    const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
+    if (file.type.startsWith('video/') || VIDEO_EXTENSIONS.includes(extension)) {
+      return VIDEO_TYPES.includes(file.type) || VIDEO_EXTENSIONS.includes(extension) ? 'video' : null;
+    }
+    if (IMAGE_TYPES.includes(file.type) || IMAGE_EXTENSIONS.includes(extension)) return 'image';
+    return null;
+  }
+
   private processFile(file: File | null) {
     this.fileError.set(null);
     if (!file) return;
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      this.fileError.set('Solo se aceptan imágenes PNG, JPG o JPEG.');
+    const kind = this.getMediaKind(file);
+    if (!kind) {
+      this.fileError.set('Formato no válido. Usa imágenes PNG, JPG o JPEG, o videos MP4, MOV o WEBM.');
       return;
     }
 
-    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-      this.fileError.set(`El archivo supera el límite de ${MAX_FILE_SIZE_MB} MB.`);
+    const maxSizeMb = kind === 'video' ? MAX_VIDEO_SIZE_MB : MAX_IMAGE_SIZE_MB;
+    if (file.size > maxSizeMb * 1024 * 1024) {
+      const label = kind === 'video' ? 'El video' : 'La imagen';
+      this.fileError.set(`${label} supera el límite de ${maxSizeMb} MB.`);
       return;
     }
 
@@ -213,9 +234,11 @@ export class AnnouncementsComponent {
     const file      = this.selectedFile();
 
     if (file) {
-      // ── Escenario B: texto + imagen → multipart/form-data ─────────────────
+      // ── Escenario B: texto + imagen/video → multipart/form-data ───────────
+      const tipoArchivo = this.getMediaKind(file) ?? 'image';
       const formData = new FormData();
       formData.append('file', file, file.name);
+      formData.append('tipo_archivo', tipoArchivo);
       formData.append('mensaje', mensaje);
       formData.append('link_texto', linkTexto);
       formData.append('link_url', linkUrl);
@@ -227,11 +250,11 @@ export class AnnouncementsComponent {
       this.http.post(environment.n8nWebhookUrl, formData)
         .subscribe({
           next: (res) => {
-            console.log('[Telegram] ✅ Enviado con imagen. Respuesta n8n:', res);
+            console.log(`[Telegram] ✅ Enviado con ${tipoArchivo}. Respuesta n8n:`, res);
             this.onSendSuccess();
           },
           error: (err) => {
-            console.error('[Telegram] ❌ Error al enviar con imagen:', err);
+            console.error(`[Telegram] ❌ Error al enviar con ${tipoArchivo}:`, err);
             this.onSendError();
           }
         });

@@ -44,7 +44,7 @@
       <input
         #fileInput
         type="file"
-        accept="image/png,image/jpeg,image/jpg"
+        accept="image/*, video/*, .mp4, .mov, .webm, .jpg, .png, .jpeg"
         class="file-input-hidden"
         (change)="onFileSelected($event)"
       />
@@ -52,7 +52,7 @@
       <!-- Etiquetas de columna -->
       <div class="editor-card__labels">
         <span class="editor-card__col-label"></span>
-        <span class="editor-card__col-label editor-card__col-label--img">Imagen para Telegram</span>
+        <span class="editor-card__col-label editor-card__col-label--img">Imagen o video para Telegram</span>
       </div>
 
       <!-- Cuerpo: textarea + separador + zona de carga -->
@@ -82,7 +82,17 @@
         >
           @if (previewUrl()) {
             <div class="dz-preview">
-              <img [src]="previewUrl()" alt="Vista previa" class="dz-preview__thumb" />
+              @if (isVideo()) {
+                <video
+                  controls
+                  [src]="previewUrl()"
+                  class="dz-preview__video"
+                  style="max-height: 200px; width: 100%; object-fit: contain;"
+                  (click)="$event.stopPropagation()"
+                ></video>
+              } @else {
+                <img [src]="previewUrl()" alt="Vista previa" class="dz-preview__thumb" />
+              }
               <div class="dz-preview__info">
                 <span class="dz-preview__name">{{ selectedFile()?.name }}</span>
                 <span class="dz-preview__size">{{ (selectedFile()!.size / 1024 / 1024).toFixed(2) }} MB</span>
@@ -91,7 +101,7 @@
                 class="dz-preview__remove"
                 type="button"
                 (click)="$event.stopPropagation(); removeFile()"
-                title="Quitar imagen"
+                [title]="isVideo() ? 'Quitar video' : 'Quitar imagen'"
               >✕</button>
             </div>
           } @else {
@@ -101,8 +111,8 @@
                 <path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5"/>
                 <path d="M16.5 7.5L12 3m0 0L7.5 7.5M12 3v13.5"/>
               </svg>
-              <span class="dz-placeholder__text">Sube o arrastra una imagen aquí.</span>
-              <span class="dz-placeholder__hint">Soporta PNG, JPG, JPEG · máx. 5 MB</span>
+              <span class="dz-placeholder__text">Sube o arrastra una imagen o video aquí</span>
+              <span class="dz-placeholder__hint">PNG, JPG, MP4, MOV - Máx. 20 MB</span>
               <span class="dz-placeholder__sparkle" aria-hidden="true">✦</span>
             </div>
           }
