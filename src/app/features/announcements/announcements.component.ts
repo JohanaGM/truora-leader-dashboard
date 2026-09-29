@@ -12,6 +12,11 @@ const VIDEO_EXTENSIONS = ['mp4', 'mov', 'webm'];
 const MAX_IMAGE_SIZE_MB = 5;
 const MAX_VIDEO_SIZE_MB = 20;
 
+export interface Enlace {
+  texto: string;
+  url: string;
+}
+
 @Component({
   selector: 'app-announcements',
   standalone: true,
@@ -30,8 +35,7 @@ export class AnnouncementsComponent {
   isSending = signal(false);
   showSuccess = signal(false);
   errorMessage = signal<string | null>(null);
-  linkTexto = signal('');
-  linkUrl = signal('');
+  enlaces = signal<Enlace[]>([{ texto: '', url: '' }]);
   scheduledAt = signal('');
 
   // ── Media upload state ────────────────────────────────────────────────────
@@ -75,6 +79,46 @@ export class AnnouncementsComponent {
   private get sendAtIso(): string {
     const value = this.scheduledAt().trim();
     return value ? new Date(value).toISOString() : new Date().toISOString();
+  }
+
+  // ── Enlaces ──────────────────────────────────────────────────────────────────────
+
+  agregarEnlace(): void {
+    this.enlaces.update(list => [...list, { texto: '', url: '' }]);
+  }
+
+  eliminarEnlace(index: number): void {
+    const list = this.enlaces();
+    if (list.length === 1) {
+      this.enlaces.set([{ texto: '', url: '' }]);
+      return;
+    }
+    this.enlaces.set(list.filter((_, i) => i !== index));
+  }
+
+  actualizarEnlace(index: number, campo: keyof Enlace, valor: string): void {
+    this.enlaces.update(list =>
+      list.map((enlace, i) => (i === index ? { ...enlace, [campo]: valor } : enlace))
+    );
+  }
+
+  puedeEliminarEnlace(index: number): boolean {
+    const enlace = this.enlaces()[index];
+    return this.enlaces().length > 1 || !!enlace.texto.trim() || !!enlace.url.trim();
+  }
+
+  private get enlacesValidos(): Enlace[] {
+    return this.enlaces()
+      .map(({ texto, url }) => ({ texto: texto.trim(), url: url.trim() }))
+      .filter(enlace => enlace.url.length > 0)
+      .map(enlace => ({ texto: enlace.texto || enlace.url, url: enlace.url }));
+  }
+
+  // Brackets in the text or parentheses in the URL would break Telegram's Markdown link syntax.
+  private buildEnlacesMarkdown(enlaces: Enlace[]): string {
+    return enlaces
+      .map(({ texto, url }) => `[${texto.replace(/[[\]]/g, '')}](${url.replace(/\)/g, '%29')})`)
+      .join('\n');
   }
 
   // ── Derived state from MessageTemplateComponent ───────────────────────────
@@ -226,8 +270,11 @@ export class AnnouncementsComponent {
     }
 
     const mensaje   = this.reminder();
-    const linkTexto = this.linkTexto().trim();
-    const linkUrl   = this.linkUrl().trim();
+    const enlaces   = this.enlacesValidos;
+    const enlacesMarkdown = this.buildEnlacesMarkdown(enlaces);
+    // The existing n8n workflow still reads the first link from the legacy single-link fields.
+    const linkTexto = enlaces[0]?.texto ?? '';
+    const linkUrl   = enlaces[0]?.url ?? '';
     const sendAt    = this.sendAtIso;
     const analistas = this.activeAnalistas;
     const tags      = this.activeTags;
@@ -242,6 +289,8 @@ export class AnnouncementsComponent {
       formData.append('mensaje', mensaje);
       formData.append('link_texto', linkTexto);
       formData.append('link_url', linkUrl);
+      formData.append('enlaces', JSON.stringify(enlaces));
+      formData.append('enlacesMarkdown', enlacesMarkdown);
       formData.append('imagen_url', '');
       formData.append('send_at', sendAt);
       formData.append('analistas', JSON.stringify(analistas));
@@ -265,6 +314,8 @@ export class AnnouncementsComponent {
         imagen_url: '',
         enlace_texto: linkTexto,
         enlace_url: linkUrl,
+        enlaces,
+        enlacesMarkdown,
         send_at: sendAt,
         // Preserve the existing n8n fields while the workflow migrates names.
         link_texto: linkTexto,
@@ -292,8 +343,7 @@ export class AnnouncementsComponent {
     this.isSending.set(false);
     setTimeout(() => {
       this.reminder.set('');
-      this.linkTexto.set('');
-      this.linkUrl.set('');
+      this.enlaces.set([{ texto: '', url: '' }]);
       this.scheduledAt.set('');
       this.showSuccess.set(false);
       this.removeFile();

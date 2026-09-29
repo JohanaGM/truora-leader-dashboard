@@ -120,35 +120,69 @@
 
       </div><!-- /editor-card__body -->
 
-      <!-- Adjuntar enlace / archivo: campos estructurados enviados al webhook -->
+      <!-- Adjuntar enlaces: lista dinámica enviada al webhook -->
       <div class="link-attach-section">
         <h3 class="link-attach-section__title">Adjuntar enlace / archivo</h3>
-        <div class="link-attach-section__row">
-          <div class="link-attach-field">
-            <label class="link-attach-field__label" for="linkTexto">Texto del enlace</label>
-            <input
-              id="linkTexto"
-              type="text"
-              class="link-attach-field__input"
-              [value]="linkTexto()"
-              (input)="linkTexto.set($any($event.target).value)"
-              placeholder="Descargar Documento PDF"
-              [disabled]="isSending()"
-            />
-          </div>
-          <div class="link-attach-field">
-            <label class="link-attach-field__label" for="linkUrl">URL del enlace</label>
-            <input
-              id="linkUrl"
-              type="url"
-              class="link-attach-field__input"
-              [value]="linkUrl()"
-              (input)="linkUrl.set($any($event.target).value)"
-              placeholder="https://miservidor.com/archivo.pdf"
-              [disabled]="isSending()"
-            />
-          </div>
+
+        <div class="link-attach-list">
+          @for (enlace of enlaces(); track $index; let i = $index, first = $first) {
+            <div class="link-attach-section__row">
+              <div class="link-attach-field">
+                @if (first) {
+                  <label class="link-attach-field__label" [for]="'linkTexto' + i">Texto del enlace</label>
+                }
+                <input
+                  [id]="'linkTexto' + i"
+                  type="text"
+                  class="link-attach-field__input"
+                  [value]="enlace.texto"
+                  (input)="actualizarEnlace(i, 'texto', $any($event.target).value)"
+                  placeholder="Descargar Documento PDF"
+                  [attr.aria-label]="'Texto del enlace ' + (i + 1)"
+                  [disabled]="isSending()"
+                />
+              </div>
+              <div class="link-attach-field">
+                @if (first) {
+                  <label class="link-attach-field__label" [for]="'linkUrl' + i">URL del enlace</label>
+                }
+                <input
+                  [id]="'linkUrl' + i"
+                  type="url"
+                  class="link-attach-field__input"
+                  [value]="enlace.url"
+                  (input)="actualizarEnlace(i, 'url', $any($event.target).value)"
+                  placeholder="https://miservidor.com/archivo.pdf"
+                  [attr.aria-label]="'URL del enlace ' + (i + 1)"
+                  [disabled]="isSending()"
+                />
+              </div>
+              <button
+                type="button"
+                class="link-attach-remove"
+                (click)="eliminarEnlace(i)"
+                [disabled]="isSending() || !puedeEliminarEnlace(i)"
+                [attr.aria-label]="'Eliminar enlace ' + (i + 1)"
+                title="Eliminar enlace"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 6h18"/>
+                  <path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                  <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+                  <path d="M10 11v6M14 11v6"/>
+                </svg>
+              </button>
+            </div>
+          }
         </div>
+
+        <button
+          type="button"
+          class="link-attach-add"
+          (click)="agregarEnlace()"
+          [disabled]="isSending()"
+        >+ Agregar otro enlace</button>
       </div>
 
       <div class="schedule-section">
