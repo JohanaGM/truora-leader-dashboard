@@ -1317,15 +1317,20 @@
     }
 
     .tip-item {
-      background: white !important;
-      border-left-color: white !important;
+      background: #252b3b !important;
+      border: 1px solid #46536d !important;
+      border-left: 4px solid #9bd2f3 !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28) !important;
 
       &:hover {
-        background: rgba(155, 210, 243, 0.2) !important;
+        background: #2d3850 !important;
+        border-color: #667eea !important;
+        border-left-color: #9bd2f3 !important;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.38) !important;
       }
 
-      p { color: white !important; }
-      p strong { color: white !important; }
+      p { color: #e2e8f0 !important; }
+      p strong { color: #9bd2f3 !important; }
     }
   }
 }
