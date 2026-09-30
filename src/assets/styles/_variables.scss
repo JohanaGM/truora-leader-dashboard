@@ -63,10 +63,10 @@ $transition-fast: 0.15s ease;
 $transition-base: 0.2s ease;
 $transition-slow: 0.3s ease;
 
-// Tipografía Truora: Host Grotesk Medium / Light y JetBrains Mono
+// Tipografía Truora: Host Grotesk Medium en toda la aplicación
 $font-family-base: 'Host Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
-$font-family-display: 'Host Grotesk', system-ui, sans-serif;
-$font-family-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+$font-family-display: $font-family-base;
+$font-family-mono: $font-family-base;
 $font-size-5xl: 5rem;      // 80px - Truora / display
 $font-size-3xl: 2.875rem;  // 46px - headings
 $font-size-2xl: 2.25rem;   // 36px - headings

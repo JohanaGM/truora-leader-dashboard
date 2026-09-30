@@ -76,6 +76,8 @@ export class TipGeneratorComponent {
     try {
       // Esperar un ciclo de renderizado para que Angular actualice el DOM y las imágenes se carguen
       await new Promise(resolve => setTimeout(resolve, 1000));
+      // html2canvas captures whatever font is active, so wait for Host Grotesk to finish loading.
+      await document.fonts.ready;
 
       const canvas = await html2canvas(this.tipCanvas.nativeElement, {
         backgroundColor: null,

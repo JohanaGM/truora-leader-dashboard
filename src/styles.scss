@@ -8,6 +8,11 @@
   box-sizing: border-box;
 }
 
+// Brand rule: every element uses Host Grotesk; weights and layout stay as each component defines them.
+*, *::before, *::after {
+  font-family: $font-family-base !important;
+}
+
 html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
