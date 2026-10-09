@@ -3,7 +3,7 @@ export const environment = {
   n8nWebhookUrl: 'https://n8n.zapsign.com.br/webhook/d4d32508-4178-4d90-bfe9-c3f6c5889bfc', // Production URL
   n8nChatWebhookUrl: 'https://n8n.zapsign.com.br/webhook/chat-ia-tips', // Production URL
   n8nTelegramWebhookUrl: 'https://n8n.zapsign.com.br/webhook/truface-upload',// production
-  n8nLensWebhookUrl: 'https://n8n.zapsign.com.br/webhook/desbloqueoaccid',
+  n8nLensWebhookUrl: 'https://n8n.zapsign.com.br/webhook/desbloqueo-acc-id',
   n8nContadorTipsUrl: 'https://n8n.zapsign.com.br/webhook/contador-tips',
   n8nTareaFinalizadaUrl: 'https://n8n.zapsign.com.br/webhook/tarea-finalizada',
   n8nBuscarTipsUrl: 'https://n8n.zapsign.com.br/webhook/buscar_tips',
