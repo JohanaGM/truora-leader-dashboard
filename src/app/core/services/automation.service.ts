@@ -22,7 +22,7 @@ export class AutomationService {
     const formData = new FormData();
     formData.append('file', file, file.name);
     formData.append('timestamp', new Date().toISOString());
-    return this.http.post(environment.n8nSnowflakeWebhookUrl, formData, {
+    return this.http.post(environment.n8nLensWebhookUrl, formData, {
       responseType: 'text'
     });
   }

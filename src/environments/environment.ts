@@ -5,7 +5,7 @@ export const environment = {
   n8nChatWebhookUrl: 'https://n8n.zapsign.com.br/webhook/chat-ia-tips',
   n8nChatWebhookUrlTest: 'https://n8n.zapsign.com.br/webhook-test/chat-ia-tips',
   n8nTelegramWebhookUrl: 'https://n8n.zapsign.com.br/webhook/truface-upload',
-  n8nSnowflakeWebhookUrl: 'https://n8n.zapsign.com.br/webhook/snowflake-query',
+  n8nLensWebhookUrl: 'https://n8n.zapsign.com.br/webhook-test/desbloqueoaccid',
   n8nContadorTipsUrl: 'https://n8n.zapsign.com.br/webhook/contador-tips',
   n8nTareaFinalizadaUrl: 'https://n8n.zapsign.com.br/webhook-test/tarea-finalizada',
   n8nBuscarTipsUrl: 'https://n8n.zapsign.com.br/webhook-test/buscar_tips',
