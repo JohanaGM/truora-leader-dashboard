@@ -17,4 +17,13 @@ export class AutomationService {
       responseType: 'text'
     });
   }
+
+  sendAccIdCsv(file: File): Observable<string> {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    formData.append('timestamp', new Date().toISOString());
+    return this.http.post(environment.n8nSnowflakeWebhookUrl, formData, {
+      responseType: 'text'
+    });
+  }
 }

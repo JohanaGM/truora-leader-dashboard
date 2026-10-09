@@ -14,6 +14,7 @@ type FlowTab = 'telegram' | 'snowflake';
 })
 export class AutomationsComponent {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('csvInput') csvInput!: ElementRef<HTMLInputElement>;
 
   private automationService = inject(AutomationService);
 
@@ -28,6 +29,13 @@ export class AutomationsComponent {
   telegramSuccess = signal(false);
   telegramError   = signal<string | null>(null);
   isCompleted     = signal(false);
+
+  // --- Flujo 2: CSV ACC ID ---
+  csvDragOver  = signal(false);
+  csvFile      = signal<File | null>(null);
+  csvLoading   = signal(false);
+  csvError     = signal<string | null>(null);
+  csvCompleted = signal(false);
 
   setTab(tab: FlowTab) {
     this.activeTab.set(tab);
@@ -87,6 +95,64 @@ export class AutomationsComponent {
       error: () => {
         this.telegramError.set('Error al enviar el archivo. Verifica el webhook e intenta nuevamente.');
         this.telegramLoading.set(false);
+      }
+    });
+  }
+
+  // ---- CSV ACC ID ----
+  onCsvDragOver(event: DragEvent) {
+    event.preventDefault();
+    this.csvDragOver.set(true);
+  }
+
+  onCsvDragLeave() {
+    this.csvDragOver.set(false);
+  }
+
+  onCsvDrop(event: DragEvent) {
+    event.preventDefault();
+    this.csvDragOver.set(false);
+    const file = event.dataTransfer?.files[0];
+    if (file) this.handleCsvFile(file);
+  }
+
+  onCsvSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) this.handleCsvFile(file);
+  }
+
+  handleCsvFile(file: File) {
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+      this.csvError.set('Solo se aceptan archivos .csv');
+      return;
+    }
+    this.csvError.set(null);
+    this.csvCompleted.set(false);
+    this.csvFile.set(file);
+  }
+
+  get canSendCsv(): boolean {
+    return !!this.csvFile() && !this.csvLoading();
+  }
+
+  sendCsvFile() {
+    const file = this.csvFile();
+    if (!file || !this.canSendCsv) return;
+
+    this.csvLoading.set(true);
+    this.csvError.set(null);
+
+    this.automationService.sendAccIdCsv(file).subscribe({
+      next: () => {
+        this.csvCompleted.set(true);
+        this.csvLoading.set(false);
+        this.csvFile.set(null);
+        if (this.csvInput) this.csvInput.nativeElement.value = '';
+      },
+      error: () => {
+        this.csvError.set('Error al enviar el archivo. Verifica el webhook e intenta nuevamente.');
+        this.csvLoading.set(false);
       }
     });
   }

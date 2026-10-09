@@ -139,16 +139,72 @@
           <span class="qlc-arrow">↗</span>
         </a>
 
-        <a class="quick-link-card" href="https://app.snowflake.com/" target="_blank" rel="noopener noreferrer">
-          <div class="qlc-icon">❄️</div>
+        <a class="quick-link-card" href="https://lens.truora.com/dashboards/DSH0d27ecfc944f9681e4630ccf09015991?account_id_1=CC1059444583&account_id_10=CC29156917" target="_blank" rel="noopener noreferrer">
+          <div class="qlc-icon">🔍</div>
           <div class="qlc-body">
-            <span class="qlc-title">Herramienta Snowflake</span>
-            <span class="qlc-desc">Consola de consultas SQL en Snowflake</span>
+            <span class="qlc-title">LENS: Lookup IDP</span>
+            <span class="qlc-desc">Dashboard de LENS para consulta de ACC ID</span>
           </div>
           <span class="qlc-arrow">↗</span>
         </a>
 
       </div>
+
+      <!-- Subida de CSV -->
+      <div
+        class="dropzone"
+        [class.dragover]="csvDragOver()"
+        [class.has-file]="!!csvFile()"
+        (dragover)="onCsvDragOver($event)"
+        (dragleave)="onCsvDragLeave()"
+        (drop)="onCsvDrop($event)"
+        (click)="csvInput.click()"
+      >
+        <input
+          #csvInput
+          type="file"
+          accept=".csv"
+          class="file-input-hidden"
+          (change)="onCsvSelected($event)"
+        />
+
+        @if (csvFile()) {
+          <div class="file-preview">
+            <span class="file-icon"></span>
+            <span class="file-name">{{ csvFile()!.name }}</span>
+            <span class="file-size">{{ (csvFile()!.size / 1024).toFixed(1) }} KB</span>
+          </div>
+        } @else {
+          <div class="dropzone-placeholder">
+            <span class="drop-icon">☁️</span>
+            <p class="drop-text">Arrastra tu archivo <strong>.csv</strong> aquí</p>
+            <p class="drop-hint">o haz clic para seleccionarlo</p>
+          </div>
+        }
+      </div>
+
+      @if (csvError()) {
+        <div class="alert alert-error"> {{ csvError() }}</div>
+      }
+
+      @if (csvCompleted()) {
+        <div class="completed-block">
+          <p class="completed-hint"> El archivo CSV ha sido enviado correctamente.</p>
+        </div>
+      }
+
+      <button
+        class="btn-primary"
+        (click)="sendCsvFile()"
+        [disabled]="!canSendCsv"
+      >
+        @if (csvLoading()) {
+          <span class="spinner"></span>
+          <span>Procesando...</span>
+        } @else {
+          <span> Iniciar Procesamiento</span>
+        }
+      </button>
 
     </div>
   }
