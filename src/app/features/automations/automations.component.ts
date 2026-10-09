@@ -1,6 +1,7 @@
 import { Component, inject, signal, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AutomationService } from '../../core/services/automation.service';
 
 type FlowTab = 'telegram' | 'snowflake';
@@ -150,8 +151,12 @@ export class AutomationsComponent {
         this.csvFile.set(null);
         if (this.csvInput) this.csvInput.nativeElement.value = '';
       },
-      error: () => {
-        this.csvError.set('Error al enviar el archivo. Verifica el webhook e intenta nuevamente.');
+      error: (error: HttpErrorResponse) => {
+        const responseDetail = typeof error.error === 'string' ? error.error : error.message;
+        const message = error.status === 0
+          ? 'No hubo respuesta del webhook. Verifica la conexión y la configuración CORS de n8n.'
+          : `El webhook respondió con HTTP ${error.status}${responseDetail ? `: ${responseDetail}` : '.'}`;
+        this.csvError.set(message);
         this.csvLoading.set(false);
       }
     });
