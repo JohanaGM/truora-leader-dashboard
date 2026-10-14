@@ -555,6 +555,72 @@
   }
 }
 
+.schedule-section {
+  display: grid;
+  gap: 0.65rem;
+  min-width: 0;
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  border: 1px solid #e6e9f2;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #fbfcff 0%, #f7f8ff 100%);
+
+  label {
+    color: #4a5568;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #2d3748;
+    font: inherit;
+    color-scheme: light;
+
+    &:focus-visible {
+      outline: 2px solid #667eea;
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  .form-hint {
+    color: #718096;
+    font-size: 0.76rem;
+    line-height: 1.4;
+  }
+
+  .alert {
+    margin: 0;
+  }
+
+  :host-context(body.dark-theme) & {
+    border-color: #2d3748;
+    background: linear-gradient(135deg, #1e2433 0%, #1a1f2e 100%);
+
+    label { color: #cbd5e0; }
+
+    input {
+      background: #1e2433;
+      border-color: #2d3748;
+      color: #e2e8f0;
+      color-scheme: dark;
+    }
+
+    .form-hint { color: #94a3b8; }
+  }
+}
+
 .preview-section {
   .loading-preview {
     display: flex;

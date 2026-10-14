@@ -35,13 +35,31 @@ export class TipGeneratorComponent {
   validationError = signal<string | null>(null);
   fontSize = signal(34);
   tipType = signal<'text' | 'image'>('text');
+  scheduledAt = signal('');
 
   get canGenerate(): boolean {
     return this.title().trim().length > 0 && this.topic().trim().length > 0 && !this.isGenerating();
   }
 
   get canSend(): boolean {
-    return this.generatedImage() !== null && !this.isSending();
+    return this.generatedImage() !== null && this.isScheduledAtValid && !this.isSending();
+  }
+
+  get minScheduledAt(): string {
+    const now = new Date();
+    const offset = now.getTimezoneOffset() * 60000;
+    return new Date(now.getTime() - offset).toISOString().slice(0, 16);
+  }
+
+  get isScheduledAtValid(): boolean {
+    const value = this.scheduledAt().trim();
+    return !value || new Date(value).getTime() > Date.now();
+  }
+
+  onScheduledAtChange(value: string): void {
+    this.scheduledAt.set(value);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
   }
 
   get currentDate(): string {
@@ -101,6 +119,8 @@ export class TipGeneratorComponent {
   sendToTelegram() {
     if (!this.canSend) return;
 
+    const scheduledAt = this.scheduledAt().trim();
+    const sendAt = scheduledAt ? new Date(scheduledAt).toISOString() : new Date().toISOString();
     this.isSending.set(true);
     this.errorMessage.set(null);
     this.successMessage.set(null);
@@ -116,7 +136,7 @@ export class TipGeneratorComponent {
       leaderName: currentLeader?.full_name || 'Líder de Identidad'
     };
 
-    this.tipService.sendToTelegram(tip)
+    this.tipService.sendToTelegram(tip, sendAt)
       .pipe(
         finalize(() => {
           // Esto se ejecuta siempre, tanto en éxito como en error
@@ -126,7 +146,9 @@ export class TipGeneratorComponent {
       .subscribe({
         next: (response) => {       
           this.tipsCounter.increment();
-          this.successMessage.set('¡Tip enviado exitosamente a Telegram!');
+          this.successMessage.set(scheduledAt
+            ? 'Tip programado para su envio a Telegram.'
+            : '¡Tip enviado exitosamente a Telegram!');
         },
         error: (error) => {
           this.errorMessage.set('Error al enviar a Telegram. Por favor, intenta nuevamente.');
@@ -206,5 +228,6 @@ export class TipGeneratorComponent {
     this.validationError.set(null);
     this.fontSize.set(34);
     this.tipType.set('text');
+    this.scheduledAt.set('');
   }
 }

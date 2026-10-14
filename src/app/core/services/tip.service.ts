@@ -149,7 +149,7 @@ export class TipService {
     });
   }
 
-  sendToTelegram(tip: Tip): Observable<any> {
+  sendToTelegram(tip: Tip, sendAt: string = new Date().toISOString()): Observable<any> {
     if (!environment.n8nWebhookUrl) {
       // Simular envío exitoso en desarrollo
       return of({ success: true, message: 'Tip enviado a Telegram (modo demo)' }).pipe(delay(1000));
@@ -165,7 +165,8 @@ export class TipService {
       title: tip.title,
       topic: tip.topic,
       leaderName: tip.leaderName,
-      timestamp: tip.createdAt.toISOString()
+      timestamp: tip.createdAt.toISOString(),
+      send_at: sendAt
     };
 
     return this.http.post(environment.n8nWebhookUrl, payload);

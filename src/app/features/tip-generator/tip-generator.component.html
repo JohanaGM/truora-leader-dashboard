@@ -167,6 +167,26 @@
           <img [src]="generatedImage()" alt="Tip generado" />
         </div>
 
+        <div class="schedule-section">
+          <label for="tipScheduledAt">Programar envío</label>
+          <input
+            id="tipScheduledAt"
+            type="datetime-local"
+            [value]="scheduledAt()"
+            [min]="minScheduledAt"
+            (input)="onScheduledAtChange($any($event.target).value)"
+            [disabled]="isSending()"
+            [attr.aria-invalid]="!isScheduledAtValid"
+            aria-describedby="tipScheduleHint tipScheduleError"
+          />
+          <span id="tipScheduleHint" class="form-hint">Déjalo vacío para enviar inmediatamente.</span>
+          @if (scheduledAt() && !isScheduledAtValid) {
+            <div id="tipScheduleError" class="alert alert-error" role="alert">
+              La fecha debe ser posterior a la fecha y hora actuales.
+            </div>
+          }
+        </div>
+
       <button class="btn-send" (click)="sendToTelegram()" [disabled]="!canSend">
         @if (isSending()) {
         <span class="spinner"></span>
