@@ -1,0 +1,29 @@
+<div class="optibot-page">
+  <div class="welcome-section">
+    <h1 class="page-title">Base de datos OptiBot</h1>
+    <p class="page-subtitle">Accesos directos a las bases de datos de los bots</p>
+  </div>
+
+  <div class="flow-card">
+    <div class="flow-header">
+      <div class="flow-icon">🤖</div>
+      <div>
+        <h2 class="flow-title">OptiBot</h2>
+        <p class="flow-desc">Selecciona una base para abrirla en una nueva pestaña.</p>
+      </div>
+    </div>
+
+    <div class="quick-links-grid">
+      @for (link of links; track link.url) {
+        <a class="quick-link-card" [href]="link.url" target="_blank" rel="noopener noreferrer">
+          <div class="qlc-icon">{{ link.icon }}</div>
+          <div class="qlc-body">
+            <span class="qlc-title">{{ link.title }}</span>
+            <span class="qlc-desc">{{ link.desc }}</span>
+          </div>
+          <span class="qlc-arrow">↗</span>
+        </a>
+      }
+    </div>
+  </div>
+</div>

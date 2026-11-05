@@ -2,69 +2,126 @@
   <header class="page-header">
     <div>
       <p class="eyebrow">Auditoría operativa</p>
-      <h1 class="page-title">Historial de Telegram</h1>
-      <p class="page-subtitle">Consulta el contenido exacto de cada aviso y tip enviado.</p>
+      <h1 class="page-title">Cronograma de Telegram</h1>
+      <p class="page-subtitle">Cada aviso y tip enviado por el bot queda anclado aquí para todo el equipo.</p>
     </div>
   </header>
 
-  <section class="filters-panel" aria-labelledby="filters-title">
-    <div class="filters-heading">
-      <div>
-        <h2 id="filters-title">Filtrar envíos</h2>
-        <p>Combina usuario, fecha y origen para encontrar un mensaje.</p>
+  <section class="calendar" aria-label="Cronograma semanal de envíos">
+    <!-- Toolbar -->
+    <div class="cal-toolbar">
+      <div class="cal-toolbar__nav">
+        <button type="button" class="cal-today" (click)="today()">Hoy</button>
+        <button type="button" class="cal-arrow" (click)="prev()" aria-label="Semana anterior">‹</button>
+        <button type="button" class="cal-arrow" (click)="next()" aria-label="Semana siguiente">›</button>
+        <h2 class="cal-title">{{ title() }}</h2>
+        @if (loading()) { <span class="cal-loading">Cargando…</span> }
       </div>
-      <button type="button" class="clear-button" (click)="clearFilters()">Limpiar filtros</button>
-    </div>
-    <div class="filters-grid">
-      <label class="filter-field">
-        <span>Usuario</span>
-        <select [value]="selectedUser()" (change)="setUser($any($event.target).value)">
+      <div class="cal-toolbar__filters">
+        <select [value]="selectedUser()" (change)="setUser($any($event.target).value)" aria-label="Filtrar por usuario">
           <option value="all">Todos los usuarios</option>
-          @for (user of users(); track user.email) { <option [value]="user.email">{{ user.name }} · {{ user.email }}</option> }
+          @for (u of users(); track u.email) { <option [value]="u.email">{{ u.name }}</option> }
         </select>
-      </label>
-      <label class="filter-field"><span>Fecha</span><input type="date" [value]="selectedDate()" (change)="setDate($any($event.target).value)" /></label>
-      <label class="filter-field">
-        <span>Origen</span>
-        <select [value]="selectedOrigin()" (change)="setOrigin($any($event.target).value)">
-          <option value="all">Todos</option><option value="announcement">Avisos</option><option value="tip">Generar Tips</option>
+        <select [value]="selectedOrigin()" (change)="setOrigin($any($event.target).value)" aria-label="Filtrar por origen">
+          <option value="all">Avisos y tips</option>
+          <option value="announcement">Solo avisos</option>
+          <option value="tip">Solo tips</option>
         </select>
-      </label>
+        <button type="button" class="cal-refresh" (click)="load()" aria-label="Actualizar" title="Actualizar">↻</button>
+      </div>
     </div>
-  </section>
 
-  <section class="results-heading" aria-live="polite"><p>{{ summary() }}</p></section>
+    <div class="cal-legend">
+      <span class="legend-dot legend-dot--announcement"></span> Aviso
+      <span class="legend-dot legend-dot--tip"></span> Tip
+      <span class="legend-dot legend-dot--error"></span> Error
+      <span class="cal-count">{{ weekCount() }} {{ weekCount() === 1 ? 'envío' : 'envíos' }} esta semana</span>
+    </div>
 
-  <section class="history-feed" aria-label="Historial de mensajes">
-    @if (filteredLogs().length === 0) {
-      <div class="empty-state"><span class="empty-state__icon">⌕</span><h2>No hay mensajes para estos filtros</h2><p>Prueba con otra fecha, usuario u origen.</p></div>
-    } @else {
-      @for (log of filteredLogs(); track log.id) {
-        <article class="message-card">
-          <header class="message-card__header">
-            <div class="message-meta"><time [attr.datetime]="log.sentAt">{{ log.sentAt | date:'medium':'':'es-CO' }}</time><span class="origin-badge" [class.origin-badge--tip]="log.origin === 'tip'">{{ originLabel(log.origin) }}</span></div>
-            <span class="status-badge" [class.status-badge--error]="log.status === 'error'"><span class="status-icon">{{ log.status === 'success' ? '✓' : '!' }}</span>{{ statusLabel(log.status) }}</span>
-          </header>
-          <div class="message-card__body" [class.message-card__body--tip]="log.origin === 'tip'">
-            @if (log.origin === 'tip') {
-              <div class="tip-audit-copy">
-                <span class="tip-audit-label">Tip enviado</span>
-                <h2>{{ log.tipTitle || 'Tip de Telegram' }}</h2>
-                <p>{{ log.message }}</p>
-                @if (log.libraryUrl) {
-                  <a class="tip-library-link" [href]="log.libraryUrl">Ver en la biblioteca de tips</a>
-                }
-              </div>
-              @if (log.imageUrl) {
-                <img class="tip-audit-image" [src]="log.imageUrl" [alt]="log.tipTitle || 'Imagen del tip enviado'" />
-              }
-            } @else {
-              <p>{{ log.message }}</p>
+    <!-- Cabecera de días -->
+    <div class="cal-head">
+      <div class="cal-gutter"></div>
+      @for (d of days(); track d.key) {
+        <div class="cal-dayhead" [class.cal-dayhead--today]="d.isToday">
+          <span class="cal-dayname">{{ d.label }}</span>
+          <span class="cal-daynum">{{ d.number }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Cuadrícula horaria -->
+    <div class="cal-scroll" #scroller>
+      <div class="cal-grid" [style.height.px]="24 * hourPx">
+        <div class="cal-hours">
+          @for (h of hours; track h) {
+            <div class="cal-hour" [style.height.px]="hourPx"><span>{{ hourLabel(h) }}</span></div>
+          }
+        </div>
+
+        @for (d of days(); track d.key) {
+          <div class="cal-col" [class.cal-col--today]="d.isToday">
+            @for (h of hours; track h) { <div class="cal-slot" [style.height.px]="hourPx"></div> }
+
+            @if (d.isToday && nowTop() !== null) {
+              <div class="cal-now" [style.top.px]="nowTop()"></div>
+            }
+
+            @for (e of d.events; track e.log.id) {
+              <button
+                type="button"
+                class="cal-event"
+                [class.cal-event--tip]="e.log.origin === 'tip'"
+                [class.cal-event--error]="e.log.status === 'error'"
+                [class.cal-event--scheduled]="isScheduled(e.log)"
+                [style.top.px]="e.top"
+                [style.height.px]="e.height"
+                [style.left.%]="e.left"
+                [style.width.%]="e.width"
+                (click)="open(e.log)"
+              >
+                <span class="cal-event__time">{{ e.log.sentAt | date:'h:mm a' }}</span>
+                <span class="cal-event__title">{{ eventTitle(e.log) }}</span>
+              </button>
             }
           </div>
-          <footer class="message-card__footer"><span class="recipient-label">Destinatario</span><strong>{{ log.chatId }}</strong><span class="sender">Enviado por {{ log.senderName }}</span></footer>
-        </article>
-      }
+        }
+      </div>
+    </div>
+
+    @if (!loading() && weekCount() === 0) {
+      <p class="cal-empty">No hay envíos en esta semana con los filtros actuales.</p>
     }
   </section>
+
+  <!-- Detalle del envío -->
+  @if (selected(); as log) {
+    <div class="modal-backdrop" (click)="close()">
+      <article class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+        <header class="modal__header">
+          <div class="modal__badges">
+            <span class="origin-badge" [class.origin-badge--tip]="log.origin === 'tip'">{{ originLabel(log.origin) }}</span>
+            <span class="status-badge" [class.status-badge--error]="log.status === 'error'" [class.status-badge--scheduled]="log.status !== 'error' && isScheduled(log)">{{ statusLabel(log) }}</span>
+          </div>
+          <button type="button" class="modal__close" (click)="close()" aria-label="Cerrar">✕</button>
+        </header>
+
+        @if (log.origin === 'tip') { <h2 class="modal__title">{{ log.tipTitle || 'Tip de Telegram' }}</h2> }
+        <time class="modal__date" [attr.datetime]="log.sentAt">{{ log.sentAt | date:'fullDate':'':'es-CO' }} · {{ log.sentAt | date:'h:mm a' }}</time>
+
+        <div class="modal__body"><p>{{ log.message }}</p></div>
+
+        @if (log.mediaKind) { <p class="modal__meta">Incluye {{ log.mediaKind === 'video' ? 'un video' : 'una imagen' }} adjunta.</p> }
+        @if (log.links?.length) {
+          <ul class="modal__links">
+            @for (l of log.links; track l.url) { <li><a [href]="l.url" target="_blank" rel="noopener noreferrer">{{ l.texto || l.url }}</a></li> }
+          </ul>
+        }
+
+        <footer class="modal__footer">
+          @if (log.recipients.length) { <span><strong>Destinatarios:</strong> {{ log.recipients.join(', ') }}</span> }
+          <span><strong>Enviado por:</strong> {{ log.senderName }}</span>
+        </footer>
+      </article>
+    </div>
+  }
 </main>

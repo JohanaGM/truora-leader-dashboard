@@ -4,3 +4,4 @@ export * from './tip.service';
 export * from './auth.service';
 export * from './event.service';
 export * from './leader-schedule.service';
+export * from './telegram-history.service';

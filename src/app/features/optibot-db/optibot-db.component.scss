@@ -1,0 +1,132 @@
+@import '../../../assets/styles/variables';
+
+.optibot-page {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.welcome-section {
+  margin-bottom: 2rem;
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .page-subtitle {
+    font-size: 1rem;
+    color: #718096;
+    margin: 0;
+  }
+}
+
+// ---- Flow Card ----
+.flow-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.flow-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+
+  .flow-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .flow-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 0.35rem 0;
+  }
+
+  .flow-desc {
+    font-size: 0.9rem;
+    color: #718096;
+    margin: 0;
+    line-height: 1.6;
+  }
+}
+
+// ---- Quick Links Grid ----
+.quick-links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.quick-link-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+
+  &:hover {
+    background: #1e293b;
+    border-color: #1e293b;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(30, 41, 59, 0.25);
+
+    .qlc-title { color: #f1f5f9; }
+    .qlc-desc  { color: #94a3b8; }
+    .qlc-icon  { filter: grayscale(0) brightness(1.1); }
+    .qlc-arrow { color: #7dd3fc; }
+  }
+}
+
+.qlc-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.qlc-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.qlc-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2d3748;
+  transition: color 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.qlc-desc {
+  font-size: 0.78rem;
+  color: #718096;
+  transition: color 0.2s;
+  line-height: 1.4;
+}
+
+.qlc-arrow {
+  font-size: 1.2rem;
+  color: #cbd5e0;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}

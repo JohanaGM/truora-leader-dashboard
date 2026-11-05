@@ -43,6 +43,12 @@ export class SidebarComponent {
       active: false
     },
     {
+      icon: '🤖',
+      label: 'OptiBot',
+      route: '/optibot',
+      active: false
+    },
+    {
       icon: '📢',
       label: 'Avisos',
       route: '/avisos',
@@ -50,7 +56,7 @@ export class SidebarComponent {
     },
     {
       icon: '📈',
-      label: 'Auditoría Telegram',
+      label: 'Cronograma Telegram',
       route: '/metricas',
       active: false
     }

@@ -44,6 +44,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/automations/automations.component').then(m => m.AutomationsComponent)
       },
       {
+        path: 'optibot',
+        loadComponent: () => import('./features/optibot-db/optibot-db.component').then(m => m.OptibotDbComponent)
+      },
+      {
         path: 'avisos',
         loadComponent: () => import('./features/announcements/announcements.component').then(m => m.AnnouncementsComponent)
       },

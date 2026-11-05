@@ -2,6 +2,7 @@ import { Component, inject, signal, ViewChild, ElementRef } from '@angular/core'
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TipService } from '../../core/services/tip.service';
+import { TelegramHistoryService } from '../../core/services/telegram-history.service';
 import { AuthService } from '../../core/services/auth.service';
 import { TipsCounterService } from '../../core/services/tips-counter.service';
 import { AiChatComponent } from '../../shared/components/ai-chat/ai-chat.component';
@@ -20,6 +21,7 @@ export class TipGeneratorComponent {
   private tipService = inject(TipService);
   authService = inject(AuthService);
   private tipsCounter = inject(TipsCounterService);
+  private history = inject(TelegramHistoryService);
   
   @ViewChild('tipCanvas', { static: false }) tipCanvas!: ElementRef<HTMLDivElement>;
   
@@ -146,11 +148,13 @@ export class TipGeneratorComponent {
       .subscribe({
         next: (response) => {       
           this.tipsCounter.increment();
+          this.history.log({ sentAt: sendAt, origin: 'tip', status: 'success', tipTitle: tip.title, message: tip.topic, recipients: [] });
           this.successMessage.set(scheduledAt
             ? 'Tip programado para su envio a Telegram.'
             : '¡Tip enviado exitosamente a Telegram!');
         },
         error: (error) => {
+          this.history.log({ sentAt: sendAt, origin: 'tip', status: 'error', tipTitle: tip.title, message: tip.topic, recipients: [] });
           this.errorMessage.set('Error al enviar a Telegram. Por favor, intenta nuevamente.');
         }
       });

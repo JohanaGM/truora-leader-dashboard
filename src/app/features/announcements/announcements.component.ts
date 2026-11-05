@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { TelegramHistoryService } from '../../core/services/telegram-history.service';
 import { MessageTemplateComponent } from '../message-template/message-template.component';
 
 const IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/jpg'];
@@ -30,6 +31,7 @@ export class AnnouncementsComponent {
   @ViewChild(MessageTemplateComponent) messageTemplate!: MessageTemplateComponent;
 
   private http = inject(HttpClient);
+  private history = inject(TelegramHistoryService);
 
   reminder = signal('');
   isSending = signal(false);
@@ -300,9 +302,11 @@ export class AnnouncementsComponent {
         .subscribe({
           next: (res) => {
             console.log(`[Telegram] ✅ Enviado con ${tipoArchivo}. Respuesta n8n:`, res);
+            this.logHistory('success');
             this.onSendSuccess();
           },
           error: (err) => {
+            this.logHistory('error');
             console.error(`[Telegram] ❌ Error al enviar con ${tipoArchivo}:`, err);
             this.onSendError();
           }
@@ -328,14 +332,30 @@ export class AnnouncementsComponent {
         .subscribe({
           next: (res) => {
             console.log('[Telegram] ✅ Enviado como JSON. Respuesta n8n:', res);
+            this.logHistory('success');
             this.onSendSuccess();
           },
           error: (err) => {
+            this.logHistory('error');
             console.error('[Telegram] ❌ Error al enviar JSON:', err);
             this.onSendError();
           }
         });
     }
+  }
+
+  /** Guarda el envío en el cronograma (historial compartido). */
+  private logHistory(status: 'success' | 'error') {
+    const file = this.selectedFile();
+    this.history.log({
+      sentAt: this.sendAtIso,
+      origin: 'announcement',
+      status,
+      message: this.reminder(),
+      recipients: [...this.activeAnalistas, ...this.activeTags],
+      mediaKind: file ? (this.getMediaKind(file) ?? 'image') : null,
+      links: this.enlacesValidos
+    });
   }
 
   private onSendSuccess() {
