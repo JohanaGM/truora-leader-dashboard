@@ -107,10 +107,15 @@
             <div class="tips-result-grid">
               @for (tip of filteredTips(); track tip.id) {
                 <article class="tip-result-card">
-                  @if (tip.imageData) { <img [src]="tip.imageData" [alt]="tip.title" class="tip-result-image" /> }
+                  @if (tip.imageData && !failedImages().has(tip.id)) {
+                    <img [src]="tip.imageData" [alt]="tip.title" class="tip-result-image" referrerpolicy="no-referrer" loading="lazy" (error)="onTipImageError(tip.id)" />
+                  } @else if (tip.url) {
+                    <div class="tip-result-image tip-result-image--empty"><span>💡</span><small>Vista previa no disponible</small></div>
+                  }
                   <div class="tip-result-body">
                     <span class="tip-result-category">{{ tip.category || 'Tip' }}</span>
                     <h3>{{ tip.title }}</h3>
+                    @if (tip.sentAt) { <time class="tip-result-date" [attr.datetime]="tip.sentAt.toISOString()">📅 Enviado el {{ tip.sentAt | date:'d MMM y, h:mm a':'':'es-CO' }}</time> }
                     <p>{{ tip.description || tip.topic }}</p>
                     <button type="button" class="tip-result-action" (click)="showTip(tip)">Ver completo</button>
                   </div>
@@ -128,9 +133,10 @@
       } @else {
         <div class="tip-detail">
           <button type="button" class="tip-back-button" (click)="selectedTip.set(null)">← Volver a resultados</button>
-          @if (selectedTip()!.imageData) { <img [src]="selectedTip()!.imageData" [alt]="selectedTip()!.title" class="tip-detail-image" /> }
+          @if (selectedTip()!.imageData && !failedImages().has(selectedTip()!.id)) { <img [src]="selectedTip()!.imageData" [alt]="selectedTip()!.title" class="tip-detail-image" referrerpolicy="no-referrer" (error)="onTipImageError(selectedTip()!.id)" /> }
           <span class="tip-result-category">{{ selectedTip()!.category || 'Tip' }}</span>
           <h3>{{ selectedTip()!.title }}</h3>
+          @if (selectedTip()!.sentAt) { <time class="tip-result-date">📅 Enviado el {{ selectedTip()!.sentAt | date:'d MMM y, h:mm a':'':'es-CO' }}</time> }
           <p>{{ selectedTip()!.description || selectedTip()!.topic }}</p>
           <div class="tip-detail-actions">
             <button type="button" class="tip-result-action" (click)="downloadTip(selectedTip()!)">Descargar</button>

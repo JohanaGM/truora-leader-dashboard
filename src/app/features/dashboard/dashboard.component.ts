@@ -32,6 +32,11 @@ export class DashboardComponent implements OnInit {
   private searchDebounceTimer?: ReturnType<typeof setTimeout>;
 
   tips = signal<Tip[]>([]);
+  /** Biblioteca completa traída de Drive (vía n8n); la búsqueda filtra en el cliente. */
+  private allDriveTips = signal<Tip[] | null>(null);
+  /** IDs de tips cuya imagen de Drive no pudo cargarse (archivo privado). */
+  failedImages = signal<Set<string>>(new Set());
+  onTipImageError(id: string): void { this.failedImages.update(s => new Set(s).add(id)); }
   filteredTips = computed(() => this.remoteTipsResults() ?? this.tips());
 
   private isAssignedLeader(): boolean {
@@ -146,21 +151,18 @@ export class DashboardComponent implements OnInit {
   onTipsSearchInput(value: string): void {
     this.tipsSearch.set(value);
     this.tipsSearchError.set(null);
-    clearTimeout(this.searchDebounceTimer);
-    this.searchDebounceTimer = setTimeout(() => this.buscarTipsRemote(), 400);
+    this.applyTipsFilter();
   }
 
   /** Ejecuta la búsqueda de "Tips generados" (tips cargados en Drive) contra el webhook de n8n. */
   buscarTipsRemote(): void {
-    const termino = this.tipsSearch().trim();
-
     this.isSearchingTips.set(true);
     this.tipsSearchError.set(null);
 
-    this.tipService.buscarTips(termino).subscribe({
+    this.tipService.buscarTips('').subscribe({
       next: (results) => {
-        const normalized = this.normalizeTips(results);
-        this.remoteTipsResults.set(normalized);
+        this.allDriveTips.set(this.normalizeTips(results));
+        this.applyTipsFilter();
         this.isSearchingTips.set(false);
       },
       error: () => {
@@ -170,6 +172,22 @@ export class DashboardComponent implements OnInit {
         this.isSearchingTips.set(false);
       }
     });
+  }
+
+  /** Fecha de envío: del nombre del archivo (..._2026-10-09_101115.png) o, si no, del campo de Drive. */
+  private parseSentAt(rawTitle: string, fallback?: string): Date | undefined {
+    const m = rawTitle.match(/(d{4})-(d{2})-(d{2})_(d{2})(d{2})(d{2})/);
+    if (m) return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
+    const d = fallback ? new Date(fallback) : null;
+    return d && !isNaN(d.getTime()) ? d : undefined;
+  }
+
+  private applyTipsFilter(): void {
+    const all = this.allDriveTips();
+    if (!all) return;
+    const term = this.tipsSearch().trim().toLowerCase();
+    this.remoteTipsResults.set(!term ? all : all.filter(t =>
+      [t.title, t.topic, t.description, t.category].some(v => (v ?? '').toLowerCase().includes(term))));
   }
 
   private normalizeTips(response: any): Tip[] {
@@ -193,12 +211,16 @@ export class DashboardComponent implements OnInit {
     return rawList.map((item, index) => {
       const data = item.json || item.data || item;
       const id = data.id || data.fileId || `tip_${Date.now()}_${index}`;
-      const title = data.title || data.titulo || data.texto || data.name || data.nombre || 'Tip generado';
+      const rawTitle = data.title || data.titulo || data.texto || data.name || data.nombre || 'Tip generado';
+      const sentAt = this.parseSentAt(String(rawTitle), data.createdTime || data.createdAt || data.fecha || data.timestamp);
+      const title = String(rawTitle).replace(/_\d{4}-\d{2}-\d{2}_\d+(\.\w+)?$/, '').replace(/\.(png|jpe?g)$/i, '');
       const topic = data.topic || data.tema || data.description || data.descripcion || data.contenido || data.content || '';
       const description = data.description || data.descripcion || topic;
       const category = data.category || data.categoria || data.tipo || 'Tip';
-      const url = data.url || data.webViewLink || data.webContentLink || data.link || '';
-      const imageData = data.imageData || data.image || data.imagen || data.thumbnailLink || data.thumbnailUrl || (data.mimeType?.startsWith('image/') ? data.webContentLink : '');
+      const url = data.descargarUrl || data.url || data.webViewLink || data.webContentLink || data.link || '';
+      const driveId = data.id || data.fileId;
+      const driveImage = driveId ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000` : '';
+      const imageData = data.imageData || (data.imagenUrl ? driveImage : '') || data.image || data.imagen || data.thumbnailLink || data.thumbnailUrl || (data.mimeType?.startsWith('image/') ? data.webContentLink : '');
       const leaderName = data.leaderName || data.lider || data.author || '';
       const createdAt = data.createdAt || data.createdTime || data.fecha || data.timestamp
         ? new Date(data.createdAt || data.createdTime || data.fecha || data.timestamp)
@@ -213,6 +235,7 @@ export class DashboardComponent implements OnInit {
         url,
         imageData,
         leaderName,
+        sentAt,
         createdAt,
         sentToTelegram: true
       } as Tip;
@@ -224,6 +247,7 @@ export class DashboardComponent implements OnInit {
   }
 
   downloadTip(tip: Tip): void {
+    if (tip.url) { window.open(tip.url, '_blank', 'noopener,noreferrer'); return; }
     const link = document.createElement('a');
     link.href = tip.imageData;
     link.download = `${tip.title.trim().replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'tip'}.png`;

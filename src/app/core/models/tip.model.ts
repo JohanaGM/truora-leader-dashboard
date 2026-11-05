@@ -7,6 +7,8 @@ export interface Tip {
   url?: string;
   imageData: string;
   createdAt: Date;
+  /** Fecha real de envío/creación, si se conoce (p. ej. viene en el nombre del archivo de Drive). */
+  sentAt?: Date;
   sentToTelegram: boolean;
   leaderName: string;
 }

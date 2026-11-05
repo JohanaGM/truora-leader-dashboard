@@ -56,7 +56,7 @@ export class SidebarComponent {
     },
     {
       icon: '📈',
-      label: 'Cronograma Telegram',
+      label: 'Historial Telegram',
       route: '/metricas',
       active: false
     }

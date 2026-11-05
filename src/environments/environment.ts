@@ -8,7 +8,7 @@ export const environment = {
   n8nLensWebhookUrl: 'https://n8n.zapsign.com.br/webhook-test/desbloqueo-acc-id',
   n8nContadorTipsUrl: 'https://n8n.zapsign.com.br/webhook/contador-tips',
   n8nTareaFinalizadaUrl: 'https://n8n.zapsign.com.br/webhook-test/tarea-finalizada',
-  n8nBuscarTipsUrl: 'https://n8n.zapsign.com.br/webhook-test/buscar_tips',
+  n8nBuscarTipsUrl: 'https://n8n.zapsign.com.br/webhook/buscar_tips',
   supabase: {
     url: 'https://zoyfudgcghnlipujxhgr.supabase.co',
     key: 'sb_publishable_4mvbxmVc62d7TGg2XUwocw_8kIxFfXt'

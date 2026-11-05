@@ -174,15 +174,8 @@ export class TipService {
 
   /** Busca tips generados en n8n a partir de un término de búsqueda libre. */
   buscarTips(termino: string): Observable<any[]> {
-    return this.http.post<any[]>(environment.n8nBuscarTipsUrl, { termino }).pipe(
-      catchError(err => {
-        const prodUrl = 'https://n8n.zapsign.com.br/webhook/buscar_tips';
-        if (environment.n8nBuscarTipsUrl !== prodUrl) {
-          return this.http.post<any[]>(prodUrl, { termino });
-        }
-        return throwError(() => err);
-      })
-    );
+    // El webhook de n8n (Drive) está registrado como GET.
+    return this.http.get<any[]>(environment.n8nBuscarTipsUrl, { params: { termino } });
   }
 
   private base64ToBlob(base64: string, contentType: string = ''): Blob {
