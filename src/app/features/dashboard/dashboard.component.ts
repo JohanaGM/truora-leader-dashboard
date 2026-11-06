@@ -286,7 +286,9 @@ export class DashboardComponent implements OnInit {
     const from = this.tipsDateFrom() ? new Date(this.tipsDateFrom() + 'T00:00:00') : null;
     const to = this.tipsDateTo() ? new Date(this.tipsDateTo() + 'T23:59:59') : null;
     const analyst = this.tipsAnalyst();
-    this.remoteTipsResults.set(all.filter(t =>
+    // Más recientes primero; los tips sin fecha quedan al final.
+    const byDateDesc = (a: Tip, b: Tip) => (b.sentAt?.getTime() ?? -Infinity) - (a.sentAt?.getTime() ?? -Infinity);
+    this.remoteTipsResults.set([...all].sort(byDateDesc).filter(t =>
       (!term || [t.title, t.topic, t.description, t.category].some(v => (v ?? '').toLowerCase().includes(term))) &&
       (!from || (!!t.sentAt && t.sentAt >= from)) &&
       (!to || (!!t.sentAt && t.sentAt <= to)) &&
