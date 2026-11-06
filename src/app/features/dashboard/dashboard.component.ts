@@ -50,6 +50,7 @@ export class DashboardComponent implements OnInit {
   private tipAssignments = signal<Record<string, string>>({});
   readonly analysts = ANALYSTS;
   readonly analystLabel = analystLabel;
+  readonly unassignedCount = computed(() => (this.allDriveTips() ?? []).filter(t => !this.analystOf(t)).length);
   readonly analystOptions = computed(() => {
     const known = new Set(ANALYSTS.map(a => a.handle));
     const extras = new Set<string>();
@@ -150,6 +151,7 @@ export class DashboardComponent implements OnInit {
     this.tipsCounter.fetchCount().subscribe();
     this.scheduleService.loadWeekTasks();
     this.tips.set(this.tipService.getTips());
+    this.loadLibrary(); // precarga la biblioteca para que abra al instante
   }
 
   openTipsSearch(): void {
@@ -160,9 +162,8 @@ export class DashboardComponent implements OnInit {
     this.tipsSearchError.set(null);
     this.selectedTip.set(null);
     this.tipsDialogOpen.set(true);
-    this.buscarTipsRemote();
-    this.telegramHistory.listTipSenders().then(s => { this.tipSenders.set(s); this.applyTipsFilter(); });
-    this.telegramHistory.listTipAnalysts().then(a => { this.tipAssignments.set(a); this.applyTipsFilter(); });
+    this.applyTipsFilter();   // muestra al instante lo que ya está en memoria
+    this.loadLibrary();       // y lo actualiza en segundo plano
   }
 
   setTipDateFrom(v: string): void { this.tipsDateFrom.set(v); this.applyTipsFilter(); }
@@ -215,23 +216,37 @@ export class DashboardComponent implements OnInit {
   }
 
   /** Ejecuta la búsqueda de "Tips generados" (tips cargados en Drive) contra el webhook de n8n. */
-  buscarTipsRemote(): void {
-    this.isSearchingTips.set(true);
+  loadLibrary(): void {
+    // 1) Pinta al instante lo último guardado en el navegador
+    if (!this.allDriveTips()) {
+      const cached = this.tipService.readDriveCache();
+      if (cached) this.allDriveTips.set(this.normalizeTips(cached));
+    }
+    if (this.allDriveTips()) this.applyTipsFilter();
+    else this.isSearchingTips.set(true);
     this.tipsSearchError.set(null);
 
+    // 2) Actualiza desde Drive en segundo plano (sin bloquear la pantalla)
     this.tipService.buscarTips('').subscribe({
       next: (results) => {
+        this.tipService.writeDriveCache(results);
         this.allDriveTips.set(this.normalizeTips(results));
         this.applyTipsFilter();
         this.isSearchingTips.set(false);
       },
       error: () => {
-        // Sin conexión con n8n: se muestra la biblioteca local como respaldo.
-        this.remoteTipsResults.set(this.tips());
-        this.tipsSearchError.set('No fue posible conectar con la biblioteca de Drive. Mostrando tips guardados localmente.');
+        if (!this.allDriveTips()) {
+          // Sin conexión con n8n y sin copia local: se muestra la biblioteca local como respaldo.
+          this.remoteTipsResults.set(this.tips());
+          this.tipsSearchError.set('No fue posible conectar con la biblioteca de Drive. Mostrando tips guardados localmente.');
+        }
         this.isSearchingTips.set(false);
       }
     });
+
+    // 3) Analistas (historial de envíos y asignaciones manuales)
+    this.telegramHistory.listTipSenders().then(s => { this.tipSenders.set(s); this.applyTipsFilter(); });
+    this.telegramHistory.listTipAnalysts().then(a => { this.tipAssignments.set(a); this.applyTipsFilter(); });
   }
 
   /** Fecha de envío: del nombre del archivo (..._2026-10-09_101115.png) o, si no, del campo de Drive. */
@@ -253,7 +268,7 @@ export class DashboardComponent implements OnInit {
       (!term || [t.title, t.topic, t.description, t.category].some(v => (v ?? '').toLowerCase().includes(term))) &&
       (!from || (!!t.sentAt && t.sentAt >= from)) &&
       (!to || (!!t.sentAt && t.sentAt <= to)) &&
-      (analyst === 'all' || this.analystOf(t) === analyst)));
+      (analyst === 'all' || (analyst === '__none__' ? !this.analystOf(t) : this.analystOf(t) === analyst))));
   }
 
   private normalizeTips(response: any): Tip[] {
@@ -286,6 +301,7 @@ export class DashboardComponent implements OnInit {
       const url = data.descargarUrl || data.url || data.webViewLink || data.webContentLink || data.link || '';
       const driveId = data.id || data.fileId;
       const driveImage = driveId ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000` : '';
+      const thumbUrl = driveId && data.imagenUrl ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w400` : '';
       const imageData = data.imageData || (data.imagenUrl ? driveImage : '') || data.image || data.imagen || data.thumbnailLink || data.thumbnailUrl || (data.mimeType?.startsWith('image/') ? data.webContentLink : '');
       const leaderName = data.leaderName || data.lider || data.author || '';
       const createdAt = data.createdAt || data.createdTime || data.fecha || data.timestamp
@@ -302,6 +318,7 @@ export class DashboardComponent implements OnInit {
         imageData,
         leaderName,
         sentAt,
+        thumbUrl,
         createdAt,
         sentToTelegram: true
       } as Tip;

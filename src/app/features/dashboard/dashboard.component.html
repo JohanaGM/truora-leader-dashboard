@@ -99,6 +99,7 @@
           <label class="tips-filter"><span>Analista</span>
             <select [value]="tipsAnalyst()" (change)="setTipAnalyst($any($event.target).value)">
               <option value="all">Todos</option>
+              <option value="__none__">Sin asignar ({{ unassignedCount() }})</option>
               @for (a of analystOptions(); track a) { <option [value]="a">{{ analystLabel(a) }} · {{ a }}</option> }
             </select>
           </label>
@@ -120,7 +121,7 @@
               @for (tip of filteredTips(); track tip.id) {
                 <article class="tip-result-card">
                   @if (tip.imageData && !failedImages().has(tip.id)) {
-                    <img [src]="tip.imageData" [alt]="tip.title" class="tip-result-image" referrerpolicy="no-referrer" loading="lazy" (error)="onTipImageError(tip.id)" />
+                    <img [src]="tip.thumbUrl || tip.imageData" [alt]="tip.title" class="tip-result-image" referrerpolicy="no-referrer" loading="lazy" decoding="async" (error)="onTipImageError(tip.id)" />
                   } @else if (tip.url) {
                     <div class="tip-result-image tip-result-image--empty"><span>💡</span><small>Vista previa no disponible</small></div>
                   }

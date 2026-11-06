@@ -6,6 +6,8 @@ export interface Tip {
   category?: string;
   url?: string;
   imageData: string;
+  /** Miniatura liviana para las tarjetas de la biblioteca. */
+  thumbUrl?: string;
   createdAt: Date;
   /** Fecha real de envío/creación, si se conoce (p. ej. viene en el nombre del archivo de Drive). */
   sentAt?: Date;

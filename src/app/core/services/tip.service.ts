@@ -172,6 +172,21 @@ export class TipService {
     return this.http.post(environment.n8nWebhookUrl, payload);
   }
 
+  private readonly DRIVE_CACHE_KEY = 'truora_drive_tips_cache';
+
+  /** Última lista de tips de Drive guardada en el navegador (para mostrarla al instante). */
+  readDriveCache(): any[] | null {
+    try {
+      const raw = localStorage.getItem(this.DRIVE_CACHE_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+      return Array.isArray(parsed) && parsed.length ? parsed : null;
+    } catch { return null; }
+  }
+
+  writeDriveCache(list: any[]): void {
+    try { if (Array.isArray(list)) localStorage.setItem(this.DRIVE_CACHE_KEY, JSON.stringify(list)); } catch { /* sin espacio */ }
+  }
+
   /** Busca tips generados en n8n a partir de un término de búsqueda libre. */
   buscarTips(termino: string): Observable<any[]> {
     // El webhook de n8n (Drive) está registrado como GET.
