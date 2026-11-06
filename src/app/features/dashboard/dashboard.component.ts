@@ -62,7 +62,7 @@ export class DashboardComponent implements OnInit {
   filteredTips = computed(() => this.remoteTipsResults() ?? this.tips());
 
   // ---- Paginación de la biblioteca (10 por página) ----
-  readonly tipsPageSize = 10;
+  readonly tipsPageSize = 9;
   tipsPage = signal(1);
   readonly tipsTotalPages = computed(() => Math.max(1, Math.ceil(this.filteredTips().length / this.tipsPageSize)));
   /** Página actual, siempre dentro del rango válido (p. ej. si el filtro reduce los resultados). */
