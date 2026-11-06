@@ -118,7 +118,7 @@
 
           @if (filteredTips().length > 0) {
             <div class="tips-result-grid">
-              @for (tip of filteredTips(); track tip.id) {
+              @for (tip of pagedTips(); track tip.id) {
                 <article class="tip-result-card">
                   @if (tip.imageData && !failedImages().has(tip.id)) {
                     <img [src]="tip.thumbUrl || tip.imageData" [alt]="tip.title" class="tip-result-image" referrerpolicy="no-referrer" loading="lazy" decoding="async" (error)="onTipImageError(tip.id)" />
@@ -143,6 +143,17 @@
                 </article>
               }
             </div>
+
+            @if (tipsTotalPages() > 1) {
+              <nav class="tips-pagination" aria-label="Paginación de tips">
+                <span class="tips-pagination-info">Mostrando {{ tipsRange().start }}–{{ tipsRange().end }} de {{ tipsRange().total }}</span>
+                <div class="tips-pagination-controls">
+                  <button type="button" (click)="goToTipsPage(tipsCurrentPage() - 1)" [disabled]="tipsCurrentPage() === 1">‹ Anterior</button>
+                  <span class="tips-pagination-page">Página {{ tipsCurrentPage() }} de {{ tipsTotalPages() }}</span>
+                  <button type="button" (click)="goToTipsPage(tipsCurrentPage() + 1)" [disabled]="tipsCurrentPage() === tipsTotalPages()">Siguiente ›</button>
+                </div>
+              </nav>
+            }
           } @else {
             <div class="tips-empty-state">
               <span aria-hidden="true">⌕</span>

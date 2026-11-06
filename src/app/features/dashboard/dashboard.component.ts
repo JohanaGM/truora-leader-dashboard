@@ -61,6 +61,27 @@ export class DashboardComponent implements OnInit {
 
   filteredTips = computed(() => this.remoteTipsResults() ?? this.tips());
 
+  // ---- Paginación de la biblioteca (10 por página) ----
+  readonly tipsPageSize = 10;
+  tipsPage = signal(1);
+  readonly tipsTotalPages = computed(() => Math.max(1, Math.ceil(this.filteredTips().length / this.tipsPageSize)));
+  /** Página actual, siempre dentro del rango válido (p. ej. si el filtro reduce los resultados). */
+  readonly tipsCurrentPage = computed(() => Math.min(this.tipsPage(), this.tipsTotalPages()));
+  readonly pagedTips = computed(() => {
+    const start = (this.tipsCurrentPage() - 1) * this.tipsPageSize;
+    return this.filteredTips().slice(start, start + this.tipsPageSize);
+  });
+  readonly tipsRange = computed(() => {
+    const total = this.filteredTips().length;
+    const start = total ? (this.tipsCurrentPage() - 1) * this.tipsPageSize + 1 : 0;
+    return { start, end: Math.min(start + this.tipsPageSize - 1, total), total };
+  });
+
+  goToTipsPage(page: number): void {
+    this.tipsPage.set(Math.min(Math.max(1, page), this.tipsTotalPages()));
+    document.querySelector('.tips-modal')?.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   private isAssignedLeader(): boolean {
     return this.scheduleService.weekTasks().length > 0;
   }
@@ -166,11 +187,11 @@ export class DashboardComponent implements OnInit {
     this.loadLibrary();       // y lo actualiza en segundo plano
   }
 
-  setTipDateFrom(v: string): void { this.tipsDateFrom.set(v); this.applyTipsFilter(); }
-  setTipDateTo(v: string): void { this.tipsDateTo.set(v); this.applyTipsFilter(); }
-  setTipAnalyst(v: string): void { this.tipsAnalyst.set(v); this.applyTipsFilter(); }
+  setTipDateFrom(v: string): void { this.tipsDateFrom.set(v); this.tipsPage.set(1); this.applyTipsFilter(); }
+  setTipDateTo(v: string): void { this.tipsDateTo.set(v); this.tipsPage.set(1); this.applyTipsFilter(); }
+  setTipAnalyst(v: string): void { this.tipsAnalyst.set(v); this.tipsPage.set(1); this.applyTipsFilter(); }
   clearTipFilters(apply = true): void {
-    this.tipsDateFrom.set(''); this.tipsDateTo.set(''); this.tipsAnalyst.set('all');
+    this.tipsDateFrom.set(''); this.tipsDateTo.set(''); this.tipsAnalyst.set('all'); this.tipsPage.set(1);
     if (apply) this.applyTipsFilter();
   }
 
@@ -212,6 +233,7 @@ export class DashboardComponent implements OnInit {
   onTipsSearchInput(value: string): void {
     this.tipsSearch.set(value);
     this.tipsSearchError.set(null);
+    this.tipsPage.set(1);
     this.applyTipsFilter();
   }
 

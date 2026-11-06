@@ -1094,6 +1094,47 @@
 
 .tip-detail-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
 
+.tips-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid $border-light;
+}
+
+.tips-pagination-info,
+.tips-pagination-page {
+  color: $text-secondary;
+  font-size: $font-size-sm;
+}
+
+.tips-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  button {
+    min-height: 36px;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid $border-light;
+    border-radius: $radius-pill;
+    background: $bg-primary;
+    color: $midnight-color;
+    font-family: $font-family-base;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+
+    &:hover:not(:disabled) { border-color: $cta-color; color: $cta-color; }
+    &:focus-visible { outline: 2px solid $cta-color; outline-offset: 2px; }
+    &:disabled { opacity: 0.45; cursor: not-allowed; }
+  }
+}
+
 :host-context(body.dark-theme) {
   .tips-modal { background: #1a1f2e; border-color: #2d3748; }
   .tips-modal-header h2,
@@ -1116,6 +1157,9 @@
   .tips-filter span, .tip-result-author { color: #94a3b8; }
   .tips-filter input, .tips-filter select { background: #252b3b; border-color: #3d4a63; color: #f1f5f9; color-scheme: dark; }
   .tips-filter-clear { color: #a5b4fc; }
+  .tips-pagination { border-top-color: #2d3748; }
+  .tips-pagination-info, .tips-pagination-page { color: #94a3b8; }
+  .tips-pagination-controls button { background: #252b3b; border-color: #3d4a63; color: #e2e8f0; &:hover:not(:disabled) { border-color: #818cf8; color: #c7d2fe; } }
   .tip-result-analyst { background: #252b3b; border-color: #3d4a63; color: #cbd5e1; color-scheme: dark; }
   .tip-result-date,
   .tip-result-image--empty { color: #94a3b8; }
