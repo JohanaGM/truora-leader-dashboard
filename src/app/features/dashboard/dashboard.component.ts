@@ -7,6 +7,8 @@ import { TipsCounterService } from '../../core/services/tips-counter.service';
 import { LeaderScheduleService } from '../../core/services/leader-schedule.service';
 import { TipService } from '../../core/services/tip.service';
 import { Tip } from '../../core/models';
+import { ANALYSTS, analystLabel, handleFromName } from '../../core/constants/analysts';
+import { TelegramHistoryService } from '../../core/services/telegram-history.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,6 +22,7 @@ export class DashboardComponent implements OnInit {
   private eventService = inject(EventService);
   private tipsCounter = inject(TipsCounterService);
   private tipService = inject(TipService);
+  private telegramHistory = inject(TelegramHistoryService);
   scheduleService = inject(LeaderScheduleService);
   tipsDialogOpen = signal(false);
   tipsSearch = signal('');
@@ -37,6 +40,24 @@ export class DashboardComponent implements OnInit {
   /** IDs de tips cuya imagen de Drive no pudo cargarse (archivo privado). */
   failedImages = signal<Set<string>>(new Set());
   onTipImageError(id: string): void { this.failedImages.update(s => new Set(s).add(id)); }
+  // ---- Filtros de la biblioteca ----
+  tipsDateFrom = signal('');
+  tipsDateTo = signal('');
+  tipsAnalyst = signal('all');
+  /** Envíos de tips registrados en el historial (para saber qué analista envió cada tip). */
+  private tipSenders = signal<{ title: string; sender: string; sentAt: Date }[]>([]);
+  /** Asignaciones manuales (id de Drive → mención). */
+  private tipAssignments = signal<Record<string, string>>({});
+  readonly analysts = ANALYSTS;
+  readonly analystLabel = analystLabel;
+  readonly analystOptions = computed(() => {
+    const known = new Set(ANALYSTS.map(a => a.handle));
+    const extras = new Set<string>();
+    for (const t of this.allDriveTips() ?? []) { const a = this.analystOf(t); if (a && !known.has(a)) extras.add(a); }
+    return [...ANALYSTS.map(a => a.handle), ...[...extras].sort()];
+  });
+  readonly hasTipFilters = computed(() => !!this.tipsDateFrom() || !!this.tipsDateTo() || this.tipsAnalyst() !== 'all');
+
   filteredTips = computed(() => this.remoteTipsResults() ?? this.tips());
 
   private isAssignedLeader(): boolean {
@@ -134,11 +155,50 @@ export class DashboardComponent implements OnInit {
   openTipsSearch(): void {
     this.tips.set(this.tipService.getTips());
     this.tipsSearch.set('');
+    this.clearTipFilters(false);
     this.remoteTipsResults.set(null);
     this.tipsSearchError.set(null);
     this.selectedTip.set(null);
     this.tipsDialogOpen.set(true);
     this.buscarTipsRemote();
+    this.telegramHistory.listTipSenders().then(s => { this.tipSenders.set(s); this.applyTipsFilter(); });
+    this.telegramHistory.listTipAnalysts().then(a => { this.tipAssignments.set(a); this.applyTipsFilter(); });
+  }
+
+  setTipDateFrom(v: string): void { this.tipsDateFrom.set(v); this.applyTipsFilter(); }
+  setTipDateTo(v: string): void { this.tipsDateTo.set(v); this.applyTipsFilter(); }
+  setTipAnalyst(v: string): void { this.tipsAnalyst.set(v); this.applyTipsFilter(); }
+  clearTipFilters(apply = true): void {
+    this.tipsDateFrom.set(''); this.tipsDateTo.set(''); this.tipsAnalyst.set('all');
+    if (apply) this.applyTipsFilter();
+  }
+
+  /** Analista del tip: asignación manual, o el que lo envió según el historial de Telegram. */
+  analystOf(tip: Tip): string {
+    const manual = this.tipAssignments()[tip.id];
+    if (manual) return manual;
+    const key = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+    const title = key(tip.title);
+    const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
+    const matches = this.tipSenders().filter(s => key(s.title) === title);
+    const byDay = tip.sentAt ? matches.find(s => sameDay(s.sentAt, tip.sentAt!)) : undefined;
+    const sender = (byDay ?? matches[0])?.sender ?? '';
+    return sender ? (handleFromName(sender) ?? sender) : '';
+  }
+
+  /** Asigna (o quita) el analista de un tip de la biblioteca y lo guarda para todo el equipo. */
+  async assignAnalyst(tip: Tip, handle: string): Promise<void> {
+    const prev = this.tipAssignments();
+    const next = { ...prev };
+    if (handle) next[tip.id] = handle; else delete next[tip.id];
+    this.tipAssignments.set(next);
+    this.applyTipsFilter();
+    const ok = await this.telegramHistory.setTipAnalyst(tip.id, handle);
+    if (!ok) {
+      this.tipAssignments.set(prev);
+      this.applyTipsFilter();
+      this.tipsSearchError.set('No se pudo guardar el analista. Verifica que la tabla tip_analysts exista en Supabase.');
+    }
   }
 
   closeTipsSearch(): void {
@@ -176,7 +236,7 @@ export class DashboardComponent implements OnInit {
 
   /** Fecha de envío: del nombre del archivo (..._2026-10-09_101115.png) o, si no, del campo de Drive. */
   private parseSentAt(rawTitle: string, fallback?: string): Date | undefined {
-    const m = rawTitle.match(/(d{4})-(d{2})-(d{2})_(d{2})(d{2})(d{2})/);
+    const m = rawTitle.match(/(\d{4})-(\d{2})-(\d{2})_(\d{2})(\d{2})(\d{2})/);
     if (m) return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
     const d = fallback ? new Date(fallback) : null;
     return d && !isNaN(d.getTime()) ? d : undefined;
@@ -186,8 +246,14 @@ export class DashboardComponent implements OnInit {
     const all = this.allDriveTips();
     if (!all) return;
     const term = this.tipsSearch().trim().toLowerCase();
-    this.remoteTipsResults.set(!term ? all : all.filter(t =>
-      [t.title, t.topic, t.description, t.category].some(v => (v ?? '').toLowerCase().includes(term))));
+    const from = this.tipsDateFrom() ? new Date(this.tipsDateFrom() + 'T00:00:00') : null;
+    const to = this.tipsDateTo() ? new Date(this.tipsDateTo() + 'T23:59:59') : null;
+    const analyst = this.tipsAnalyst();
+    this.remoteTipsResults.set(all.filter(t =>
+      (!term || [t.title, t.topic, t.description, t.category].some(v => (v ?? '').toLowerCase().includes(term))) &&
+      (!from || (!!t.sentAt && t.sentAt >= from)) &&
+      (!to || (!!t.sentAt && t.sentAt <= to)) &&
+      (analyst === 'all' || this.analystOf(t) === analyst)));
   }
 
   private normalizeTips(response: any): Tip[] {

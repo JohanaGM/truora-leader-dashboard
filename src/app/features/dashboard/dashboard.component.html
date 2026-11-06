@@ -93,6 +93,18 @@
           placeholder="Busca un tip..." [value]="tipsSearch()"
           (input)="onTipsSearchInput($any($event.target).value)" />
 
+        <div class="tips-filters">
+          <label class="tips-filter"><span>Desde</span><input type="date" [value]="tipsDateFrom()" [max]="tipsDateTo()" (change)="setTipDateFrom($any($event.target).value)" /></label>
+          <label class="tips-filter"><span>Hasta</span><input type="date" [value]="tipsDateTo()" [min]="tipsDateFrom()" (change)="setTipDateTo($any($event.target).value)" /></label>
+          <label class="tips-filter"><span>Analista</span>
+            <select [value]="tipsAnalyst()" (change)="setTipAnalyst($any($event.target).value)">
+              <option value="all">Todos</option>
+              @for (a of analystOptions(); track a) { <option [value]="a">{{ analystLabel(a) }} · {{ a }}</option> }
+            </select>
+          </label>
+          @if (hasTipFilters()) { <button type="button" class="tips-filter-clear" (click)="clearTipFilters()">Limpiar filtros</button> }
+        </div>
+
         @if (isSearchingTips()) {
           <div class="tips-loading-state">
             <span class="tips-loading-spinner" aria-hidden="true"></span>
@@ -115,6 +127,14 @@
                   <div class="tip-result-body">
                     <span class="tip-result-category">{{ tip.category || 'Tip' }}</span>
                     <h3>{{ tip.title }}</h3>
+                    @if (analystOf(tip); as who) {
+                      <span class="tip-result-author">👤 {{ analystLabel(who) }}</span>
+                    } @else {
+                      <select class="tip-result-analyst" (change)="assignAnalyst(tip, $any($event.target).value)" aria-label="Asignar analista que envió el tip">
+                        <option value="">👤 Asignar analista…</option>
+                        @for (a of analystOptions(); track a) { <option [value]="a">👤 {{ analystLabel(a) }}</option> }
+                      </select>
+                    }
                     @if (tip.sentAt) { <time class="tip-result-date" [attr.datetime]="tip.sentAt.toISOString()">📅 Enviado el {{ tip.sentAt | date:'d MMM y, h:mm a':'':'es-CO' }}</time> }
                     <p>{{ tip.description || tip.topic }}</p>
                     <button type="button" class="tip-result-action" (click)="showTip(tip)">Ver completo</button>

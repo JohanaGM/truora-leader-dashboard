@@ -9,6 +9,8 @@ export interface Tip {
   createdAt: Date;
   /** Fecha real de envío/creación, si se conoce (p. ej. viene en el nombre del archivo de Drive). */
   sentAt?: Date;
+  /** Analista que envió el tip (según el historial de Telegram). */
+  analyst?: string;
   sentToTelegram: boolean;
   leaderName: string;
 }

@@ -919,6 +919,65 @@
   }
 }
 
+.tips-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+  margin: -0.5rem 0 1.25rem;
+}
+
+.tips-filter {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 150px;
+  flex: 1;
+
+  span { color: $text-secondary; font-size: $font-size-xs; font-weight: $font-weight-medium; }
+
+  input, select {
+    min-height: 40px;
+    padding: 0.5rem 0.8rem;
+    border: 1px solid $border-light;
+    border-radius: $radius-md;
+    background: $bg-primary;
+    color: $midnight-color;
+    font-family: $font-family-base;
+    font-size: $font-size-sm;
+  }
+}
+
+.tips-filter-clear {
+  min-height: 40px;
+  padding: 0 0.9rem;
+  border: 0;
+  background: transparent;
+  color: $brand-color;
+  font-family: $font-family-base;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+}
+
+.tip-result-analyst {
+  width: 100%;
+  margin: 0 0 0.4rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
+  background: $bg-primary;
+  color: $text-secondary;
+  font-family: $font-family-base;
+  font-size: $font-size-xs;
+}
+
+.tip-result-author {
+  display: block;
+  margin: 0 0 0.25rem;
+  color: $text-secondary;
+  font-size: $font-size-xs;
+}
+
 .tip-result-image--empty {
   display: flex;
   flex-direction: column;
@@ -1054,6 +1113,10 @@
   .tip-result-image,
   .tip-detail-image { background: #252b3b; }
   .tip-result-category { background: rgba(60, 26, 234, 0.2); color: #b1a4f7; }
+  .tips-filter span, .tip-result-author { color: #94a3b8; }
+  .tips-filter input, .tips-filter select { background: #252b3b; border-color: #3d4a63; color: #f1f5f9; color-scheme: dark; }
+  .tips-filter-clear { color: #a5b4fc; }
+  .tip-result-analyst { background: #252b3b; border-color: #3d4a63; color: #cbd5e1; color-scheme: dark; }
   .tip-result-date,
   .tip-result-image--empty { color: #94a3b8; }
 }
